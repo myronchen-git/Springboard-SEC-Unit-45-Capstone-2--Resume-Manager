@@ -1,0 +1,167 @@
+Identification for things that can have multiple revisions is id:revision.
+
+Legend:
+PK = Primary Key
+FK = Foreign Key
+NN = Not Null
+
+==================================================
+Documents.
+--------------------------------------------------
+
+documents
+	id SERIAL PK
+	document_name TEXT NN
+	owner TEXT FK NN
+	created_on TIMESTAMP NN DEFAULT NOW()
+	last_updated TIMESTAMP
+	is_master BOOL NN (create partial index for master?)
+	is_template BOOL NN
+	is_locked BOOL NN (locked from updating)
+
+==================================================
+Document-related.
+--------------------------------------------------
+
+sections
+	id SERIAL PK
+	section_name TEXT NN
+
+==================================================
+Relations.
+--------------------------------------------------
+
+documents_x_sections
+	document_id INT PK&FK
+	section_id INT PK&FK
+	position INT NN
+	CONSTRAINT UNIQUE (document_id, position)
+
+/*
+sections_x_section_entries (section entries can be education & etc. or text snippet for generic types)
+	section_id INT PK&FK
+	position INT PK
+	document_id INT PK&FK
+	section_entry_id INT NN
+	section_entry_version TIMESTAMP (this is nullable to allow use of text snippet or some other entry)
+	CONSTRAINT UNIQUE (section_id, section_entry_id)
+*/
+
+documents_x_educations
+	document_id INT PK&FK
+	education_id INT PK&FK
+	position INT NN
+	CONSTRAINT UNIQUE (document_id, position)
+
+documents_x_experiences
+	id SERIAL PK
+	document_id INT FK
+	experience_id INT FK
+	position INT NN
+	CONSTRAINT UNIQUE (document_id, position)
+
+documents_x_skills
+	document_id INT PK&FK
+	skill_id INT PK&FK
+
+documents_x_certifications
+	document_id INT PK&FK
+	certification_id INT PK&FK
+	position INT NN
+	CONSTRAINT UNIQUE (document_id, position)
+
+documents_x_projects
+	id SERIAL PK
+	document_id INT FK
+	project_id INT FK
+	position INT NN
+	CONSTRAINT UNIQUE (document_id, position)
+
+experiences_x_text_snippets
+	document_x_experience_id INT PK&FK
+	text_snippet_id INT PK&FK
+	text_snippet_version TIMESTAMP FK NN
+	position INT NN
+	CONSTRAINT UNIQUE (document_x_experience_id, position)
+
+projects_x_text_snippets (stretch goal)
+	document_x_project_id INT PK&FK
+	text_snippet_id INT PK&FK
+	text_snippet_version TIMESTAMP FK NN
+	position INT NN
+	CONSTRAINT UNIQUE (document_x_project_id, position)
+
+==================================================
+Content; Details that will go thru many revisions.
+--------------------------------------------------
+
+text_snippets
+	id SERIAL PK
+	version TIMESTAMP PK DEFAULT NOW()
+	owner TEXT FK NN
+	parent TIMESTAMP FK (references version)
+	type TEXT NN (bullet point? description? Not needed?)
+	content TEXT NN (allow formatting?)
+
+==================================================
+Section Entries; Details that will not change often.
+--------------------------------------------------
+
+educations
+	id SERIAL PK
+	owner TEXT FK NN
+	school TEXT NN
+	location TEXT NN
+	start_date DATE NN
+	end_date DATE NN
+	degree TEXT NN
+	gpa TEXT
+	awards_and_honors TEXT
+	activities TEXT
+
+experiences (work, volunteer, etc.)
+	id SERIAL PK
+	owner TEXT FK NN
+	title TEXT NN
+	organization TEXT NN
+	location TEXT NN
+	start_date DATE NN
+	end_date DATE
+
+skills
+	id SERIAL PK
+	name TEXT UNIQUE NN
+	owner TEXT FK NN
+	text_snippet_id INT FK NN
+	text_snippet_version TIMESTAMP FK NN
+
+certifications (stretch goal)
+	id SERIAL PK
+	owner TEXT FK NN
+	name TEXT NN
+	issuing_org TEXT NN
+	issue_date DATE NN
+
+projects (stretch goal)
+	id SERIAL PK
+	owner TEXT FK NN
+	name TEXT NN
+	start_date DATE NN
+	end_date DATE
+
+==================================================
+Basic, necessary user info.
+--------------------------------------------------
+
+users
+	username TEXT PK
+	password TEXT NN
+
+contact_info
+	username TEXT PK
+	full_name TEXT NN
+	location TEXT
+	email TEXT
+	phone TEXT
+	linkedin TEXT
+	github TEXT

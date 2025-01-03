@@ -1,0 +1,203 @@
+// https://dbdiagram.io/d/Springboard-Capstone-2-Resume-Manager-6763563784c741072722c779
+
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+// ==================================================
+// Documents.
+// --------------------------------------------------
+
+Table documents {
+	id SERIAL [pk]
+	document_name TEXT [not null]
+	owner TEXT [ref: > users.username, not null]
+	created_on TIMESTAMP [not null, default: `now()`]
+	last_updated TIMESTAMP
+	is_master BOOL [not null]
+	is_template BOOL [not null]
+	is_locked BOOL [not null, default: false]
+}
+
+// ==================================================
+// Document-related.
+// --------------------------------------------------
+
+Table sections {
+	id SERIAL [pk]
+	section_name TEXT [not null]
+}
+
+// ==================================================
+// Relations.
+// --------------------------------------------------
+
+// TableGroup relations {
+//   documents_x_sections
+//   sections_x_section_entries
+//   experiences_x_text_snippets
+//   projects_x_text_snippets
+// }
+
+Table documents_x_sections {
+	document_id INTEGER [pk, ref: > documents.id]
+	section_id INTEGER [pk, ref: > sections.id]
+	position INTEGER [not null]
+	// CONSTRAINT UNIQUE (document_id, position)
+}
+
+/*
+Table sections_x_section_entries {
+	section_id INTEGER [pk, ref: > sections.id]
+	position INTEGER [pk]
+    document_id INTEGER [pk, ref: > documents.id]
+	section_entry_id INTEGER [not null]
+	section_entry_version TIMESTAMP
+	// CONSTRAINT UNIQUE (section_id, section_entry_id)
+}
+*/
+
+Table documents_x_educations {
+	document_id INTEGER [pk, ref: > documents.id]
+	education_id INTEGER [pk, ref: > educations.id]
+	position INTEGER [not null]
+	// CONSTRAINT UNIQUE (document_id, position)
+}
+
+Table documents_x_experiences {
+	id SERIAL [pk]
+	document_id INTEGER [ref: > documents.id]
+	experience_id INTEGER [ref: > experiences.id]
+	position INTEGER [not null]
+	// CONSTRAINT UNIQUE (document_id, position)
+}
+
+Table documents_x_skills {
+	document_id INTEGER [pk, ref: - documents.id]
+	skill_id INTEGER [pk, ref: > skills.id]
+}
+
+Table documents_x_certifications {
+	document_id INTEGER [pk, ref: > documents.id]
+	certification_id INTEGER [pk, ref: > certifications.id]
+	position INTEGER [not null]
+	// CONSTRAINT UNIQUE (document_id, position)
+}
+
+Table documents_x_projects {
+	id SERIAL [pk]
+	document_id INTEGER [ref: > documents.id]
+	project_id INTEGER [ref: > projects.id]
+	position INTEGER [not null]
+	// CONSTRAINT UNIQUE (document_id, position)
+}
+
+Table experiences_x_text_snippets {
+	document_x_experience_id INTEGER [pk, ref: > documents_x_experiences.id]
+	text_snippet_id INTEGER [pk, ref: > text_snippets.id]
+	text_snippet_version TIMESTAMP [ref: > text_snippets.version, not null]
+	position INTEGER [not null]
+	// CONSTRAINT UNIQUE (document_x_experience_id, position)
+}
+
+Table projects_x_text_snippets {
+	document_x_project_id INTEGER [pk, ref: > documents_x_projects.id]
+	text_snippet_id INTEGER [pk, ref: > text_snippets.id]
+	text_snippet_version TIMESTAMP [ref: > text_snippets.version, not null]
+	position INTEGER [not null]
+	// CONSTRAINT UNIQUE (document_x_project_id, position)
+}
+
+// ==================================================
+// Content; Details that will go thru many revisions.
+// --------------------------------------------------
+
+Table text_snippets {
+	id SERIAL [pk]
+	version TIMESTAMP [pk, default: `now()`]
+	owner TEXT [ref: > users.username, not null]
+	parent TIMESTAMP [ref: > text_snippets.version]
+	type TEXT [not null]
+	content TEXT [not null]
+}
+
+// ==================================================
+// Section Entries; Details that will not change often.
+// --------------------------------------------------
+
+// TableGroup section_entries {
+//   educations
+//   experiences
+//   certifications
+//   projects
+// }
+
+Table educations {
+	id SERIAL [pk]
+	owner TEXT [ref: > users.username, not null]
+	school TEXT [not null]
+	location TEXT [not null]
+	start_date DATE [not null]
+	end_date DATE [not null]
+	degree TEXT [not null]
+	gpa TEXT
+	awards_and_honors TEXT
+	activities TEXT
+}
+
+Table experiences {
+	id SERIAL [pk]
+	owner TEXT [ref: > users.username, not null]
+	title TEXT [not null]
+	organization TEXT [not null]
+	location TEXT [not null]
+	start_date DATE [not null]
+	end_date DATE
+}
+
+Table skills {
+	id SERIAL [pk]
+	name TEXT [unique, not null]
+	owner TEXT [ref: > users.username, not null]
+	text_snippet_id INTEGER [ref: - text_snippets.id, not null]
+	text_snippet_version TIMESTAMP [ref: - text_snippets.version, not null]
+}
+
+Table certifications {
+	id SERIAL [pk]
+	owner TEXT [ref: > users.username, not null]
+	name TEXT [not null]
+	issuing_org TEXT [not null]
+	issue_date DATE [not null]
+}
+
+Table projects {
+	id SERIAL [pk]
+	owner TEXT [ref: > users.username, not null]
+	name TEXT [not null]
+	start_date DATE [not null]
+	end_date DATE
+}
+
+// ==================================================
+// Basic, necessary user info.
+// --------------------------------------------------
+
+// TableGroup basic {
+//   users
+//   contact_info
+// }
+
+Table users {
+	username TEXT [pk]
+	password TEXT [not null]
+}
+
+Table contact_info {
+	username TEXT [pk, ref: - users.username]
+	full_name TEXT [not null]
+	location TEXT
+	email TEXT
+	phone TEXT
+	linkedin TEXT
+	github TEXT
+}
