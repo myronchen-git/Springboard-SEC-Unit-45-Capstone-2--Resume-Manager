@@ -2,6 +2,8 @@
 
 require('dotenv').config();
 
+const logger = require('./util/logger');
+
 // ==================================================
 
 const SECRET_KEY = process.env.SECRET_KEY || 'secret-dev';
@@ -16,12 +18,12 @@ const DATABASE_URI =
 
 const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === 'test' ? 1 : 12;
 
-console.log('Resume Manager Config:');
-console.log('SECRET_KEY:', SECRET_KEY);
-console.log('PORT:', PORT.toString());
-console.log('BCRYPT_WORK_FACTOR:', BCRYPT_WORK_FACTOR);
-console.log('DATABASE_URI:', DATABASE_URI);
-console.log('---');
+logger.info('Resume Manager Config:');
+logger.info('SECRET_KEY: ' + SECRET_KEY);
+logger.info('PORT: ' + PORT.toString());
+logger.info('BCRYPT_WORK_FACTOR: ' + BCRYPT_WORK_FACTOR);
+logger.info('DATABASE_URI: ' + DATABASE_URI);
+logger.info('---');
 
 // ==================================================
 

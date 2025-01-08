@@ -32,7 +32,7 @@ app.use(function (req, res, next) {
 
 /** Generic error handler for anything unhandled. */
 app.use(function (err, req, res, next) {
-  if (process.env.NODE_ENV !== 'test') console.error(err.stack);
+  if (process.env.NODE_ENV !== 'test') logger.error(err.stack);
   const status = err.status || 500;
   const message = err.message;
 

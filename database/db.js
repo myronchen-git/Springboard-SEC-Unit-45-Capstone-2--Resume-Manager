@@ -3,7 +3,9 @@
 'use strict';
 
 const { Pool } = require('pg');
+
 const { DATABASE_URI } = require('../config');
+const logger = require('../util/logger');
 
 // ==================================================
 
@@ -22,7 +24,7 @@ class PostgresDb {
   constructor() {
     this.pool = new Pool(PostgresDb.config);
     this.pool.on('error', (err, client) => {
-      console.error('Unexpected error on idle client:', err);
+      logger.error('Unexpected error on idle client: ' + err);
       process.exit(-1);
     });
   }
@@ -46,7 +48,7 @@ class PostgresDb {
    * @returns The result from a database query.
    */
   async query(queryConfig) {
-    console.log('Executing query on database:', queryConfig.text);
+    logger.info('Executing query on database: ' + queryConfig.text);
     const dbClient = await this.pool.connect();
     const result = await dbClient.query(queryConfig);
     dbClient.release();
