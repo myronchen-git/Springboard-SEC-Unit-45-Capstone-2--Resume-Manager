@@ -19,6 +19,7 @@ const DATABASE_URI =
 const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === 'test' ? 1 : 12;
 
 logger.info('Resume Manager Config:');
+logger.info('NODE_ENV: ' + process.env.NODE_ENV);
 logger.info('SECRET_KEY: ' + SECRET_KEY);
 logger.info('PORT: ' + PORT.toString());
 logger.info('BCRYPT_WORK_FACTOR: ' + BCRYPT_WORK_FACTOR);
