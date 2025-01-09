@@ -7,6 +7,7 @@ const express = require('express');
 const morgan = require('morgan');
 
 const PostgresDb = require('./database/db');
+const { NotFoundError } = require('./errors/appErrors');
 const logger = require('./util/logger');
 
 // ==================================================
@@ -27,7 +28,7 @@ app.use(morgan('common', { stream: logger.stream }));
 
 /** Catch-all for handling 404 errors. */
 app.use(function (req, res, next) {
-  return next(new Error('URL path not found.'));
+  return next(new NotFoundError('URL path not found.'));
 });
 
 /** Generic error handler for anything unhandled. */

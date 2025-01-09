@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 
 const { BCRYPT_WORK_FACTOR } = require('../config');
 const { db } = require('../app');
+const { RegistrationError, SigninError } = require('../errors/userErrors');
 const logger = require('../util/logger');
 
 // ==================================================
@@ -46,7 +47,7 @@ class User {
 
       // PostgreSQL error code 23505 is for unique constraint violation.
       if (err.code === '23505') {
-        throw new Error(`Username "${username}" is not available.`);
+        throw new RegistrationError(`Username "${username}" is not available.`);
       } else {
         throw err;
       }
@@ -88,7 +89,7 @@ class User {
     if (data && (await bcrypt.compare(password, data.password)))
       return new User(data.username);
 
-    throw new Error('Invalid username/password.');
+    throw new SigninError('Invalid username/password.');
   }
 }
 

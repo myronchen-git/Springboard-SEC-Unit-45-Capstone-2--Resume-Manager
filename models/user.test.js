@@ -2,6 +2,7 @@
 
 const User = require('./user');
 const { db } = require('../app');
+const { RegistrationError, SigninError } = require('../errors/userErrors');
 
 // ==================================================
 
@@ -42,9 +43,7 @@ describe('register', () => {
     }
 
     // Assert
-    await expect(runFunc).rejects.toThrow(
-      `Username "${newUser.username}" is not available.`
-    );
+    await expect(runFunc).rejects.toThrow(RegistrationError);
   });
 });
 
@@ -72,7 +71,7 @@ describe('signin', () => {
     }
 
     // Assert
-    await expect(runFunc).rejects.toThrow('Invalid username/password.');
+    await expect(runFunc).rejects.toThrow(SigninError);
   });
 
   test('Throws an Error if password is invalid.', async () => {
@@ -90,6 +89,6 @@ describe('signin', () => {
     }
 
     // Assert
-    await expect(runFunc).rejects.toThrow('Invalid username/password.');
+    await expect(runFunc).rejects.toThrow(SigninError);
   });
 });
