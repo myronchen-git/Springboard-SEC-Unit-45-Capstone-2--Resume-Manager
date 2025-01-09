@@ -3,9 +3,10 @@ const { createLogger, transports, format } = require('winston');
 // ==================================================
 
 const logDir = process.env.NODE_ENV === 'test' ? './logs-dev/' : './logs/';
+const logLevel = process.env.NODE_ENV === 'test' ? 'debug' : 'info';
 
 const logger = createLogger({
-  level: 'info',
+  level: logLevel,
   format: format.combine(
     format.timestamp(),
     format.printf(({ timestamp, level, message }) => {
