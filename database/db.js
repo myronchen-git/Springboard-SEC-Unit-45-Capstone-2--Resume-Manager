@@ -50,9 +50,14 @@ class PostgresDb {
   async query(queryConfig) {
     logger.info('Executing query on database: ' + queryConfig.text);
     const dbClient = await this.pool.connect();
-    const result = await dbClient.query(queryConfig);
-    dbClient.release();
-    return result;
+
+    try {
+      return await dbClient.query(queryConfig);
+    } catch (err) {
+      throw err;
+    } finally {
+      dbClient.release();
+    }
   }
 }
 
