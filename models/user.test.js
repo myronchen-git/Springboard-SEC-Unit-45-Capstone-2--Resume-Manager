@@ -35,7 +35,7 @@ describe('register', () => {
 
     // Assert
     expect(user).toBeInstanceOf(User);
-    expect(user.username).toEqual(newUser.username);
+    expect(user.username).toBe(newUser.username);
   });
 
   test('Throws an Error if username is not available.', async () => {
@@ -64,7 +64,7 @@ describe('signin', () => {
 
     // Assert
     expect(user).toBeInstanceOf(User);
-    expect(user.username).toEqual(existingUser.username);
+    expect(user.username).toBe(existingUser.username);
   });
 
   test('Throws an Error if username is not found.', async () => {
