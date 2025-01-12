@@ -2,6 +2,7 @@
 
 const User = require('./user');
 const { db } = require('../app');
+const { AppServerError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
 // ==================================================
@@ -10,6 +11,10 @@ const { RegistrationError, SigninError } = require('../errors/userErrors');
 jest.mock('../app', () => ({
   db: new (require('../database/db'))(),
 }));
+
+// ==================================================
+
+const existingUser = Object.freeze({ username: 'user1', password: '123' });
 
 beforeEach(() => {
   return db.query({ text: 'TRUNCATE TABLE users CASCADE' });
@@ -50,8 +55,6 @@ describe('register', () => {
 // -------------------------------------------------- signin
 
 describe('signin', () => {
-  const existingUser = Object.freeze({ username: 'user1', password: '123' });
-
   test('Signs in a user.', async () => {
     // Arrange
     await User.register(existingUser);
@@ -90,5 +93,70 @@ describe('signin', () => {
 
     // Assert
     await expect(runFunc).rejects.toThrow(SigninError);
+  });
+});
+
+// -------------------------------------------------- update
+
+describe('update', () => {
+  test("Updates a user's info.", async () => {
+    // Arrange
+    const user = await User.register(existingUser);
+    const updatedInfo = Object.freeze({ password: 'updated' });
+
+    // Act
+    await user.update(updatedInfo);
+
+    // Assert
+    const userData = (
+      await db.query({
+        text: 'SELECT * FROM users WHERE username = $1',
+        values: [existingUser.username],
+      })
+    ).rows[0];
+
+    expect(userData.password).toBe(updatedInfo.password);
+  });
+
+  test('Throws an Error if username is not found.', async () => {
+    // Arrange
+    const updatedInfo = Object.freeze({ password: 'updated' });
+    const user = new User('nonexistent');
+
+    // Act
+    async function runFunc() {
+      await user.update(updatedInfo);
+    }
+
+    // Assert
+    await expect(runFunc).rejects.toThrow(AppServerError);
+  });
+});
+
+// -------------------------------------------------- delete
+
+describe('delete', () => {
+  test('Deletes a user.', async () => {
+    // Arrange
+    const user = await User.register(existingUser);
+
+    // Act
+    await user.delete();
+
+    // Assert
+    const data = await db.query({
+      text: 'SELECT * FROM users WHERE username = $1',
+      values: [existingUser.username],
+    });
+
+    expect(data.rows.length).toBe(0);
+  });
+
+  test('Does not throw an Error if username is not found.', async () => {
+    // Arrange
+    const user = new User('nonexistent');
+
+    // Act
+    await user.delete();
   });
 });

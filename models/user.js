@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 
 const { BCRYPT_WORK_FACTOR } = require('../config');
 const { db } = require('../app');
+const { AppServerError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 const logger = require('../util/logger');
 
@@ -90,6 +91,66 @@ class User {
       return new User(data.username);
 
     throw new SigninError('Invalid username/password.');
+  }
+
+  /**
+   * Updates a user entry in the database.  Currently, this only updates the
+   * password.  In the future, this might update other info.  If that's the
+   * case, then this would need to return the updated info.
+   *
+   * @param {Object} data - Contains data for updating an account.
+   * @param {String} data.password - New password for the account.
+   */
+  async update({ password }) {
+    const logPrefix = `User.update({ password: (password) })`;
+    logger.verbose(logPrefix + `: Updating info for "${this.username}".`);
+
+    const queryConfig = {
+      text: `
+      UPDATE users
+      SET password = $1
+      WHERE username = $2;`,
+      values: [password, this.username],
+    };
+
+    let result;
+    try {
+      result = await db.query(queryConfig);
+    } catch (err) {
+      logger.error(`${logPrefix}: ${err}`);
+      throw err;
+    }
+
+    if (result.rowCount === 0) {
+      logger.error(`${logPrefix}: Username "${this.username}" not found.`);
+      throw new AppServerError(`Username "${this.username}" not found.`);
+    }
+  }
+
+  /**
+   * Deletes a user entry in the database.  Does not delete the username
+   * instance variable.  Remember to delete the User instance this belongs to!
+   */
+  async delete() {
+    const logPrefix = `User.delete()`;
+    logger.verbose(logPrefix + `: Deleting "${this.username}".`);
+
+    const queryConfig = {
+      text: `
+      DELETE FROM users
+      WHERE username = $1;`,
+      values: [this.username],
+    };
+
+    let result;
+    try {
+      result = await db.query(queryConfig);
+    } catch (err) {
+      logger.error(`${logPrefix}: ${err}`);
+      throw err;
+    }
+
+    logger.info(`${logPrefix}: ${result.rowCount} user(s) deleted.`);
   }
 }
 
