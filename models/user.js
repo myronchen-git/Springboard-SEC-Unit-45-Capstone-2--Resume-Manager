@@ -27,7 +27,8 @@ class User {
    * @returns {User} A new User instance that contains the user's data.
    */
   static async register({ username, password }) {
-    const logPrefix = `User.register({ '${username}', (password) })`;
+    const logPrefix =
+      `User.register(` + `{ username: '${username}', password: (password) })`;
     logger.verbose(logPrefix);
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
@@ -67,7 +68,8 @@ class User {
    * @returns {User} A new User instance that contains the user's data.
    */
   static async signin({ username, password }) {
-    const logPrefix = `User.signin({ '${username}', (password) })`;
+    const logPrefix =
+      `User.signin(` + `{ username: '${username}', password: (password) })`;
     logger.verbose(logPrefix);
 
     const queryConfig = {
@@ -90,6 +92,9 @@ class User {
     if (data && (await bcrypt.compare(password, data.password)))
       return new User(data.username);
 
+    logger.error(
+      `${logPrefix}: Invalid username/password when signing into "${username}".`
+    );
     throw new SigninError('Invalid username/password.');
   }
 
