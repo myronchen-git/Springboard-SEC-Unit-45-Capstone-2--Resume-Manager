@@ -38,13 +38,18 @@ class PostgresDb {
   }
 
   /**
-   * Acts as a liaison between the call to query the database and the app.
-   * This is used to add things like logging to each query.
+   * Acts as a liaison between the call to query the database and the app. This
+   * is used to add things like logging to each query.
    *
    * @param {Object} queryConfig - Contains parameters such as text (SQL
    *  strings), values (arguments for parameterized queries), and name (for
    *  creating prepared statements).  See
    *  [https://node-postgres.com/apis/client#queryconfig].
+   * @param {String} queryConfig.text - The SQL statement to execute.
+   * @param {Array} [queryConfig.values] - Query parameters for a parameterized
+   *  query.
+   * @param {String} [queryConfig.name] - Query name, for creating a prepared
+   * statement.
    * @returns The result from a database query.
    */
   async query(queryConfig) {
