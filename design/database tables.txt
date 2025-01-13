@@ -18,6 +18,7 @@ documents
 	is_master BOOL NN (create partial index for master?)
 	is_template BOOL NN
 	is_locked BOOL NN (locked from updating)
+	CONSTRAINT UNIQUE (document_name, owner)
 
 ==================================================
 Document-related.

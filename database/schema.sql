@@ -35,7 +35,8 @@ CREATE TABLE documents (
     last_updated TIMESTAMP,
 	is_master BOOLEAN NOT NULL,
 	is_template BOOLEAN NOT NULL,
-	is_locked BOOLEAN NOT NULL DEFAULT FALSE
+	is_locked BOOLEAN NOT NULL DEFAULT FALSE,
+	UNIQUE (document_name, owner)
 );
 
 /*

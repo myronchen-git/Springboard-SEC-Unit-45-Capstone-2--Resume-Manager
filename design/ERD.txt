@@ -16,6 +16,7 @@ Table documents {
 	is_master BOOL [not null]
 	is_template BOOL [not null]
 	is_locked BOOL [not null, default: false]
+	// CONSTRAINT UNIQUE (document_name, owner)
 }
 
 // ==================================================
