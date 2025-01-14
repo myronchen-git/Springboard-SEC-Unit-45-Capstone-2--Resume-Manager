@@ -215,6 +215,32 @@ class Document {
 
     return this;
   }
+
+  /**
+   * Deletes a document entry in the database.  Does not delete the instance
+   * properties/fields.  Remember to delete the instance this belongs to!
+   */
+  async delete() {
+    const logPrefix = `Document.delete()`;
+    logger.verbose(logPrefix);
+
+    const queryConfig = {
+      text: `
+      DELETE FROM documents
+      WHERE id = $1;`,
+      values: [this.id],
+    };
+
+    let result;
+    try {
+      result = await db.query(queryConfig);
+    } catch (err) {
+      logger.error(`${logPrefix}: ${err}`);
+      throw err;
+    }
+
+    logger.info(`${logPrefix}: ${result.rowCount} document(s) deleted.`);
+  }
 }
 
 // ==================================================

@@ -277,7 +277,30 @@ describe('Document', () => {
   // -------------------------------------------------- delete
 
   describe('delete', () => {
-    test.todo('Deletes a document.');
-    test.todo('Does not throw an Error if document is not found.');
+    const docProps = newDocsProps[0];
+
+    test('Deletes a document.', async () => {
+      // Arrange
+      const document = await Document.add(docProps);
+
+      // Act
+      await document.delete();
+
+      // Assert
+      const databaseDocsData = await db.query({
+        text: 'SELECT id FROM documents WHERE id = $1',
+        values: [document.id],
+      });
+
+      expect(databaseDocsData.rows.length).toBe(0);
+    });
+
+    test('Does not throw an Error if document is not found.', async () => {
+      // Arrange
+      const nonexistentDocument = new Document(999);
+
+      // Act
+      await nonexistentDocument.delete();
+    });
   });
 });
