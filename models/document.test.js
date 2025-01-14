@@ -288,7 +288,7 @@ describe('Document', () => {
 
       // Assert
       const databaseDocsData = await db.query({
-        text: 'SELECT id FROM documents WHERE id = $1',
+        text: 'SELECT id FROM documents WHERE id = $1;',
         values: [document.id],
       });
 

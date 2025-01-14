@@ -70,13 +70,7 @@ class Document {
       values: [documentName, owner, isMaster, isTemplate],
     };
 
-    let result;
-    try {
-      result = await db.query(queryConfig);
-    } catch (err) {
-      logger.error(`${logPrefix}: ${err}`);
-      throw err;
-    }
+    const result = await db.query(queryConfig, logPrefix);
 
     return new Document(...Object.values(result.rows[0]));
   }
@@ -99,13 +93,7 @@ class Document {
       values: [owner],
     };
 
-    let result;
-    try {
-      result = await db.query(queryConfig);
-    } catch (err) {
-      logger.error(`${logPrefix}: ${err}`);
-      throw err;
-    }
+    const result = await db.query(queryConfig, logPrefix);
 
     return result.rows.map((data) => new Document(...Object.values(data)));
   }
@@ -135,13 +123,7 @@ class Document {
       values: [id == undefined ? documentName : id, owner],
     };
 
-    let result;
-    try {
-      result = await db.query(queryConfig);
-    } catch (err) {
-      logger.error(`${logPrefix}: ${err}`);
-      throw err;
-    }
+    const result = await db.query(queryConfig, logPrefix);
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Document not found.`);
@@ -190,13 +172,7 @@ class Document {
       values: [...sqlValues, this.id],
     };
 
-    let result;
-    try {
-      result = await db.query(queryConfig);
-    } catch (err) {
-      logger.error(`${logPrefix}: ${err}`);
-      throw err;
-    }
+    const result = await db.query(queryConfig, logPrefix);
 
     if (result.rowCount === 0) {
       logger.error(
@@ -231,13 +207,7 @@ class Document {
       values: [this.id],
     };
 
-    let result;
-    try {
-      result = await db.query(queryConfig);
-    } catch (err) {
-      logger.error(`${logPrefix}: ${err}`);
-      throw err;
-    }
+    const result = await db.query(queryConfig, logPrefix);
 
     logger.info(`${logPrefix}: ${result.rowCount} document(s) deleted.`);
   }

@@ -50,20 +50,34 @@ class PostgresDb {
    *  query.
    * @param {String} [queryConfig.name] - Query name, for creating a prepared
    * statement.
+   * @param {String} [logPrefix] - Text to be placed at the beginning of logs.
+   * @param {PostgresDb~queryErrorCallback} [errorCallback] - Callback that runs
+   *  if pg.Client.query throws an Error.
    * @returns The result from a database query.
    */
-  async query(queryConfig) {
-    logger.info('Executing query on database: ' + queryConfig.text);
+  async query(queryConfig, logPrefix = 'PostgresDb.query(...)', errorCallback) {
+    logger.verbose(
+      `${logPrefix}: Executing query on database: ${queryConfig.text}`
+    );
     const dbClient = await this.pool.connect();
 
     try {
       return await dbClient.query(queryConfig);
     } catch (err) {
+      logger.error(`${logPrefix}: ${err}.`);
+
+      if (errorCallback) errorCallback(err);
+
       throw err;
     } finally {
       dbClient.release();
     }
   }
+
+  /**
+   * @callback PostgresDb~queryErrorCallback
+   * @param {Error} err - The Error thrown by pg.Client.query.
+   */
 }
 
 // ==================================================

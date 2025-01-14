@@ -17,7 +17,7 @@ jest.mock('../app', () => ({
 const existingUser = Object.freeze({ username: 'user1', password: '123' });
 
 beforeEach(() => {
-  return db.query({ text: 'TRUNCATE TABLE users CASCADE' });
+  return db.query({ text: 'TRUNCATE TABLE users CASCADE;' });
 });
 
 afterAll(() => {
@@ -110,7 +110,7 @@ describe('update', () => {
     // Assert
     const userData = (
       await db.query({
-        text: 'SELECT * FROM users WHERE username = $1',
+        text: 'SELECT * FROM users WHERE username = $1;',
         values: [existingUser.username],
       })
     ).rows[0];
@@ -145,7 +145,7 @@ describe('delete', () => {
 
     // Assert
     const data = await db.query({
-      text: 'SELECT * FROM users WHERE username = $1',
+      text: 'SELECT * FROM users WHERE username = $1;',
       values: [existingUser.username],
     });
 
