@@ -13,7 +13,8 @@ const logger = require('../util/logger');
  * actual content.
  */
 class Document {
-  // To use in SQL statements to return all column data.
+  // To use in SQL statements to return all column data.  Ensure the properties
+  // are in the same order and amount as constructor parameters.
   static _allDbDocumentColsAsJs = `
     id,
     document_name AS "documentName",
@@ -60,6 +61,7 @@ class Document {
     const logPrefix = `Document.add(${JSON.stringify(docProps)})`;
     logger.verbose(logPrefix);
 
+    // Allowed properties/attributes.
     const { documentName, owner, isMaster, isTemplate } = docProps;
 
     const queryConfig = {
