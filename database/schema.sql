@@ -47,7 +47,7 @@ Document-related.
 
 CREATE TABLE sections (
 	id SERIAL PRIMARY KEY,
-	section_name TEXT NOT NULL
+	section_name TEXT UNIQUE NOT NULL
 );
 
 /*
