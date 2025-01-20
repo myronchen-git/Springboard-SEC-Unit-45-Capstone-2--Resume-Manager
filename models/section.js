@@ -12,7 +12,7 @@ const logger = require('../util/logger');
 class Section {
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
-  static _allDbSectionColsAsJs = `
+  static _allDbColsAsJs = `
     id,
     section_name AS "sectionName"`;
 
@@ -40,7 +40,7 @@ class Section {
       text: `
   INSERT INTO sections (section_name)
   VALUES ($1)
-  RETURNING ${Section._allDbSectionColsAsJs};`,
+  RETURNING ${Section._allDbColsAsJs};`,
       values: [sectionName],
     };
 

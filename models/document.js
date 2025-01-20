@@ -15,7 +15,7 @@ const logger = require('../util/logger');
 class Document {
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
-  static _allDbDocumentColsAsJs = `
+  static _allDbColsAsJs = `
     id,
     document_name AS "documentName",
     owner,
@@ -68,7 +68,7 @@ class Document {
       text: `
   INSERT INTO documents (document_name, owner, is_master, is_template)
   VALUES ($1, $2, $3, $4)
-  RETURNING ${Document._allDbDocumentColsAsJs};`,
+  RETURNING ${Document._allDbColsAsJs};`,
       values: [documentName, owner, isMaster, isTemplate],
     };
 
@@ -89,7 +89,7 @@ class Document {
 
     const queryConfig = {
       text: `
-  SELECT ${Document._allDbDocumentColsAsJs}
+  SELECT ${Document._allDbColsAsJs}
   FROM documents
   WHERE owner = $1;`,
       values: [owner],
@@ -119,7 +119,7 @@ class Document {
 
     const queryConfig = {
       text: `
-  SELECT ${Document._allDbDocumentColsAsJs}
+  SELECT ${Document._allDbColsAsJs}
   FROM documents
   WHERE ${id == undefined ? 'document_name' : 'id'} = $1 AND owner = $2;`,
       values: [id == undefined ? documentName : id, owner],
@@ -170,7 +170,7 @@ class Document {
   SET ${sqlSubstring}
     last_updated = (NOW() at time zone 'utc')
   WHERE id = $${sqlValues.length + 1}
-  RETURNING ${Document._allDbDocumentColsAsJs};`,
+  RETURNING ${Document._allDbColsAsJs};`,
       values: [...sqlValues, this.id],
     };
 

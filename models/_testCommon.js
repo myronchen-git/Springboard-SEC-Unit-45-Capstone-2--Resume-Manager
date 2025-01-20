@@ -1,0 +1,352 @@
+'use strict';
+
+const { db } = require('../app');
+const { AppServerError } = require('../errors/appErrors');
+
+const { users } = require('./_testData');
+
+// ==================================================
+
+// Mock to bypass executing app code, but use actual "db" instance.
+jest.mock('../app', () => ({
+  db: new (require('../database/db'))(),
+}));
+
+// ==================================================
+
+/**
+ * Runs standard tests for create, read, update, and delete operations.  Uses
+ * first item of lists for certain operations, such as the first user for the
+ * primary user and first entity's data as the primary entity for GET and UPDATE
+ * operations.
+ *
+ * @param {Object} testConfig - Contains various names, text, data, etc for
+ * testing a model.
+ * @param {Class} testConfig.class - Reference to the class.
+ * @param {String} testConfig.tableName - Name of the table that the class is a
+ * model of.
+ * @param {Boolean} testConfig.hasOwner - If the table has the attribute
+ * "owner".
+ * @param {Object[]} testConfig.dataForNewInstances - Data for creating new
+ * records/entries.
+ * @param {Object[]} testConfig.dataForDuplicationCheck - Similar data of the
+ * ones for creating new entries.  These are used for checking the adding of
+ * same names or info.
+ * @param {Object[]} testConfig.dataForUpdate - Data used to update existing
+ * data.
+ * @param {Object[]} testConfig.expectedDataInNewInstances - Expected data for
+ * every entry after doing operations.
+ * @param {String} testConfig.whereClauseToGetOne - SQL WHERE statement and
+ * filter that can be used in SQL statements to retrieve a specific entry.
+ * @param {String} testConfig.whereClauseToGetAll - SQL WHERE statement and
+ * filter that can be used in SQL statements to retrieve all related entries.
+ * @param {Boolean} testConfig.runGetAllTests - Whether to run tests for the
+ * getAll method.
+ * @param {Boolean} testConfig.runGetTests - Whether to run tests for the get
+ * method.
+ * @param {Array} testConfig.testCasesForGet - The test cases for the get test
+ *  that tests for success.
+ *
+ *  [[type, queryParams, expected], ...]
+ *
+ *  {String} type  - Signifies what is being searched for.
+ *
+ *  {Object} queryParams - The filters used to find a specific entry.
+ *
+ *  {Object} expected - Contains the expected data of the specific entry.
+ */
+function runCommonTests(testConfig) {
+  const ClassRef = testConfig.class;
+  const className = testConfig.class.name;
+  const classNameLowerCase = className.toLowerCase();
+
+  const {
+    tableName,
+    hasOwner = true,
+    dataForNewInstances,
+    dataForDuplicationCheck,
+    dataForUpdate,
+    expectedDataInNewInstances,
+    whereClauseToGetOne,
+    whereClauseToGetAll,
+    runGetAllTests = true,
+    runGetTests = true,
+    testCasesForGet,
+  } = testConfig;
+
+  describe(className, () => {
+    // To help with expects by directly getting data from the database.
+    const sqlTextSelectAll = `
+  SELECT ${ClassRef._allDbColsAsJs}
+  FROM ${tableName}`;
+
+    beforeAll(() => {
+      return db.query({
+        text: `
+  INSERT INTO users VALUES
+  ($1, $2);`,
+        values: [users[0].username, users[0].password],
+      });
+    });
+
+    beforeEach(() => {
+      return db.query({
+        text: `
+  TRUNCATE TABLE ${tableName} CASCADE;`,
+      });
+    });
+
+    afterAll((done) => {
+      db.query({
+        text: `
+  TRUNCATE TABLE users, sections RESTART IDENTITY CASCADE;`,
+      })
+        .then(() => db.shutdown())
+        .then(() => done());
+    });
+
+    // -------------------------------------------------- add
+
+    describe('add', () => {
+      // Arrange
+      const newInstanceData = dataForNewInstances[0];
+      const expectedInstanceData = expectedDataInNewInstances[0];
+
+      test(`Adds a new ${classNameLowerCase}.`, async () => {
+        // Act
+        const instance = await ClassRef.add(newInstanceData);
+
+        // Assert
+        expect(instance).toBeInstanceOf(ClassRef);
+        expect(instance).toEqual(expectedInstanceData);
+
+        const databaseEntry = (
+          await db.query({
+            text: sqlTextSelectAll + `\n ${whereClauseToGetOne};`,
+            values: [instance.id],
+          })
+        ).rows[0];
+
+        expect(databaseEntry).toEqual(expectedInstanceData);
+      });
+
+      if (dataForDuplicationCheck) {
+        test(
+          `Throws an Error if adding a ${classNameLowerCase} ` +
+            `with the same name as another.`,
+          async () => {
+            // Arrange
+            await ClassRef.add(newInstanceData);
+            const duplicateInstanceData = dataForDuplicationCheck[0];
+
+            // Act
+            async function runFunc() {
+              await ClassRef.add(duplicateInstanceData);
+            }
+
+            // Assert
+            await expect(runFunc).rejects.toThrow();
+
+            // fragile query config; consider redoing because of values
+            const databaseEntries = (
+              await db.query({
+                text: sqlTextSelectAll + `\n ${whereClauseToGetAll};`,
+                values: whereClauseToGetAll ? [users[0].username] : [],
+              })
+            ).rows;
+
+            // Ensure existing data has not been modified.
+            expect(databaseEntries.length).toBe(1);
+            expect(databaseEntries[0]).toEqual(expectedInstanceData);
+          }
+        );
+      }
+    });
+
+    // -------------------------------------------------- getAll
+
+    if (runGetAllTests) {
+      describe('getAll', () => {
+        test.each([
+          [0, [], []],
+          [
+            dataForNewInstances.length,
+            dataForNewInstances,
+            expectedDataInNewInstances,
+          ],
+        ])(
+          `Get all of %i ${classNameLowerCase}(s)${
+            hasOwner ? 'for a user' : ''
+          }.`,
+          async (amount, inputData, expected) => {
+            // Arrange
+            for (const props of inputData) {
+              await ClassRef.add(props);
+            }
+
+            // Act
+            const instances = await ClassRef.getAll(
+              hasOwner ? users[0].username : undefined
+            );
+
+            // Assert
+            expect(instances.length).toBe(inputData.length);
+
+            instances.forEach((instance, i) => {
+              expect(instance).toBeInstanceOf(ClassRef);
+              expect(instance).toEqual(expected[i]);
+            });
+          }
+        );
+      });
+    }
+
+    // -------------------------------------------------- get
+
+    if (runGetTests) {
+      describe('get', () => {
+        test.each(testCasesForGet)(
+          `Gets a specified ${classNameLowerCase} by %s${
+            hasOwner ? ' from a user' : ''
+          }.`,
+          async (type, queryParams, expected) => {
+            // Arrange
+            const preexistingInstance = await ClassRef.add(
+              dataForNewInstances[0]
+            );
+
+            if (type === 'ID') queryParams.id = preexistingInstance.id;
+
+            Object.freeze(queryParams);
+
+            // Act
+            const instance = await ClassRef.get(queryParams);
+
+            // Assert
+            expect(instance).toBeInstanceOf(ClassRef);
+            expect(instance).toEqual(expected);
+          }
+        );
+      });
+    }
+
+    // -------------------------------------------------- update
+
+    describe('update', () => {
+      // Arrange
+      let preexistingInstance = null;
+
+      beforeEach((done) => {
+        ClassRef.add(dataForNewInstances[0]).then((instance) => {
+          preexistingInstance = instance;
+          done();
+        });
+      });
+
+      afterEach(() => {
+        preexistingInstance = null;
+      });
+
+      test.each([
+        [0, Object.freeze({})], // empty
+        [
+          1,
+          Object.freeze(
+            Object.fromEntries([Object.entries(dataForUpdate[0])[0]])
+          ),
+        ], // one
+        [Object.keys(dataForUpdate[0]).length, dataForUpdate[0]], // all
+        [
+          Object.keys(dataForUpdate[0]).length + 1,
+          Object.freeze({ ...dataForUpdate[0], isValidColumn: false }),
+        ], // extra
+      ])(
+        `Updates a ${classNameLowerCase} with %s properties.`,
+        async (amount, updatedData) => {
+          // Arrange
+          const expectedUpdatedInstance = {
+            ...preexistingInstance,
+            ...updatedData,
+          };
+
+          delete expectedUpdatedInstance.isValidColumn;
+
+          // specifically for documents
+          if (
+            Object.keys(preexistingInstance).includes('lastUpdated') &&
+            Object.keys(updatedData).length
+          )
+            expectedUpdatedInstance.lastUpdated = expect.any(Date);
+
+          // Act
+          const updatedInstance = await preexistingInstance.update(updatedData);
+
+          // Assert
+          expect(updatedInstance).toEqual(expectedUpdatedInstance);
+
+          const databaseEntry = (
+            await db.query({
+              text: sqlTextSelectAll + `\n ${whereClauseToGetOne};`,
+              values: [preexistingInstance.id],
+            })
+          ).rows[0];
+
+          expect(databaseEntry).toEqual(expectedUpdatedInstance);
+        }
+      );
+
+      test(
+        `Throws an Error if ${classNameLowerCase} ` + `is not found.`,
+        async () => {
+          // Arrange
+          const nonexistentInstance = new ClassRef(999);
+
+          // Act
+          async function runFunc() {
+            await nonexistentInstance.update(dataForUpdate[0]);
+          }
+
+          // Assert
+          await expect(runFunc).rejects.toThrow(AppServerError);
+        }
+      );
+    });
+
+    // -------------------------------------------------- delete
+
+    describe('delete', () => {
+      const docProps = dataForNewInstances[0];
+
+      test(`Deletes a ${classNameLowerCase}.`, async () => {
+        // Arrange
+        const instance = await ClassRef.add(docProps);
+
+        // Act
+        await instance.delete();
+
+        // Assert
+        const databaseData = await db.query({
+          text: sqlTextSelectAll + `\n ${whereClauseToGetOne};`,
+          values: [instance.id],
+        });
+
+        expect(databaseData.rows.length).toBe(0);
+      });
+
+      test(
+        `Does not throw an Error if ${classNameLowerCase} ` + `is not found.`,
+        async () => {
+          // Arrange
+          const nonexistentInstance = new ClassRef(999);
+
+          // Act
+          await nonexistentInstance.delete();
+        }
+      );
+    });
+  });
+}
+
+// ==================================================
+
+module.exports = { runCommonTests };
