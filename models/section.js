@@ -163,6 +163,26 @@ class Section {
 
     return this;
   }
+
+  /**
+   * Deletes a section entry in the database.  Does not delete the instance
+   * properties/fields.  Remember to delete the instance this belongs to!
+   */
+  async delete() {
+    const logPrefix = `Section.delete()`;
+    logger.verbose(logPrefix);
+
+    const queryConfig = {
+      text: `
+      DELETE FROM sections
+      WHERE id = $1;`,
+      values: [this.id],
+    };
+
+    const result = await db.query(queryConfig, logPrefix);
+
+    logger.info(`${logPrefix}: ${result.rowCount} section(s) deleted.`);
+  }
 }
 
 // ==================================================
