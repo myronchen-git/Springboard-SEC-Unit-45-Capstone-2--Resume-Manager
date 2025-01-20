@@ -115,7 +115,7 @@ class Document {
     const logPrefix = `Document.get(${JSON.stringify(queryParams)})`;
     logger.verbose(logPrefix);
 
-    // allowed parameters
+    // Allowed parameters.
     const { id, documentName, owner } = queryParams;
 
     const queryConfig = {

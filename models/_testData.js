@@ -25,6 +25,28 @@ for (let i = 1; i <= numSections; i++) {
 }
 Object.freeze(sections);
 
+const educations = Object.freeze([
+  Object.freeze({
+    owner: users[0].username,
+    school: 'School 1',
+    location: 'Location 1',
+    startDate: new Date(2020, 11, 1),
+    endDate: new Date(2024, 6, 20),
+    degree: 'Degree 1',
+  }),
+  Object.freeze({
+    owner: users[0].username,
+    school: 'University of California,',
+    location: 'Los Angeles',
+    startDate: new Date(2025, 0, 1),
+    endDate: new Date(2030, 0, 1),
+    degree: "Bachelor's of Science, Computer Science",
+    gpa: '4.0 / 4.0',
+    awardsAndHonors: 'Award 1, Honors 1',
+    activities: 'Extracurricular Activity 1, Extracurricular Activity 2',
+  }),
+]);
+
 // ==================================================
 
-module.exports = { users, documents, sections };
+module.exports = { users, documents, sections, educations };

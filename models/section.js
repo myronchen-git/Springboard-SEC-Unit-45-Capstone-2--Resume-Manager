@@ -86,7 +86,7 @@ class Section {
     const logPrefix = `Section.get(${JSON.stringify(queryParams)})`;
     logger.verbose(logPrefix);
 
-    // allowed parameters
+    // Allowed parameters.
     const { id, sectionName } = queryParams;
 
     const queryConfig = {
