@@ -115,6 +115,7 @@ class Document {
     const logPrefix = `Document.get(${JSON.stringify(queryParams)})`;
     logger.verbose(logPrefix);
 
+    // allowed parameters
     const { id, documentName, owner } = queryParams;
 
     const queryConfig = {
@@ -160,6 +161,7 @@ class Document {
       Object.entries(docProps).filter((prop) => allowedProps.includes(prop[0]))
     );
 
+    // If given no arguments, return.
     if (!Object.keys(filteredProps).length) return this;
 
     const [sqlSubstring, sqlValues] = convertPropsForSqlUpdate(filteredProps);
@@ -187,6 +189,7 @@ class Document {
       );
     }
 
+    // Update current instance's properties.
     Object.entries(result.rows[0]).forEach(([colName, val]) => {
       this[colName] = val;
     });

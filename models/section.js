@@ -1,6 +1,9 @@
 'use strict';
 
 const { db } = require('../app');
+const { AppServerError } = require('../errors/appErrors');
+const { NotFoundError } = require('../errors/appErrors');
+const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
 const logger = require('../util/logger');
 
 // ==================================================
@@ -47,6 +50,118 @@ class Section {
     const result = await db.query(queryConfig, logPrefix);
 
     return new Section(...Object.values(result.rows[0]));
+  }
+
+  /**
+   * Retrieves all the sections.
+   *
+   * @returns {Section[]} A list of Section instances.
+   */
+  static async getAll() {
+    const logPrefix = 'Section.getAll()';
+    logger.verbose(logPrefix);
+
+    const queryConfig = {
+      text: `
+  SELECT ${Section._allDbColsAsJs}
+  FROM sections;`,
+    };
+
+    const result = await db.query(queryConfig, logPrefix);
+
+    return result.rows.map((data) => new Section(...Object.values(data)));
+  }
+
+  /**
+   * Retrieves a specific section by ID or name.
+   *
+   * @param {Object} queryParams - Contains the query parameters for finding a
+   *  specific section.
+   * @param {String} [queryParams.id] - ID of the section.
+   * @param {String} [queryParams.sectionName] - Name of the section.
+   * @returns {Section} A new Section instance that contains the section's
+   *  data.
+   */
+  static async get(queryParams) {
+    const logPrefix = `Section.get(${JSON.stringify(queryParams)})`;
+    logger.verbose(logPrefix);
+
+    // allowed parameters
+    const { id, sectionName } = queryParams;
+
+    const queryConfig = {
+      text: `
+  SELECT ${Section._allDbColsAsJs}
+  FROM sections
+  WHERE ${id == undefined ? 'section_name' : 'id'} = $1;`,
+      values: [id == undefined ? sectionName : id],
+    };
+
+    const result = await db.query(queryConfig, logPrefix);
+
+    if (result.rows.length === 0) {
+      logger.error(`${logPrefix}: Section not found.`);
+      throw new NotFoundError(`Can not find section "${sectionName}".`);
+    }
+
+    const data = result.rows[0];
+    return new Section(...Object.values(data));
+  }
+
+  /**
+   * Updates a section with new properties.  If no properties are passed, then
+   * the section is not updated.
+   *
+   * @param {Object} sectionProps - Contains the updated properties.
+   * @param {String} [sectionProps.sectionName] - The new name of the section.
+   * @returns {Section} The same Section instance that this method was called
+   *  on, but with updated property values.
+   */
+  async update(sectionProps) {
+    const logPrefix = `Section.update(${JSON.stringify(sectionProps)})`;
+    logger.verbose(logPrefix);
+
+    const allowedProps = ['sectionName'];
+    const filteredProps = Object.fromEntries(
+      Object.entries(sectionProps).filter((prop) =>
+        allowedProps.includes(prop[0])
+      )
+    );
+
+    // If given no arguments, return.
+    if (!Object.keys(filteredProps).length) return this;
+
+    const [sqlSubstring, sqlValues] = convertPropsForSqlUpdate(filteredProps);
+
+    // Comma at end of sqlSubstring will be removed.
+    const queryConfig = {
+      text: `
+  UPDATE sections
+  SET ${sqlSubstring.slice(0, -1)}
+  WHERE id = $${sqlValues.length + 1}
+  RETURNING ${Section._allDbColsAsJs};`,
+      values: [...sqlValues, this.id],
+    };
+
+    const result = await db.query(queryConfig, logPrefix);
+
+    if (result.rowCount === 0) {
+      logger.error(
+        `${logPrefix}: Section ID ${this.id} with ` +
+          `name "${this.sectionName}" was not found.`
+      );
+      throw new AppServerError(
+        `Section ID ${this.id} with ` +
+          `name "${this.sectionName}" was not found.`
+      );
+    }
+
+    // Update current instance's properties.
+    Object.entries(result.rows[0]).forEach(([colName, val]) => {
+      this[colName] = val;
+    });
+
+    return this;
   }
 }
 
