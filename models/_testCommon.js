@@ -1,7 +1,7 @@
 'use strict';
 
 const { db } = require('../app');
-const { AppServerError } = require('../errors/appErrors');
+const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const { users } = require('./_testData');
 
@@ -225,6 +225,22 @@ function runCommonTests(testConfig) {
             // Assert
             expect(instance).toBeInstanceOf(ClassRef);
             expect(instance).toEqual(expected);
+          }
+        );
+
+        test(
+          `Throws an Error if ${classNameLowerCase} ` + `is not found.`,
+          async () => {
+            // Arrange
+            const queryParams = { id: 999 };
+
+            // Act
+            async function runFunc() {
+              await ClassRef.get(queryParams);
+            }
+
+            // Assert
+            await expect(runFunc).rejects.toThrow(NotFoundError);
           }
         );
       });
