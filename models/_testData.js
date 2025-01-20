@@ -47,6 +47,24 @@ const educations = Object.freeze([
   }),
 ]);
 
+const experiences = Object.freeze([
+  Object.freeze({
+    owner: users[0].username,
+    title: 'Software Engineer I',
+    organization: 'Company 1',
+    location: 'City 1, State 1, Country',
+    startDate: new Date(2000, 1, 2),
+  }),
+  Object.freeze({
+    owner: users[0].username,
+    title: 'Full-Stack Engineer I',
+    organization: 'Company 100',
+    location: 'City 100, State 100, Country',
+    startDate: new Date(2000, 9, 8),
+    endDate: new Date(2020, 11, 30),
+  }),
+]);
+
 // ==================================================
 
-module.exports = { users, documents, sections, educations };
+module.exports = { users, documents, sections, educations, experiences };
