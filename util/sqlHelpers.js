@@ -8,7 +8,7 @@ const { camelToSnakeCase } = require('./caseConversions');
  * Helps to convert a set of table properties from JavaScript to a SQL substring
  * and values, which will be used in a database UPDATE query.
  *
- * The substring will be used after the SET command.
+ * The substring will be used for the SET command.
  *
  * The values will be used in the query config for the database query method,
  * when using parameterized queries.

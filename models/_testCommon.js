@@ -122,7 +122,7 @@ function runCommonTests(testConfig) {
 
         const databaseEntry = (
           await db.query({
-            text: sqlTextSelectAll + `\n ${whereClauseToGetOne};`,
+            text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
             values: [instance.id],
           })
         ).rows[0];
@@ -150,7 +150,7 @@ function runCommonTests(testConfig) {
             // fragile query config; consider redoing because of values
             const databaseEntries = (
               await db.query({
-                text: sqlTextSelectAll + `\n ${whereClauseToGetAll};`,
+                text: sqlTextSelectAll + `\n  ${whereClauseToGetAll};`,
                 values: whereClauseToGetAll ? [users[0].username] : [],
               })
             ).rows;
@@ -302,7 +302,7 @@ function runCommonTests(testConfig) {
 
           const databaseEntry = (
             await db.query({
-              text: sqlTextSelectAll + `\n ${whereClauseToGetOne};`,
+              text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
               values: [preexistingInstance.id],
             })
           ).rows[0];
@@ -342,7 +342,7 @@ function runCommonTests(testConfig) {
 
         // Assert
         const databaseData = await db.query({
-          text: sqlTextSelectAll + `\n ${whereClauseToGetOne};`,
+          text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
           values: [instance.id],
         });
 
