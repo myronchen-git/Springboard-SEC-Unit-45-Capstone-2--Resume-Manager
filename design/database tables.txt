@@ -13,8 +13,8 @@ documents
 	id SERIAL PK
 	document_name TEXT NN
 	owner TEXT FK NN
-	created_on TIMESTAMP NN DEFAULT NOW()
-	last_updated TIMESTAMP
+	created_on TIMESTAMPTZ(3) NN DEFAULT NOW()
+	last_updated TIMESTAMPTZ(3)
 	is_master BOOL NN (create partial index for master?)
 	is_template BOOL NN
 	is_locked BOOL NN (locked from updating)
@@ -44,7 +44,7 @@ sections_x_section_entries (section entries can be education & etc. or text snip
 	position INT PK
 	document_id INT PK&FK
 	section_entry_id INT NN
-	section_entry_version TIMESTAMP (this is nullable to allow use of text snippet or some other entry)
+	section_entry_version TIMESTAMPTZ(3) (this is nullable to allow use of text snippet or some other entry)
 	CONSTRAINT UNIQUE (section_id, section_entry_id)
 */
 
@@ -81,14 +81,14 @@ documents_x_projects
 experiences_x_text_snippets
 	document_x_experience_id INT PK&FK
 	text_snippet_id INT PK&FK
-	text_snippet_version TIMESTAMP FK NN
+	text_snippet_version TIMESTAMPTZ(3) FK NN
 	position INT NN
 	CONSTRAINT UNIQUE (document_x_experience_id, position)
 
 projects_x_text_snippets (stretch goal)
 	document_x_project_id INT PK&FK
 	text_snippet_id INT PK&FK
-	text_snippet_version TIMESTAMP FK NN
+	text_snippet_version TIMESTAMPTZ(3) FK NN
 	position INT NN
 	CONSTRAINT UNIQUE (document_x_project_id, position)
 
@@ -98,9 +98,9 @@ Content; Details that will go thru many revisions.
 
 text_snippets
 	id SERIAL PK
-	version TIMESTAMP PK DEFAULT NOW()
+	version TIMESTAMPTZ(3) PK DEFAULT NOW()
 	owner TEXT FK NN
-	parent TIMESTAMP FK (references version)
+	parent TIMESTAMPTZ(3) FK (references version)
 	type TEXT NN (bullet point? description? Not needed?)
 	content TEXT NN (allow formatting?)
 
@@ -134,7 +134,7 @@ skills
 	name TEXT UNIQUE NN
 	owner TEXT FK NN
 	text_snippet_id INT FK NN
-	text_snippet_version TIMESTAMP FK NN
+	text_snippet_version TIMESTAMPTZ(3) FK NN
 
 certifications (stretch goal)
 	id SERIAL PK

@@ -11,8 +11,8 @@ Table documents {
 	id SERIAL [pk]
 	document_name TEXT [not null]
 	owner TEXT [ref: > users.username, not null]
-	created_on TIMESTAMP [not null, default: `now()`]
-	last_updated TIMESTAMP
+	created_on TIMESTAMPTZ(3) [not null, default: `now()`]
+	last_updated TIMESTAMPTZ(3)
 	is_master BOOL [not null]
 	is_template BOOL [not null]
 	is_locked BOOL [not null, default: false]
@@ -52,7 +52,7 @@ Table sections_x_section_entries {
 	position INTEGER [pk]
     document_id INTEGER [pk, ref: > documents.id]
 	section_entry_id INTEGER [not null]
-	section_entry_version TIMESTAMP
+	section_entry_version TIMESTAMPTZ(3)
 	// CONSTRAINT UNIQUE (section_id, section_entry_id)
 }
 */
@@ -95,7 +95,7 @@ Table documents_x_projects {
 Table experiences_x_text_snippets {
 	document_x_experience_id INTEGER [pk, ref: > documents_x_experiences.id]
 	text_snippet_id INTEGER [pk, ref: > text_snippets.id]
-	text_snippet_version TIMESTAMP [ref: > text_snippets.version, not null]
+	text_snippet_version TIMESTAMPTZ(3) [ref: > text_snippets.version, not null]
 	position INTEGER [not null]
 	// CONSTRAINT UNIQUE (document_x_experience_id, position)
 }
@@ -103,7 +103,7 @@ Table experiences_x_text_snippets {
 Table projects_x_text_snippets {
 	document_x_project_id INTEGER [pk, ref: > documents_x_projects.id]
 	text_snippet_id INTEGER [pk, ref: > text_snippets.id]
-	text_snippet_version TIMESTAMP [ref: > text_snippets.version, not null]
+	text_snippet_version TIMESTAMPTZ(3) [ref: > text_snippets.version, not null]
 	position INTEGER [not null]
 	// CONSTRAINT UNIQUE (document_x_project_id, position)
 }
@@ -114,9 +114,9 @@ Table projects_x_text_snippets {
 
 Table text_snippets {
 	id SERIAL [pk]
-	version TIMESTAMP [pk, default: `now()`]
+	version TIMESTAMPTZ(3) [pk, default: `now()`]
 	owner TEXT [ref: > users.username, not null]
-	parent TIMESTAMP [ref: > text_snippets.version]
+	parent TIMESTAMPTZ(3) [ref: > text_snippets.version]
 	type TEXT [not null]
 	content TEXT [not null]
 }
@@ -160,7 +160,7 @@ Table skills {
 	name TEXT [unique, not null]
 	owner TEXT [ref: > users.username, not null]
 	text_snippet_id INTEGER [ref: - text_snippets.id, not null]
-	text_snippet_version TIMESTAMP [ref: - text_snippets.version, not null]
+	text_snippet_version TIMESTAMPTZ(3) [ref: - text_snippets.version, not null]
 }
 
 Table certifications {

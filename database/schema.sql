@@ -31,8 +31,8 @@ CREATE TABLE documents (
     document_name TEXT NOT NULL,
     owner TEXT NOT NULL
         REFERENCES users ON DELETE CASCADE,
-    created_on TIMESTAMP NOT NULL DEFAULT (NOW() at time zone 'utc'),
-    last_updated TIMESTAMP,
+    created_on TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+    last_updated TIMESTAMPTZ(3),
 	is_master BOOLEAN NOT NULL,
 	is_template BOOLEAN NOT NULL,
 	is_locked BOOLEAN NOT NULL DEFAULT FALSE,
@@ -58,10 +58,10 @@ Content; Details that will go thru many revisions.
 
 CREATE TABLE text_snippets (
 	id SERIAL,
-	version TIMESTAMP DEFAULT (NOW() at time zone 'utc'),
+	version TIMESTAMPTZ(3) DEFAULT NOW(),
     owner TEXT NOT NULL
         REFERENCES users ON DELETE CASCADE,
-	parent TIMESTAMP,
+	parent TIMESTAMPTZ(3),
 	type TEXT NOT NULL,
 	content TEXT NOT NULL,
 	PRIMARY KEY (id, version),
@@ -106,7 +106,7 @@ CREATE TABLE skills (
 	owner TEXT NOT NULL
 		REFERENCES users ON DELETE CASCADE,
 	text_snippet_id INTEGER NOT NULL,
-	text_snippet_version TIMESTAMP NOT NULL,
+	text_snippet_version TIMESTAMPTZ(3) NOT NULL,
 	FOREIGN KEY (text_snippet_id, text_snippet_version)
 		REFERENCES text_snippets (id, version)
 );
@@ -202,7 +202,7 @@ CREATE TABLE experiences_x_text_snippets (
 	document_x_experience_id INTEGER
 		REFERENCES documents_x_experiences ON DELETE CASCADE,
 	text_snippet_id INTEGER,
-	text_snippet_version TIMESTAMP NOT NULL,
+	text_snippet_version TIMESTAMPTZ(3) NOT NULL,
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
 	PRIMARY KEY (document_x_experience_id, text_snippet_id),
@@ -215,7 +215,7 @@ CREATE TABLE projects_x_text_snippets (
 	document_x_project_id INTEGER
 		REFERENCES documents_x_projects ON DELETE CASCADE,
 	text_snippet_id INTEGER,
-	text_snippet_version TIMESTAMP NOT NULL,
+	text_snippet_version TIMESTAMPTZ(3) NOT NULL,
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
 	PRIMARY KEY (document_x_project_id, text_snippet_id),
