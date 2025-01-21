@@ -1,3 +1,5 @@
+/** Holds common test data that might be used across all tests. */
+
 const users = Object.freeze([
   Object.freeze({ username: 'user1', password: '123' }),
   Object.freeze({ username: 'user2', password: '123' }),
@@ -24,6 +26,19 @@ for (let i = 1; i <= numSections; i++) {
   sections[i - 1] = Object.freeze({ sectionName: `section${i}` });
 }
 Object.freeze(sections);
+
+const textSnippets = Object.freeze([
+  Object.freeze({
+    owner: users[0].username,
+    type: 'paragraph',
+    content: 'content1',
+  }),
+  Object.freeze({
+    owner: users[0].username,
+    type: 'bullet point',
+    content: 'content2',
+  }),
+]);
 
 const educations = Object.freeze([
   Object.freeze({
@@ -67,4 +82,11 @@ const experiences = Object.freeze([
 
 // ==================================================
 
-module.exports = { users, documents, sections, educations, experiences };
+module.exports = {
+  users,
+  documents,
+  sections,
+  textSnippets,
+  educations,
+  experiences,
+};

@@ -123,7 +123,10 @@ function runCommonTests(testConfig) {
         const databaseEntry = (
           await db.query({
             text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
-            values: [instance.id],
+            values:
+              className === 'TextSnippet'
+                ? [instance.id, instance.version]
+                : [instance.id],
           })
         ).rows[0];
 
@@ -215,7 +218,12 @@ function runCommonTests(testConfig) {
               dataForNewInstances[0]
             );
 
-            if (type === 'ID') queryParams.id = preexistingInstance.id;
+            switch (type) {
+              case 'ID & version':
+                queryParams.version = preexistingInstance.version;
+              case 'ID':
+                queryParams.id = preexistingInstance.id;
+            }
 
             Object.freeze(queryParams);
 
@@ -287,12 +295,21 @@ function runCommonTests(testConfig) {
 
           delete expectedUpdatedInstance.isValidColumn;
 
-          // specifically for documents
+          // Specifically for documents.
           if (
             Object.keys(preexistingInstance).includes('lastUpdated') &&
             Object.keys(updatedData).length
           )
             expectedUpdatedInstance.lastUpdated = expect.any(Date);
+
+          // Specifically for text snippets.
+          if (
+            Object.keys(preexistingInstance).includes('parent') &&
+            Object.keys(updatedData).length
+          ) {
+            expectedUpdatedInstance.parent = expect.any(Date);
+            expectedUpdatedInstance.version = expect.any(Date);
+          }
 
           // Act
           const updatedInstance = await preexistingInstance.update(updatedData);
@@ -303,7 +320,10 @@ function runCommonTests(testConfig) {
           const databaseEntry = (
             await db.query({
               text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
-              values: [preexistingInstance.id],
+              values:
+                className === 'TextSnippet'
+                  ? [preexistingInstance.id, updatedInstance.version]
+                  : [preexistingInstance.id],
             })
           ).rows[0];
 
@@ -315,7 +335,10 @@ function runCommonTests(testConfig) {
         `Throws an Error if ${classNameLowerCase} ` + `is not found.`,
         async () => {
           // Arrange
-          const nonexistentInstance = new ClassRef(999);
+          const nonexistentInstance =
+            className === 'TextSnippet'
+              ? new ClassRef(999, new Date(2030, 0, 1))
+              : new ClassRef(999);
 
           // Act
           async function runFunc() {
@@ -343,7 +366,10 @@ function runCommonTests(testConfig) {
         // Assert
         const databaseData = await db.query({
           text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
-          values: [instance.id],
+          values:
+            className === 'TextSnippet'
+              ? [instance.id, instance.version]
+              : [instance.id],
         });
 
         expect(databaseData.rows.length).toBe(0);
