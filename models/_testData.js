@@ -80,6 +80,19 @@ const experiences = Object.freeze([
   }),
 ]);
 
+// These are missing text snippet ID and version, which will need to be added
+// later.
+const skills = Object.freeze([
+  Object.freeze({
+    name: 'skills1',
+    owner: users[0].username,
+  }),
+  Object.freeze({
+    name: 'skills2',
+    owner: users[0].username,
+  }),
+]);
+
 // ==================================================
 
 module.exports = {
@@ -89,4 +102,5 @@ module.exports = {
   textSnippets,
   educations,
   experiences,
+  skills,
 };
