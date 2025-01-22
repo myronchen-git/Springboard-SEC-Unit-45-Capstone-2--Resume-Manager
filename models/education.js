@@ -148,7 +148,7 @@ class Education {
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific education.
-   * @param {String} queryParams.id - ID of the education.
+   * @param {Number} queryParams.id - ID of the education.
    * @param {String} queryParams.owner - Username the education belongs to.
    * @returns {Education} A new Education instance that contains the education's
    *  data.
@@ -184,16 +184,16 @@ class Education {
    * then the education is not updated.
    *
    * @param {Object} props - Contains the updated properties.
-   * @param {String} props.school - New school or education center name.
-   * @param {String} props.location - New location of school.
-   * @param {Date} props.startDate - New start date of joining the school.
-   * @param {Date} props.endDate - New end date of leaving the school.
-   * @param {String} props.degree - New degree name that was or will be given
+   * @param {String} [props.school] - New school or education center name.
+   * @param {String} [props.location] - New location of school.
+   * @param {Date} [props.startDate] - New start date of joining the school.
+   * @param {Date} [props.endDate] - New end date of leaving the school.
+   * @param {String} [props.degree] - New degree name that was or will be given
    *  from the school.
-   * @param {String} props.gpa - New grade point average throughout the
+   * @param {String} [props.gpa] - New grade point average throughout the
    *  attendance.
-   * @param {String} props.awardsAndHonors - New awards or honors String.
-   * @param {String} props.activities - New activities String.
+   * @param {String} [props.awardsAndHonors] - New awards or honors String.
+   * @param {String} [props.activities] - New activities String.
    * @returns {Education} The same Education instance that this method was
    *  called on, but with updated property values.
    */

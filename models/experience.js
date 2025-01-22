@@ -102,7 +102,7 @@ class Experience {
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific experience.
-   * @param {String} queryParams.id - ID of the experience.
+   * @param {Number} queryParams.id - ID of the experience.
    * @param {String} queryParams.owner - Username the experience belongs to.
    * @returns {Experience} A new Experience instance that contains the
    *  experience's data.
@@ -138,12 +138,12 @@ class Experience {
    * then the experience is not updated.
    *
    * @param {Object} props - Contains the updated properties.
-   * @param {String} props.title - New job title or equivalent.
-   * @param {String} props.organization - New name of the company or other type
+   * @param {String} [props.title] - New job title or equivalent.
+   * @param {String} [props.organization] - New name of the company or other type
    *  of organization.
-   * @param {String} props.location - New location of the organization.
-   * @param {Date} props.startDate - New start date of joining the organization.
-   * @param {Date} props.endDate - New end date of leaving the organization.
+   * @param {String} [props.location] - New location of the organization.
+   * @param {Date} [props.startDate] - New start date of joining the organization.
+   * @param {Date} [props.endDate] - New end date of leaving the organization.
    * @returns {Experience} The same Experience instance that this method was
    *  called on, but with updated property values.
    */

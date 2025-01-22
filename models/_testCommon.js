@@ -21,29 +21,29 @@ jest.mock('../app', () => ({
  * operations.
  *
  * @param {Object} testConfig - Contains various names, text, data, etc for
- * testing a model.
+ *  testing a model.
  * @param {Class} testConfig.class - Reference to the class.
  * @param {String} testConfig.tableName - Name of the table that the class is a
- * model of.
+ *  model of.
  * @param {Boolean} testConfig.hasOwner - If the table has the attribute
- * "owner".
+ *  "owner".
  * @param {Object[]} testConfig.dataForNewInstances - Data for creating new
- * records/entries.
+ *  records/entries.
  * @param {Object[]} testConfig.dataForDuplicationCheck - Similar data of the
- * ones for creating new entries.  These are used for checking the adding of
- * same names or info.
+ *  ones for creating new entries.  These are used for checking the adding of
+ *  same names or info.
  * @param {Object[]} testConfig.dataForUpdate - Data used to update existing
- * data.
+ *  data.
  * @param {Object[]} testConfig.expectedDataInNewInstances - Expected data for
- * every entry after doing operations.
+ *  every entry after doing operations.
  * @param {String} testConfig.whereClauseToGetOne - SQL WHERE statement and
- * filter that can be used in SQL statements to retrieve a specific entry.
+ *  filter that can be used in SQL statements to retrieve a specific entry.
  * @param {String} testConfig.whereClauseToGetAll - SQL WHERE statement and
- * filter that can be used in SQL statements to retrieve all related entries.
+ *  filter that can be used in SQL statements to retrieve all related entries.
  * @param {Boolean} testConfig.runGetAllTests - Whether to run tests for the
- * getAll method.
+ *  getAll method.
  * @param {Boolean} testConfig.runGetTests - Whether to run tests for the get
- * method.
+ *  method.
  * @param {Array} testConfig.testCasesForGet - The test cases for the get test
  *  that tests for success.
  *
@@ -179,7 +179,7 @@ function runCommonTests(testConfig) {
           ],
         ])(
           `Get all of %i ${classNameLowerCase}(s)${
-            hasOwner ? 'for a user' : ''
+            hasOwner ? ' for a user' : ''
           }.`,
           async (amount, inputData, expected) => {
             // Arrange
@@ -354,11 +354,11 @@ function runCommonTests(testConfig) {
     // -------------------------------------------------- delete
 
     describe('delete', () => {
-      const docProps = dataForNewInstances[0];
+      const props = dataForNewInstances[0];
 
       test(`Deletes a ${classNameLowerCase}.`, async () => {
         // Arrange
-        const instance = await ClassRef.add(docProps);
+        const instance = await ClassRef.add(props);
 
         // Act
         await instance.delete();

@@ -105,7 +105,7 @@ class Document {
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific document.
-   * @param {String} [queryParams.id] - ID of the document.
+   * @param {Number} [queryParams.id] - ID of the document.
    * @param {String} [queryParams.documentName] - Name of the document.
    * @param {String} queryParams.owner - Username the document belongs to.
    * @returns {Document} A new Document instance that contains the document's

@@ -77,7 +77,7 @@ class Section {
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific section.
-   * @param {String} [queryParams.id] - ID of the section.
+   * @param {Number} [queryParams.id] - ID of the section.
    * @param {String} [queryParams.sectionName] - Name of the section.
    * @returns {Section} A new Section instance that contains the section's
    *  data.

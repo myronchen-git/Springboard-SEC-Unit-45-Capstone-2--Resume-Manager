@@ -91,7 +91,7 @@ class TextSnippet {
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific text snippet.
-   * @param {String} queryParams.id - ID of the text snippet.
+   * @param {Number} queryParams.id - ID of the text snippet.
    * @param {Date} queryParams.version - Timestamp of the text snippet.
    * @param {String} queryParams.owner - Username the text snippet belongs to.
    * @returns {TextSnippet} A new TextSnippet instance that contains the
