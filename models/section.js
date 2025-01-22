@@ -181,7 +181,9 @@ class Section {
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(`${logPrefix}: ${result.rowCount} section(s) deleted.`);
+    logger.info(
+      `${logPrefix}: ${result.rowCount} section(s) deleted: id = ${this.id}.`
+    );
   }
 }
 

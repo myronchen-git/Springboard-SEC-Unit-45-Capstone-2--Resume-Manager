@@ -262,7 +262,9 @@ class Education {
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(`${logPrefix}: ${result.rowCount} education(s) deleted.`);
+    logger.info(
+      `${logPrefix}: ${result.rowCount} education(s) deleted: id = ${this.id}.`
+    );
   }
 }
 

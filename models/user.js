@@ -130,7 +130,10 @@ class User {
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(`${logPrefix}: ${result.rowCount} user(s) deleted.`);
+    logger.info(
+      `${logPrefix}: ${result.rowCount} user(s) deleted: ` +
+        `username = ${this.username}.`
+    );
   }
 }
 
