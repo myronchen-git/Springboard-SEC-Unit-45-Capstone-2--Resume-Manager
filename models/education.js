@@ -144,12 +144,11 @@ class Education {
   }
 
   /**
-   * Retrieves a specific education by ID, for a specified owner.
+   * Retrieves a specific education by ID.
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific education.
    * @param {Number} queryParams.id - ID of the education.
-   * @param {String} queryParams.owner - Username the education belongs to.
    * @returns {Education} A new Education instance that contains the education's
    *  data.
    */
@@ -158,14 +157,14 @@ class Education {
     logger.verbose(logPrefix);
 
     // Allowed parameters.
-    const { id, owner } = queryParams;
+    const { id } = queryParams;
 
     const queryConfig = {
       text: `
   SELECT ${Education._allDbColsAsJs}
   FROM educations
-  WHERE id = $1 AND owner = $2;`,
-      values: [id, owner],
+  WHERE id = $1;`,
+      values: [id],
     };
 
     const result = await db.query(queryConfig, logPrefix);

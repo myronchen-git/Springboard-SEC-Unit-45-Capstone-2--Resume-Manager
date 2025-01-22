@@ -87,29 +87,28 @@ class TextSnippet {
   }
 
   /**
-   * Retrieves a specific text snippet by ID and version, for a specified owner.
+   * Retrieves a specific text snippet by ID and version.
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific text snippet.
    * @param {Number} queryParams.id - ID of the text snippet.
    * @param {Date} queryParams.version - Timestamp of the text snippet.
-   * @param {String} queryParams.owner - Username the text snippet belongs to.
-   * @returns {TextSnippet} A new TextSnippet instance that contains the
-   *  text snippet's data.
+   * @returns {TextSnippet} A new TextSnippet instance that contains the text
+   *  snippet's data.
    */
   static async get(queryParams) {
     const logPrefix = `TextSnippet.get(${JSON.stringify(queryParams)})`;
     logger.verbose(logPrefix);
 
     // Allowed parameters.
-    const { id, version, owner } = queryParams;
+    const { id, version } = queryParams;
 
     const queryConfig = {
       text: `
   SELECT ${TextSnippet._allDbColsAsJs}
   FROM text_snippets
-  WHERE id = $1 AND version = $2 AND owner = $3;`,
-      values: [id, version, owner],
+  WHERE id = $1 AND version = $2;`,
+      values: [id, version],
     };
 
     const result = await db.query(queryConfig, logPrefix);

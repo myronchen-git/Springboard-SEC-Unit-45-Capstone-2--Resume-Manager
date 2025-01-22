@@ -101,13 +101,12 @@ class Document {
   }
 
   /**
-   * Retrieves a specific document by ID or name, for a specified owner.
+   * Retrieves a specific document by ID or name.
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific document.
    * @param {Number} [queryParams.id] - ID of the document.
    * @param {String} [queryParams.documentName] - Name of the document.
-   * @param {String} queryParams.owner - Username the document belongs to.
    * @returns {Document} A new Document instance that contains the document's
    *  data.
    */
@@ -116,21 +115,23 @@ class Document {
     logger.verbose(logPrefix);
 
     // Allowed parameters.
-    const { id, documentName, owner } = queryParams;
+    const { id, documentName } = queryParams;
 
     const queryConfig = {
       text: `
   SELECT ${Document._allDbColsAsJs}
   FROM documents
-  WHERE ${id == undefined ? 'document_name' : 'id'} = $1 AND owner = $2;`,
-      values: [id == undefined ? documentName : id, owner],
+  WHERE ${id == undefined ? 'document_name' : 'id'} = $1;`,
+      values: [id == undefined ? documentName : id],
     };
 
     const result = await db.query(queryConfig, logPrefix);
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Document not found.`);
-      throw new NotFoundError(`Can not find document "${documentName}".`);
+      throw new NotFoundError(
+        `Can not find document with ID ${id} / name "${documentName}".`
+      );
     }
 
     const data = result.rows[0];

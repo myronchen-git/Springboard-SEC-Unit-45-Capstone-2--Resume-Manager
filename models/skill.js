@@ -100,28 +100,27 @@ class Skill {
   }
 
   /**
-   * Retrieves a specific skill by ID, for a specified owner.
+   * Retrieves a specific skill by ID.
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific skill.
-   * @param {Number} queryParams.id - ID of the skill.
-   * @param {String} queryParams.owner - Username the skill belongs to.
-   * @returns {Skill} A new Skill instance that contains the
-   *  skill's data.
+   * @param {Number} [queryParams.id] - ID of the skill.
+   * @param {String} [queryParams.name] - Name of the skill.
+   * @returns {Skill} A new Skill instance that contains the skill's data.
    */
   static async get(queryParams) {
     const logPrefix = `Skill.get(${JSON.stringify(queryParams)})`;
     logger.verbose(logPrefix);
 
     // Allowed parameters.
-    const { id, name, owner } = queryParams;
+    const { id, name } = queryParams;
 
     const queryConfig = {
       text: `
   SELECT ${Skill._allDbColsAsJs}
   FROM skills
-  WHERE ${id == undefined ? 'name' : 'id'} = $1 AND owner = $2;`,
-      values: [id == undefined ? name : id, owner],
+  WHERE ${id == undefined ? 'name' : 'id'} = $1;`,
+      values: [id == undefined ? name : id],
     };
 
     const result = await db.query(queryConfig, logPrefix);
@@ -129,7 +128,7 @@ class Skill {
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Skill not found.`);
       throw new NotFoundError(
-        `Can not find skill with ID ${id}, for owner "${owner}".`
+        `Can not find skill with ID ${id} / name "${name}".`
       );
     }
 

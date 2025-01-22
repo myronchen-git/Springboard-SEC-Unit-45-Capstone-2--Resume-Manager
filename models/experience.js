@@ -98,12 +98,11 @@ class Experience {
   }
 
   /**
-   * Retrieves a specific experience by ID, for a specified owner.
+   * Retrieves a specific experience by ID.
    *
    * @param {Object} queryParams - Contains the query parameters for finding a
    *  specific experience.
    * @param {Number} queryParams.id - ID of the experience.
-   * @param {String} queryParams.owner - Username the experience belongs to.
    * @returns {Experience} A new Experience instance that contains the
    *  experience's data.
    */
@@ -112,14 +111,14 @@ class Experience {
     logger.verbose(logPrefix);
 
     // Allowed parameters.
-    const { id, owner } = queryParams;
+    const { id } = queryParams;
 
     const queryConfig = {
       text: `
   SELECT ${Experience._allDbColsAsJs}
   FROM experiences
-  WHERE id = $1 AND owner = $2;`,
-      values: [id, owner],
+  WHERE id = $1;`,
+      values: [id],
     };
 
     const result = await db.query(queryConfig, logPrefix);
