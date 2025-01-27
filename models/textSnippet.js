@@ -1,8 +1,7 @@
 'use strict';
 
 const { db } = require('../app');
-const { AppServerError } = require('../errors/appErrors');
-const { NotFoundError } = require('../errors/appErrors');
+const { AppServerError, NotFoundError } = require('../errors/appErrors');
 const logger = require('../util/logger');
 
 // ==================================================
