@@ -42,7 +42,7 @@
     "coveragePathIgnorePatterns": [
       "/database/",
       "/errors/",
-      "_.*",
+      "/_.*",
       "logger.js",
       "config.js"
     ]

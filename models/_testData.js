@@ -23,7 +23,7 @@ const documents = Object.freeze([
 const numSections = 2;
 const sections = new Array(numSections);
 for (let i = 1; i <= numSections; i++) {
-  sections[i - 1] = Object.freeze({ sectionName: `section${i}` });
+  sections[i - 1] = Object.freeze({ sectionName: `section ${i}` });
 }
 Object.freeze(sections);
 
@@ -93,6 +93,16 @@ const skills = Object.freeze([
   }),
 ]);
 
+const documents_x_sections = Object.freeze(
+  sections.map((_, idx) =>
+    Object.freeze({
+      documentId: 1,
+      sectionId: idx + 1,
+      position: idx,
+    })
+  )
+);
+
 // ==================================================
 
 module.exports = {
@@ -103,4 +113,5 @@ module.exports = {
   educations,
   experiences,
   skills,
+  documents_x_sections,
 };
