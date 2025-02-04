@@ -121,7 +121,7 @@ describe('Document_X_Education', () => {
         await db.query({
           text:
             sqlTextSelectAll +
-            `\n  WHERE document_id = $1 AND education_id = $2;`,
+            '\n  WHERE document_id = $1 AND education_id = $2;',
           values: [dataToAdd.documentId, dataToAdd.educationId],
         })
       ).rows[0];
@@ -179,7 +179,7 @@ describe('Document_X_Education', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + `\n  WHERE document_id = $1;`,
+            text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
             values: [documentId],
           })
         ).rows;
@@ -202,7 +202,7 @@ describe('Document_X_Education', () => {
         documents_x_educations,
       ],
     ])(
-      `Get all of %i document_x_education(s) for a document.`,
+      'Get all of %i document_x_education(s) for a document.',
       async (amount, inputData, expected) => {
         // Arrange
         for (const props of inputData) {
@@ -245,7 +245,7 @@ describe('Document_X_Education', () => {
       expect(instance).toEqual(existingData);
     });
 
-    test(`Throws an Error if document_x_education is not found.`, async () => {
+    test('Throws an Error if document_x_education is not found.', async () => {
       // Arrange
       const queryParams = { documentId: 999, educationId: 999 };
 
@@ -296,7 +296,7 @@ describe('Document_X_Education', () => {
         await db.query({
           text:
             sqlTextSelectAll +
-            `\n  WHERE document_id = $1 AND education_id = $2;`,
+            '\n  WHERE document_id = $1 AND education_id = $2;',
           values: [
             preexistingInstance.documentId,
             preexistingInstance.educationId,
@@ -339,7 +339,7 @@ describe('Document_X_Education', () => {
   describe('delete', () => {
     const existingData = documents_x_educations[0];
 
-    test(`Deletes a document_x_education.`, async () => {
+    test('Deletes a document_x_education.', async () => {
       // Arrange
       const instance = await Document_X_Education.add(existingData);
 
@@ -350,14 +350,14 @@ describe('Document_X_Education', () => {
       const databaseData = await db.query({
         text:
           sqlTextSelectAll +
-          `\n  WHERE document_id = $1 AND education_id = $2;`,
+          '\n  WHERE document_id = $1 AND education_id = $2;',
         values: [instance.documentId, instance.educationId],
       });
 
       expect(databaseData.rows.length).toBe(0);
     });
 
-    test(`Does not throw an Error if document_x_education is not found.`, async () => {
+    test('Does not throw an Error if document_x_education is not found.', async () => {
       // Arrange
       const nonexistentInstance = new Document_X_Education(999, 999);
 

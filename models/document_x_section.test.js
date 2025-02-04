@@ -108,7 +108,7 @@ describe('Document_X_Section', () => {
         await db.query({
           text:
             sqlTextSelectAll +
-            `\n  WHERE document_id = $1 AND section_id = $2;`,
+            '\n  WHERE document_id = $1 AND section_id = $2;',
           values: [dataToAdd.documentId, dataToAdd.sectionId],
         })
       ).rows[0];
@@ -138,7 +138,7 @@ describe('Document_X_Section', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + `\n  WHERE document_id = $1;`,
+            text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
             values: [documentId],
           })
         ).rows;
@@ -170,7 +170,7 @@ describe('Document_X_Section', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + `\n  WHERE document_id = $1;`,
+            text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
             values: [documentId],
           })
         ).rows;
@@ -189,7 +189,7 @@ describe('Document_X_Section', () => {
       [0, [], []],
       [documents_x_sections.length, documents_x_sections, documents_x_sections],
     ])(
-      `Get all of %i document_x_section(s) for a document.`,
+      'Get all of %i document_x_section(s) for a document.',
       async (amount, inputData, expected) => {
         // Arrange
         for (const props of inputData) {
@@ -232,7 +232,7 @@ describe('Document_X_Section', () => {
       expect(instance).toEqual(existingData);
     });
 
-    test(`Throws an Error if document_x_section is not found.`, async () => {
+    test('Throws an Error if document_x_section is not found.', async () => {
       // Arrange
       const queryParams = { documentId: 999, sectionId: 999 };
 
@@ -283,7 +283,7 @@ describe('Document_X_Section', () => {
         await db.query({
           text:
             sqlTextSelectAll +
-            `\n  WHERE document_id = $1 AND section_id = $2;`,
+            '\n  WHERE document_id = $1 AND section_id = $2;',
           values: [
             preexistingInstance.documentId,
             preexistingInstance.sectionId,
@@ -326,7 +326,7 @@ describe('Document_X_Section', () => {
   describe('delete', () => {
     const existingData = documents_x_sections[0];
 
-    test(`Deletes a document_x_section.`, async () => {
+    test('Deletes a document_x_section.', async () => {
       // Arrange
       const instance = await Document_X_Section.add(existingData);
 
@@ -336,14 +336,14 @@ describe('Document_X_Section', () => {
       // Assert
       const databaseData = await db.query({
         text:
-          sqlTextSelectAll + `\n  WHERE document_id = $1 AND section_id = $2;`,
+          sqlTextSelectAll + '\n  WHERE document_id = $1 AND section_id = $2;',
         values: [instance.documentId, instance.sectionId],
       });
 
       expect(databaseData.rows.length).toBe(0);
     });
 
-    test(`Does not throw an Error if document_x_section is not found.`, async () => {
+    test('Does not throw an Error if document_x_section is not found.', async () => {
       // Arrange
       const nonexistentInstance = new Document_X_Section(999, 999);
 

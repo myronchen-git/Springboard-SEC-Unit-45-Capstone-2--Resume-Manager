@@ -197,7 +197,7 @@ class Document_X_Section {
    * to!
    */
   async delete() {
-    const logPrefix = `Document_X_Section.delete()`;
+    const logPrefix = 'Document_X_Section.delete()';
     logger.verbose(logPrefix);
 
     const queryConfig = {

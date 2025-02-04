@@ -132,7 +132,7 @@ class Document_X_Education extends Relationship {
       `documentId = ${this.documentId}, ` + `educationId = ${this.educationId}`;
 
     const notFoundLog =
-      `Document_X_Education with ` +
+      'Document_X_Education with ' +
       `document ID ${this.documentId} and ` +
       `education ID ${this.educationId} was not found.`;
 
@@ -163,7 +163,7 @@ class Document_X_Education extends Relationship {
     };
 
     const deletedLog =
-      `document_x_education(s) deleted: ` +
+      'document_x_education(s) deleted: ' +
       `documentId = ${this.documentId}, educationId = ${this.educationId}.`;
 
     await super.delete(queryConfig, deletedLog);
