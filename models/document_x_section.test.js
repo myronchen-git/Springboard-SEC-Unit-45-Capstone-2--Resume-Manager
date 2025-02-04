@@ -33,10 +33,6 @@ describe('Document_X_Section', () => {
   FROM ${tableName}`;
 
   const documentId = 1;
-  const sectionData = sections.map((section, idx) => ({
-    ...section,
-    id: idx + 1,
-  }));
 
   beforeAll((done) => {
     db.query({
@@ -59,20 +55,23 @@ describe('Document_X_Section', () => {
           ],
         })
       )
-      .then(() =>
+      .then(() => {
+        const insertData = sections.map((section, idx) => ({
+          id: idx + 1,
+          ...section,
+        }));
+
         db.query({
           text: `
   INSERT INTO sections VALUES
     ($1, $2),
     ($3, $4);`,
           values: [
-            sectionData[0].id,
-            sectionData[0].sectionName,
-            sectionData[1].id,
-            sectionData[1].sectionName,
+            ...Object.values(insertData[0]),
+            ...Object.values(insertData[1]),
           ],
-        })
-      )
+        });
+      })
       .then(() => done());
   });
 

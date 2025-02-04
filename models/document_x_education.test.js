@@ -31,10 +31,6 @@ describe('Document_X_Education', () => {
   FROM ${Document_X_Education.tableName}`;
 
   const documentId = 1;
-  const educationData = educations.map((education, idx) => ({
-    id: idx + 1,
-    ...education,
-  }));
 
   beforeAll((done) => {
     db.query({
@@ -58,8 +54,8 @@ describe('Document_X_Education', () => {
         })
       )
       .then(() => {
-        const insertData = educationData.map((origEdu) => {
-          const edu = { ...origEdu };
+        const insertData = educations.map((origEdu, idx) => {
+          const edu = { id: idx + 1, ...origEdu };
           edu.gpa ||= null;
           edu.awardsAndHonors ||= null;
           edu.activities ||= null;
