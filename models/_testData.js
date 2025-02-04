@@ -103,6 +103,16 @@ const documents_x_sections = Object.freeze(
   )
 );
 
+const documents_x_educations = Object.freeze(
+  educations.map((_, idx) =>
+    Object.freeze({
+      documentId: 1,
+      educationId: idx + 1,
+      position: idx,
+    })
+  )
+);
+
 // ==================================================
 
 module.exports = {
@@ -114,4 +124,5 @@ module.exports = {
   experiences,
   skills,
   documents_x_sections,
+  documents_x_educations,
 };
