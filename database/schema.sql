@@ -165,6 +165,7 @@ CREATE TABLE documents_x_experiences (
 		REFERENCES experiences ON DELETE CASCADE,
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
+	UNIQUE (document_id, experience_id),
 	UNIQUE (document_id, position)
 );
 
@@ -195,6 +196,7 @@ CREATE TABLE documents_x_projects (
 		REFERENCES projects ON DELETE CASCADE,
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
+	UNIQUE (document_id, project_id),
 	UNIQUE (document_id, position)
 );
 
