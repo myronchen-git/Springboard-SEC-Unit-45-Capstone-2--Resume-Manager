@@ -42,7 +42,7 @@ class Experience {
    *  organization.
    * @param {String} props.location - Location of the organization.
    * @param {Date} props.startDate - The start date of joining the organization.
-   * @param {Date} props.endDate - The end date of leaving the organization.
+   * @param {Date} [props.endDate] - The end date of leaving the organization.
    * @returns {Experience} A new Experience instance that contains the
    *  experience's data.
    */

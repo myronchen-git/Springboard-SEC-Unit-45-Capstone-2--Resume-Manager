@@ -4,6 +4,9 @@ const Relationship = require('./relationship');
 
 // ==================================================
 
+/**
+ * Represents a document and skill relationship.
+ */
 class Document_X_Skill extends Relationship {
   static tableName = 'documents_x_skills';
 

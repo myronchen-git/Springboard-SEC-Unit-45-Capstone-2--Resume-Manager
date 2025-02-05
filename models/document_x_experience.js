@@ -4,6 +4,9 @@ const Relationship = require('./relationship');
 
 // ==================================================
 
+/**
+ * Represents a document and experience relationship.
+ */
 class Document_X_Experience extends Relationship {
   static tableName = 'documents_x_experiences';
 

@@ -60,11 +60,11 @@ class Education {
    * @param {Date} props.endDate - The end date of leaving the school.
    * @param {String} props.degree - The degree name that was or will be given
    *  from the school.
-   * @param {String} props.gpa - The grade point average throughout the
+   * @param {String} [props.gpa] - The grade point average throughout the
    *  attendance.
-   * @param {String} props.awardsAndHonors - Any awards or honors given by the
+   * @param {String} [props.awardsAndHonors] - Any awards or honors given by the
    *  school.
-   * @param {String} props.activities - Any activities done in relation to the
+   * @param {String} [props.activities] - Any activities done in relation to the
    *  school.
    * @returns {Education} A new Education instance that contains the education's
    *  data.
