@@ -5,6 +5,19 @@ const users = Object.freeze([
   Object.freeze({ username: 'user2', password: '123' }),
 ]);
 
+const contactInfos = Object.freeze([
+  Object.freeze({ username: 'user1', fullName: 'First1 Last1' }),
+  Object.freeze({
+    username: 'user2',
+    fullName: 'First2 Last2',
+    location: 'Location 2',
+    email: 'email2@email.com',
+    phone: '111-111-1111',
+    linkedin: 'user2@linkedin.com',
+    github: 'user2@github.com',
+  }),
+]);
+
 const documents = Object.freeze([
   Object.freeze({
     documentName: 'doc1',
@@ -150,6 +163,7 @@ const experiences_x_text_snippets = Object.freeze(
 
 module.exports = {
   users,
+  contactInfos,
   documents,
   sections,
   textSnippets,
