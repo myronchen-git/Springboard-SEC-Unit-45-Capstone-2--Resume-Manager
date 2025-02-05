@@ -1,19 +1,15 @@
 'use strict';
 
-const { db } = require('../app');
-const {
-  AppServerError,
-  BadRequestError,
-  NotFoundError,
-} = require('../errors/appErrors');
-const logger = require('../util/logger');
+const Relationship = require('./relationship');
 
 // ==================================================
 
 /**
  * Represents a document and section relationship.
  */
-class Document_X_Section {
+class Document_X_Section extends Relationship {
+  static tableName = 'documents_x_sections';
+
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
   static _allDbColsAsJs = `
@@ -22,6 +18,7 @@ class Document_X_Section {
     position`;
 
   constructor(documentId, sectionId, position) {
+    super();
     this.documentId = documentId;
     this.sectionId = sectionId;
     this.position = position;
@@ -40,15 +37,12 @@ class Document_X_Section {
    *  contains the document_x_section's data.
    */
   static async add(props) {
-    const logPrefix = `Document_X_Section.add(${JSON.stringify(props)})`;
-    logger.verbose(logPrefix);
-
     // Allowed properties/attributes.
     const { documentId, sectionId, position } = props;
 
     const queryConfig = {
       text: `
-  INSERT INTO documents_x_sections (
+  INSERT INTO ${Document_X_Section.tableName} (
     document_id,
     section_id,
     position
@@ -58,18 +52,12 @@ class Document_X_Section {
       values: [documentId, sectionId, position],
     };
 
-    const result = await db.query(queryConfig, logPrefix, (err) => {
-      // PostgreSQL error code 23503 is for foreign key violation.
-      if (err.code === '23503') {
-        throw new NotFoundError(
-          'Document or section was not found.  ' +
-            `Document ID: ${documentId}, ` +
-            `section ID: ${sectionId}.`
-        );
-      }
-    });
+    const notFoundMessage =
+      'Document or section was not found.  ' +
+      `Document ID: ${documentId}, ` +
+      `section ID: ${sectionId}.`;
 
-    return new Document_X_Section(...Object.values(result.rows[0]));
+    return await super.add(props, queryConfig, notFoundMessage);
   }
 
   /**
@@ -80,22 +68,15 @@ class Document_X_Section {
    * @returns {Document_X_Section[]} A list of Document_X_Section instances.
    */
   static async getAll(documentId) {
-    const logPrefix = `Document_X_Section.getAll(${documentId})`;
-    logger.verbose(logPrefix);
-
     const queryConfig = {
       text: `
   SELECT ${Document_X_Section._allDbColsAsJs}
-  FROM documents_x_sections
+  FROM ${Document_X_Section.tableName}
   WHERE document_id = $1;`,
       values: [documentId],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
-
-    return result.rows.map(
-      (data) => new Document_X_Section(...Object.values(data))
-    );
+    return await super.getAll(documentId, queryConfig);
   }
 
   /**
@@ -111,32 +92,22 @@ class Document_X_Section {
    *  contains the document_x_section's data.
    */
   static async get(queryParams) {
-    const logPrefix = `Document_X_Section.get(${JSON.stringify(queryParams)})`;
-    logger.verbose(logPrefix);
-
     // Allowed parameters.
     const { documentId, sectionId } = queryParams;
 
     const queryConfig = {
       text: `
   SELECT ${Document_X_Section._allDbColsAsJs}
-  FROM documents_x_sections
+  FROM ${Document_X_Section.tableName}
   WHERE document_id = $1 AND section_id = $2;`,
       values: [documentId, sectionId],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const notFoundMessage =
+      'Can not find document-section relation with ' +
+      `document ID ${documentId} and section ID ${sectionId}.`;
 
-    if (result.rows.length === 0) {
-      logger.error(`${logPrefix}: Document_X_Section not found.`);
-      throw new NotFoundError(
-        'Can not find document-section relation with ' +
-          `document ID ${documentId} and section ID ${sectionId}.`
-      );
-    }
-
-    const data = result.rows[0];
-    return new Document_X_Section(...Object.values(data));
+    return await super.get(queryParams, queryConfig, notFoundMessage);
   }
 
   /**
@@ -148,47 +119,34 @@ class Document_X_Section {
    *  this method was called on, but with updated property values.
    */
   async update(position) {
-    const logPrefix = `Document_X_Section.update(${position})`;
-    logger.verbose(logPrefix);
-
-    if (position < 0) {
-      const message = 'Position can not be less than 0.';
-      logger.error(
-        `${logPrefix}: documentId = ${this.documentId}, ` +
-          `sectionId = ${this.sectionId}: ${message}`
-      );
-      throw new BadRequestError(message);
-    }
-
     const queryConfig = {
       text: `
-  UPDATE documents_x_sections
+  UPDATE ${Document_X_Section.tableName}
   SET position = $1
   WHERE document_id = $2 AND section_id = $3
   RETURNING ${Document_X_Section._allDbColsAsJs};`,
       values: [position, this.documentId, this.sectionId],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const instanceArgsForLog =
+      `documentId = ${this.documentId}, ` + `sectionId = ${this.sectionId}`;
 
-    if (result.rowCount === 0) {
-      logger.error(
-        `${logPrefix}: Document_X_Section with ` +
-          `document ID ${this.documentId} and ` +
-          `section ID ${this.sectionId} was not found.`
-      );
-      throw new AppServerError(
-        `Document-section relation with document ID ${this.documentId} and ` +
-          `section ID ${this.sectionId} was not found.`
-      );
-    }
+    const notFoundLog =
+      'Document_X_Section with ' +
+      `document ID ${this.documentId} and ` +
+      `section ID ${this.sectionId} was not found.`;
 
-    // Update current instance's properties.
-    Object.entries(result.rows[0]).forEach(([colName, val]) => {
-      this[colName] = val;
-    });
+    const serverErrorMessage =
+      `Document-section relation with document ID ${this.documentId} and ` +
+      `section ID ${this.sectionId} was not found.`;
 
-    return this;
+    return await super.update(
+      position,
+      queryConfig,
+      instanceArgsForLog,
+      notFoundLog,
+      serverErrorMessage
+    );
   }
 
   /**
@@ -197,26 +155,18 @@ class Document_X_Section {
    * to!
    */
   async delete() {
-    const logPrefix = 'Document_X_Section.delete()';
-    logger.verbose(logPrefix);
-
     const queryConfig = {
       text: `
-  DELETE FROM documents_x_sections
+  DELETE FROM ${Document_X_Section.tableName}
   WHERE document_id = $1 AND section_id = $2;`,
       values: [this.documentId, this.sectionId],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const deletedLog =
+      'document_x_section(s) deleted: ' +
+      `documentId = ${this.documentId}, sectionId = ${this.sectionId}.`;
 
-    if (result.rowCount) {
-      logger.info(
-        `${logPrefix}: ${result.rowCount} document_x_section(s) deleted: ` +
-          `documentId = ${this.documentId}, sectionId = ${this.sectionId}.`
-      );
-    } else {
-      logger.info(`${logPrefix}: 0 documents_x_sections entries deleted.`);
-    }
+    await super.delete(queryConfig, deletedLog);
   }
 }
 
