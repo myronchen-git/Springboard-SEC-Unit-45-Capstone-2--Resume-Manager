@@ -197,17 +197,21 @@ class TextSnippet {
 
     const queryConfig = {
       text: `
-      DELETE FROM text_snippets
-      WHERE id = $1 AND version = $2;`,
+  DELETE FROM text_snippets
+  WHERE id = $1 AND version = $2;`,
       values: [this.id, this.version],
     };
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(
-      `${logPrefix}: ${result.rowCount} text snippet(s) deleted: ` +
-        `id = ${this.id}, version = ${this.version}.`
-    );
+    if (result.rowCount) {
+      logger.info(
+        `${logPrefix}: ${result.rowCount} text snippet(s) deleted: ` +
+          `id = ${this.id}, version = ${this.version}.`
+      );
+    } else {
+      logger.info(`${logPrefix}: 0 text snippets deleted.`);
+    }
   }
 }
 

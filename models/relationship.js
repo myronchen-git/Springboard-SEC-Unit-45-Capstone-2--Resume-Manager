@@ -164,7 +164,13 @@ class Relationship {
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(`${logPrefix}: ${result.rowCount} ${deletedLog}`);
+    if (result.rowCount) {
+      logger.info(`${logPrefix}: ${result.rowCount} ${deletedLog}`);
+    } else {
+      logger.info(
+        `${logPrefix}: 0 ${this.constructor.tableName} entries deleted.`
+      );
+    }
   }
 }
 

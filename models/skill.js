@@ -200,9 +200,13 @@ class Skill {
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(
-      `${logPrefix}: ${result.rowCount} skill(s) deleted: id = ${this.id}.`
-    );
+    if (result.rowCount) {
+      logger.info(
+        `${logPrefix}: ${result.rowCount} skill(s) deleted: id = ${this.id}.`
+      );
+    } else {
+      logger.info(`${logPrefix}: 0 skills deleted.`);
+    }
   }
 }
 

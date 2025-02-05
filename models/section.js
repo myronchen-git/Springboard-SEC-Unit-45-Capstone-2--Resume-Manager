@@ -173,16 +173,20 @@ class Section {
 
     const queryConfig = {
       text: `
-      DELETE FROM sections
-      WHERE id = $1;`,
+  DELETE FROM sections
+  WHERE id = $1;`,
       values: [this.id],
     };
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(
-      `${logPrefix}: ${result.rowCount} section(s) deleted: id = ${this.id}.`
-    );
+    if (result.rowCount) {
+      logger.info(
+        `${logPrefix}: ${result.rowCount} section(s) deleted: id = ${this.id}.`
+      );
+    } else {
+      logger.info(`${logPrefix}: 0 sections deleted.`);
+    }
   }
 }
 

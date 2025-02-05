@@ -209,10 +209,14 @@ class Document_X_Section {
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(
-      `${logPrefix}: ${result.rowCount} document_x_section(s) deleted: ` +
-        `documentId = ${this.documentId}, sectionId = ${this.sectionId}.`
-    );
+    if (result.rowCount) {
+      logger.info(
+        `${logPrefix}: ${result.rowCount} document_x_section(s) deleted: ` +
+          `documentId = ${this.documentId}, sectionId = ${this.sectionId}.`
+      );
+    } else {
+      logger.info(`${logPrefix}: 0 documents_x_sections entries deleted.`);
+    }
   }
 }
 

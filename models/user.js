@@ -35,9 +35,9 @@ class User {
 
     const queryConfig = {
       text: `
-      INSERT INTO users VALUES
-      ($1, $2)
-      RETURNING username;`,
+  INSERT INTO users VALUES
+  ($1, $2)
+  RETURNING username;`,
       values: [username, hashedPassword],
     };
 
@@ -67,9 +67,9 @@ class User {
 
     const queryConfig = {
       text: `
-      SELECT username, password
-      FROM users
-      WHERE username = $1;`,
+  SELECT username, password
+  FROM users
+  WHERE username = $1;`,
       values: [username],
     };
 
@@ -99,9 +99,9 @@ class User {
 
     const queryConfig = {
       text: `
-      UPDATE users
-      SET password = $1
-      WHERE username = $2;`,
+  UPDATE users
+  SET password = $1
+  WHERE username = $2;`,
       values: [password, this.username],
     };
 
@@ -123,17 +123,21 @@ class User {
 
     const queryConfig = {
       text: `
-      DELETE FROM users
-      WHERE username = $1;`,
+  DELETE FROM users
+  WHERE username = $1;`,
       values: [this.username],
     };
 
     const result = await db.query(queryConfig, logPrefix);
 
-    logger.info(
-      `${logPrefix}: ${result.rowCount} user(s) deleted: ` +
-        `username = ${this.username}.`
-    );
+    if (result.rowCount) {
+      logger.info(
+        `${logPrefix}: ${result.rowCount} user(s) deleted: ` +
+          `username = ${this.username}.`
+      );
+    } else {
+      logger.info(`${logPrefix}: 0 users deleted.`);
+    }
   }
 }
 
