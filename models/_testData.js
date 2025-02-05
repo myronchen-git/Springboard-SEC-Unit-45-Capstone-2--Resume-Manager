@@ -40,6 +40,9 @@ const textSnippets = Object.freeze([
   }),
 ]);
 
+// To use in text snippets.
+const versions = textSnippets.map((_, idx) => new Date(2000 + idx, 0, 1));
+
 const educations = Object.freeze([
   Object.freeze({
     owner: users[0].username,
@@ -132,6 +135,17 @@ const documents_x_skills = Object.freeze(
   )
 );
 
+const experiences_x_text_snippets = Object.freeze(
+  textSnippets.map((_, idx) =>
+    Object.freeze({
+      documentXExperienceId: 1,
+      textSnippetId: idx + 1,
+      textSnippetVersion: versions[idx],
+      position: idx,
+    })
+  )
+);
+
 // ==================================================
 
 module.exports = {
@@ -139,6 +153,7 @@ module.exports = {
   documents,
   sections,
   textSnippets,
+  versions,
   educations,
   experiences,
   skills,
@@ -146,4 +161,5 @@ module.exports = {
   documents_x_educations,
   documents_x_experiences,
   documents_x_skills,
+  experiences_x_text_snippets,
 };
