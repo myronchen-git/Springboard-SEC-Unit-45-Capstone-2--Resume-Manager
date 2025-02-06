@@ -34,11 +34,11 @@ app.use(function (req, res, next) {
 /** Generic error handler for anything unhandled. */
 app.use(function (err, req, res, next) {
   if (process.env.NODE_ENV !== 'test') logger.error(err.stack);
-  const status = err.status || 500;
+  const statusCode = err.statusCode || 500;
   const message = err.message;
 
-  return res.status(status).json({
-    error: { message, status },
+  return res.status(statusCode).json({
+    error: { message, statusCode },
   });
 });
 
