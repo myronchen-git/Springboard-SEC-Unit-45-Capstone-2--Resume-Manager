@@ -6,6 +6,8 @@ const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
 
+const authRoutes = require('./routes/auth');
+
 const { NotFoundError } = require('./errors/appErrors');
 
 const logger = require('./util/logger');
@@ -20,6 +22,10 @@ app.use(express.json());
 app.use(morgan('common', { stream: logger.stream }));
 
 // --------------------------------------------------
+
+const urlPrefix = '/api/v1';
+
+app.use(`${urlPrefix}/auth`, authRoutes);
 
 /** Catch-all for handling 404 errors. */
 app.use(function (req, res, next) {

@@ -1,8 +1,8 @@
 /** Holds common test data that might be used across all tests. */
 
 const users = Object.freeze([
-  Object.freeze({ username: 'user1', password: '123' }),
-  Object.freeze({ username: 'user2', password: '123' }),
+  Object.freeze({ username: 'user1', password: '123Ab!' }),
+  Object.freeze({ username: 'user2', password: '123Ab!' }),
 ]);
 
 const contactInfos = Object.freeze([
