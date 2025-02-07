@@ -80,6 +80,11 @@ class PostgresDb {
    */
 }
 
+// --------------------------------------------------
+// Start database connection.
+
+const db = new PostgresDb();
+
 // ==================================================
 
-module.exports = PostgresDb;
+module.exports = db;

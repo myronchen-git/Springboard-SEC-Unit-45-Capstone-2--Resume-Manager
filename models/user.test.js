@@ -1,7 +1,8 @@
 'use strict';
 
+const db = require('../database/db');
 const User = require('./user');
-const { db } = require('../app');
+
 const { AppServerError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
@@ -11,7 +12,7 @@ const { users } = require('./_testData');
 
 // Mock to bypass executing app code, but use actual "db" instance.
 jest.mock('../app', () => ({
-  db: new (require('../database/db'))(),
+  db: require('../database/db'),
 }));
 
 // ==================================================
@@ -41,9 +42,7 @@ describe('User', () => {
     });
   });
 
-  afterAll(() => {
-    return db.shutdown();
-  });
+  afterAll(() => db.shutdown());
 
   // -------------------------------------------------- register
 

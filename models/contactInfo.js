@@ -1,8 +1,10 @@
 'use strict';
 
-const { db } = require('../app');
-const { AppServerError, NotFoundError } = require('../errors/appErrors');
+const db = require('../database/db');
 const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
+
+const { AppServerError, NotFoundError } = require('../errors/appErrors');
+
 const logger = require('../util/logger');
 
 // ==================================================

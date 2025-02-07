@@ -1,7 +1,8 @@
 'use strict';
 
-const { db } = require('../app');
+const db = require('../database/db');
 const Experience_X_Text_Snippet = require('./experience_x_text_snippet');
+
 const {
   AppServerError,
   NotFoundError,
@@ -22,7 +23,7 @@ const {
 
 // Mock to bypass executing app code, but use actual "db" instance.
 jest.mock('../app', () => ({
-  db: new (require('../database/db'))(),
+  db: require('../database/db'),
 }));
 
 // ==================================================

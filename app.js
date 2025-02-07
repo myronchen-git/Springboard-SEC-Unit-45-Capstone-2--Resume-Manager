@@ -6,14 +6,9 @@ const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
 
-const PostgresDb = require('./database/db');
 const { NotFoundError } = require('./errors/appErrors');
+
 const logger = require('./util/logger');
-
-// ==================================================
-// Start database connection.
-
-const db = new PostgresDb();
 
 // ==================================================
 // Start app and configure routes, middleware, error handling, etc..
@@ -44,4 +39,4 @@ app.use(function (err, req, res, next) {
 
 // ==================================================
 
-module.exports = { app, db };
+module.exports = app;

@@ -1,11 +1,13 @@
 'use strict';
 
-const { db } = require('../app');
+const db = require('../database/db');
+
 const {
   AppServerError,
   BadRequestError,
   NotFoundError,
 } = require('../errors/appErrors');
+
 const logger = require('../util/logger');
 
 // ==================================================

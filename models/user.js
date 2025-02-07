@@ -2,10 +2,12 @@
 
 const bcrypt = require('bcrypt');
 
-const { BCRYPT_WORK_FACTOR } = require('../config');
-const { db } = require('../app');
+const db = require('../database/db');
+
 const { AppServerError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
+
+const { BCRYPT_WORK_FACTOR } = require('../config');
 const logger = require('../util/logger');
 
 // ==================================================
@@ -36,7 +38,7 @@ class User {
     const queryConfig = {
       text: `
   INSERT INTO users VALUES
-  ($1, $2)
+    ($1, $2)
   RETURNING username;`,
       values: [username, hashedPassword],
     };
