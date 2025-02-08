@@ -6,6 +6,7 @@ const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
 
+const { authenticateJWT } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 
 const { NotFoundError } = require('./errors/appErrors');
@@ -20,6 +21,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan('common', { stream: logger.stream }));
+app.use(authenticateJWT);
 
 // --------------------------------------------------
 
