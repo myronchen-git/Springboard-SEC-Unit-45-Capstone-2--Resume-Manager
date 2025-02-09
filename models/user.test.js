@@ -53,7 +53,7 @@ describe('User', () => {
 
       // Assert
       expect(user).toBeInstanceOf(User);
-      expect(user.username).toBe(testUser.username);
+      expect(user).toEqual({ username: testUser.username });
 
       const databaseEntry = (
         await db.query({
@@ -99,7 +99,7 @@ describe('User', () => {
 
       // Assert
       expect(user).toBeInstanceOf(User);
-      expect(user.username).toBe(testUser.username);
+      expect(user).toEqual({ username: testUser.username });
     });
 
     test('Throws an Error if username is not found.', async () => {

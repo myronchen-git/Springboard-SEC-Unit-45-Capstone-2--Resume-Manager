@@ -16,6 +16,13 @@ const logger = require('../util/logger');
  * Represents a user account.
  */
 class User {
+  static tableName = 'users';
+
+  // To use in SQL statements to return all column data.  Ensure the properties
+  // are in the same order and amount as constructor parameters.
+  static _allDbColsAsJs = `
+    username`;
+
   constructor(username) {
     this.username = username;
   }
@@ -37,9 +44,9 @@ class User {
 
     const queryConfig = {
       text: `
-  INSERT INTO users VALUES
+  INSERT INTO ${User.tableName} VALUES
     ($1, $2)
-  RETURNING username;`,
+  RETURNING ${User._allDbColsAsJs};`,
       values: [username, hashedPassword],
     };
 
@@ -51,7 +58,7 @@ class User {
     });
 
     const data = result.rows[0];
-    return new User(data.username);
+    return new User(...Object.values(data));
   }
 
   /**
@@ -70,7 +77,7 @@ class User {
     const queryConfig = {
       text: `
   SELECT username, password
-  FROM users
+  FROM ${User.tableName}
   WHERE username = $1;`,
       values: [username],
     };
@@ -78,8 +85,10 @@ class User {
     const result = await db.query(queryConfig, logPrefix);
 
     const data = result.rows[0];
-    if (data && (await bcrypt.compare(password, data.password)))
-      return new User(data.username);
+    if (data && (await bcrypt.compare(password, data.password))) {
+      delete data.password;
+      return new User(...Object.values(data));
+    }
 
     logger.error(
       `${logPrefix}: Invalid username/password when signing into "${username}".`
@@ -101,7 +110,7 @@ class User {
 
     const queryConfig = {
       text: `
-  UPDATE users
+  UPDATE ${User.tableName}
   SET password = $1
   WHERE username = $2;`,
       values: [password, this.username],
@@ -125,7 +134,7 @@ class User {
 
     const queryConfig = {
       text: `
-  DELETE FROM users
+  DELETE FROM ${User.tableName}
   WHERE username = $1;`,
       values: [this.username],
     };
