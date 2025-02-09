@@ -55,11 +55,9 @@ router.post('/register', async (req, res, next) => {
     // These reassigned error messages are specific to the JSON schema.  Ensure
     // that these are up-to-date.
     if (err.message.includes('instance.username')) {
-      err.message = 'Username must be 3-30 characters long.';
+      err.message = User.usernameRequirementsMessage;
     } else if (err.message.includes('password does not match pattern')) {
-      err.message =
-        'Password must be 6-20 characters long and contain a ' +
-        'number, uppercase letter, lowercase letter, and symbol.';
+      err.message = User.passwordRequirementsMessage;
     }
 
     return next(err);

@@ -23,6 +23,11 @@ class User {
   static _allDbColsAsJs = `
     username`;
 
+  static usernameRequirementsMessage = 'Username must be 3-30 characters long.';
+  static passwordRequirementsMessage =
+    'Password must be 6-20 characters long and contain a ' +
+    'number, uppercase letter, lowercase letter, and symbol.';
+
   constructor(username) {
     this.username = username;
   }

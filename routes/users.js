@@ -61,8 +61,7 @@ router.patch('/:username', ensureLoggedIn, async (req, res, next) => {
 
       const rewordedErrs = errs.map((err) => {
         return err.toLowerCase().includes('password does not match pattern')
-          ? 'Password must be 6-20 characters long and contain a ' +
-              'number, uppercase letter, lowercase letter, and symbol.'
+          ? User.passwordRequirementsMessage
           : err;
       });
 
