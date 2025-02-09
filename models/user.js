@@ -98,30 +98,54 @@ class User {
 
   /**
    * Updates a user entry in the database.  Currently, this only updates the
-   * password.  In the future, this might update other info.  If that's the
-   * case, then this would need to return the updated info.
+   * password.
    *
+   * @param {String} username - Username of the account to update.
    * @param {Object} data - Contains data for updating an account.
    * @param {String} data.password - New password for the account.
+   * @returns {User} A new User instance that contains the user's data.
    */
-  async update({ password }) {
-    const logPrefix = `User.update({ password: (password) })`;
-    logger.verbose(logPrefix + `: Updating info for "${this.username}".`);
+  static async update(username, { password }) {
+    const logPrefix =
+      'User.update( ' + `username: '${username}', { password: (password) } )`;
+    logger.verbose(logPrefix + `: Updating info for "${username}".`);
 
     const queryConfig = {
       text: `
   UPDATE ${User.tableName}
   SET password = $1
-  WHERE username = $2;`,
-      values: [password, this.username],
+  WHERE username = $2
+  RETURNING ${User._allDbColsAsJs};`,
+      values: [password, username],
     };
 
     const result = await db.query(queryConfig, logPrefix);
 
     if (result.rowCount === 0) {
-      logger.error(`${logPrefix}: Username "${this.username}" not found.`);
-      throw new AppServerError(`Username "${this.username}" not found.`);
+      logger.error(`${logPrefix}: Username "${username}" not found.`);
+      throw new AppServerError(`Username "${username}" not found.`);
     }
+
+    const data = result.rows[0];
+    return new User(...Object.values(data));
+  }
+
+  /**
+   * Updates a user entry in the database, using a User instance.
+   *
+   * @param {Object} data - Contains data for updating an account.
+   * @returns {User} The same User instance that this method was called on, but
+   *  with updated property values.
+   */
+  async update(data) {
+    const user = await User.update(this.username, data);
+
+    // Update current instance's properties.
+    Object.entries(user).forEach(([colName, val]) => {
+      this[colName] = val;
+    });
+
+    return this;
   }
 
   /**

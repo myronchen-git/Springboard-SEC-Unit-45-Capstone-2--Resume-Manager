@@ -133,16 +133,19 @@ describe('User', () => {
 
   // -------------------------------------------------- update
 
-  describe('update', () => {
+  describe('class update', () => {
     test("Updates a user's info.", async () => {
       // Arrange
-      const user = await User.register(testUser);
+      await User.register(testUser);
       const updatedInfo = Object.freeze({ password: 'updated' });
 
       // Act
-      await user.update(updatedInfo);
+      const user = await User.update(testUser.username, updatedInfo);
 
       // Assert
+      expect(user).toBeInstanceOf(User);
+      expect(user).toEqual({ username: testUser.username });
+
       const databaseEntry = (
         await db.query({
           text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
@@ -156,15 +159,43 @@ describe('User', () => {
     test('Throws an Error if username is not found.', async () => {
       // Arrange
       const updatedInfo = Object.freeze({ password: 'updated' });
-      const user = new User('nonexistent');
 
       // Act
       async function runFunc() {
-        await user.update(updatedInfo);
+        await User.update('nonexistent', updatedInfo);
       }
 
       // Assert
       await expect(runFunc).rejects.toThrow(AppServerError);
+    });
+  });
+
+  describe('instance update unit tests', () => {
+    let origUpdate = User.update;
+
+    beforeAll(() => {
+      User.update = jest.fn().mockResolvedValue(new User(testUser.username));
+    });
+
+    afterAll(() => {
+      User.update = origUpdate;
+    });
+
+    test("Updates a user's info.", async () => {
+      // Arrange
+      const user = await User.register(testUser);
+      const updatedInfo = Object.freeze({ password: 'updated' });
+
+      // Act
+      const updatedUser = await user.update(updatedInfo);
+
+      // Assert
+      expect(updatedUser).toBe(user);
+
+      const expectedUser = { ...updatedInfo, username: testUser.username };
+      delete expectedUser.password;
+
+      expect(updatedUser).toEqual(expectedUser);
     });
   });
 
