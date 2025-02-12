@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://example.com/schemas/userRegister.json",
+  "$id": "http://example.com/schemas/user-register.json",
   "type": "object",
   "title": "Register User",
   "description": "Required info when registering.",

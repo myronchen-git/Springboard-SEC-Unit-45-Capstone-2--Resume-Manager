@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://example.com/schemas/contactInfo.json",
+  "$id": "http://example.com/schemas/contact-info.json",
   "type": "object",
   "title": "Add Or Update Contact Info",
   "description": "Required info for contact information.",
