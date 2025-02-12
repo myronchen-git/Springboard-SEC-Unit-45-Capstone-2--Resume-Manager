@@ -262,3 +262,59 @@ describe('PUT /users/:username/contact-info', () => {
     expect(resp.body).not.toHaveProperty('contactInfo');
   });
 });
+
+// --------------------------------------------------
+// GET /users/:username/contact-info
+
+describe('GET /users/:username/contact-info', () => {
+  const getUrl = (username) => `${urlPrefix}/users/${username}/contact-info`;
+
+  afterEach(() => {
+    return db.query({
+      text: `
+  TRUNCATE TABLE contact_info RESTART IDENTITY CASCADE;`,
+    });
+  });
+
+  test.each(contactInfos.map((info, idx) => [idx, { ...info }]))(
+    'Retrieves contact info for a user.  Field %i: %o.',
+    async (idx, contactInfoData) => {
+      // Arrange
+      const expectedContactInfoData = { ...contactInfoData };
+      expectedContactInfoData.location ||= null;
+      expectedContactInfoData.email ||= null;
+      expectedContactInfoData.phone ||= null;
+      expectedContactInfoData.linkedin ||= null;
+      expectedContactInfoData.github ||= null;
+
+      delete contactInfoData.username;
+
+      await request(app)
+        .put(getUrl(users[idx].username))
+        .send(contactInfoData)
+        .set('authorization', `Bearer ${authTokens[idx]}`);
+
+      // Act
+      const resp = await request(app)
+        .get(getUrl(users[idx].username))
+        .set('authorization', `Bearer ${authTokens[idx]}`);
+
+      // Assert
+      expect(resp.statusCode).toEqual(200);
+      expect(resp.body).toEqual({
+        contactInfo: expectedContactInfoData,
+      });
+    }
+  );
+
+  test('Returns status code 404 if contact info does not exist.', async () => {
+    // Act
+    const resp = await request(app)
+      .get(getUrl(users[0].username))
+      .set('authorization', `Bearer ${authTokens[0]}`);
+
+    // Assert
+    expect(resp.statusCode).toEqual(404);
+    expect(resp.body).not.toHaveProperty('contactInfo');
+  });
+});

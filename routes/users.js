@@ -172,6 +172,37 @@ router.put(
   }
 );
 
+/**
+ * GET /users/:username/contact-info
+ * {} => { contactInfo }
+ *
+ * Authorization required: login
+ *
+ * @returns {Object} contactInfo - Returns all contact information of the user.
+ */
+router.get(
+  '/:username/contact-info',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+
+    const logPrefix =
+      'GET /users/:username/contact-info (' +
+      `user: ${JSON.stringify(userPayload)})`;
+    logger.verbose(logPrefix + ': BEGIN');
+
+    try {
+      const contactInfo = await ContactInfo.get({
+        username: userPayload.username,
+      });
+
+      return res.json({ contactInfo });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
 // ==================================================
 
 module.exports = router;
