@@ -10,11 +10,11 @@ const contactInfos = Object.freeze([
   Object.freeze({
     username: 'user2',
     fullName: 'First2 Last2',
-    location: 'Location 2',
+    location: '123 Main St., City, State 11111',
     email: 'email2@email.com',
-    phone: '111-111-1111',
-    linkedin: 'user2@linkedin.com',
-    github: 'user2@github.com',
+    phone: '123-456-7890',
+    linkedin: 'linkedin.com/in/name/',
+    github: 'github.com/name',
   }),
 ]);
 

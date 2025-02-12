@@ -3,12 +3,14 @@
 const express = require('express');
 const jsonschema = require('jsonschema');
 
+const contactInfoSchema = require('../schemas/contactInfo.json');
 const userUpdateSchema = require('../schemas/userUpdate.json');
 
+const ContactInfo = require('../models/contactInfo');
 const User = require('../models/user');
 const { ensureLoggedIn } = require('../middleware/auth');
 
-const { BadRequestError } = require('../errors/appErrors');
+const { BadRequestError, NotFoundError } = require('../errors/appErrors');
 
 const logger = require('../util/logger');
 
@@ -92,6 +94,83 @@ router.patch('/:username', ensureLoggedIn, async (req, res, next) => {
     return next(err);
   }
 });
+
+/**
+ * PUT /users/:username/contact-info
+ * { fullName, location, email, phone, linkedin, github } => { contactInfo }
+ *
+ * Authorization required: login
+ *
+ * Full name is required when creating a new contact info entry in the database.
+ *
+ * @param {String} [fullName] - Full name of the user.
+ * @param {String} [location] - Any kind of location description for the user.
+ *  This can be full address, nearest city, etc..
+ * @param {String} [email] - Email of the user.
+ * @param {String} [phone] - Phone number of the user.
+ * @param {String} [linkedin] - LinkedIn URL address for the profile of the
+ *  user.
+ * @param {String} [github] - GitHub URL address for the user's GitHub profile.
+ * @returns {Object} contactInfo - Returns all contact information of the user.
+ */
+router.put(
+  '/:username/contact-info',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+
+    const logPrefix =
+      'PUT /users/:username/contact-info (' +
+      `user: ${JSON.stringify(userPayload)}, ` +
+      `request body: ${JSON.stringify(req.body)})`;
+    logger.verbose(logPrefix + ': BEGIN');
+
+    try {
+      const validator = jsonschema.validate(req.body, contactInfoSchema);
+
+      if (!validator.valid) {
+        const errs = validator.errors.map((e) => e.stack);
+        logger.error(
+          `${logPrefix}: JSON schema validation failed.  ${errs.join(', ')}`
+        );
+        throw new BadRequestError(errs);
+      }
+
+      try {
+        const contactInfo = await ContactInfo.get({
+          username: userPayload.username,
+        });
+
+        await contactInfo.update(req.body);
+
+        return res.json({ contactInfo });
+      } catch (err) {
+        if (err instanceof NotFoundError) {
+          if (!req.body.fullName) {
+            logger.error(
+              `${logPrefix}: Missing full name for new contact info entry ` +
+                `for user "${userPayload.username}".`
+            );
+            throw new BadRequestError(
+              'Full name is required when saving contact info for the first time.'
+            );
+          }
+
+          const contactInfo = await ContactInfo.add({
+            username: userPayload.username,
+            ...req.body,
+          });
+
+          return res.status(201).json({ contactInfo });
+        } else {
+          throw err;
+        }
+      }
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
 
 // ==================================================
 
