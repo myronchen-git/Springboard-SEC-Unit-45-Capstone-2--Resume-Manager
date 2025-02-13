@@ -96,6 +96,8 @@ router.patch('/:username', ensureLoggedIn, async (req, res, next) => {
  *  user.
  * @param {String} [github] - GitHub URL address for the user's GitHub profile.
  * @returns {Object} contactInfo - Returns all contact information of the user.
+ * @throws {BadRequestError} If creating a new contact info entry without a full
+ *  name.
  */
 router.put(
   '/:username/contact-info',
@@ -110,18 +112,24 @@ router.put(
     logger.verbose(logPrefix + ': BEGIN');
 
     try {
+      // Using JSON schema validator.
       runJsonSchemaValidator(contactInfoSchema, req.body, logPrefix);
 
       try {
+        // Retrieve contact info if it exists.
         const contactInfo = await ContactInfo.get({
           username: userPayload.username,
         });
 
+        // Update existing contact info.
         await contactInfo.update(req.body);
 
         return res.json({ contactInfo });
       } catch (err) {
+        // If contact info does not exist.
         if (err instanceof NotFoundError) {
+          // Require full name if creating a new contact info entry in the
+          // database.
           if (!req.body.fullName) {
             logger.error(
               `${logPrefix}: Missing full name for new contact info entry ` +
@@ -132,6 +140,7 @@ router.put(
             );
           }
 
+          // Create a new contact info entry.
           const contactInfo = await ContactInfo.add({
             username: userPayload.username,
             ...req.body,
