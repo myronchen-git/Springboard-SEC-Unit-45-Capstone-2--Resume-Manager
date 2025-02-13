@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express');
-const jsonschema = require('jsonschema');
 
 const contactInfoSchema = require('../schemas/contactInfo.json');
 const userUpdateSchema = require('../schemas/userUpdate.json');
@@ -9,6 +8,7 @@ const userUpdateSchema = require('../schemas/userUpdate.json');
 const ContactInfo = require('../models/contactInfo');
 const User = require('../models/user');
 const { ensureLoggedIn } = require('../middleware/auth');
+const { runJsonSchemaValidator } = require('../util/validators');
 
 const { BadRequestError, NotFoundError } = require('../errors/appErrors');
 
@@ -52,23 +52,7 @@ router.patch('/:username', ensureLoggedIn, async (req, res, next) => {
     }
 
     // Using JSON schema validator.
-    const validator = jsonschema.validate(req.body, userUpdateSchema);
-
-    if (!validator.valid) {
-      const errs = validator.errors.map((e) => e.stack);
-
-      logger.error(
-        `${logPrefix}: JSON schema validation failed.  ${errs.join(', ')}`
-      );
-
-      const rewordedErrs = errs.map((err) => {
-        return err.toLowerCase().includes('password does not match pattern')
-          ? User.passwordRequirementsMessage
-          : err;
-      });
-
-      throw new BadRequestError(rewordedErrs);
-    }
+    runJsonSchemaValidator(userUpdateSchema, req.body, logPrefix);
 
     // Setting up data for updating.
     const dataToUpdate = { ...req.body };
@@ -126,15 +110,7 @@ router.put(
     logger.verbose(logPrefix + ': BEGIN');
 
     try {
-      const validator = jsonschema.validate(req.body, contactInfoSchema);
-
-      if (!validator.valid) {
-        const errs = validator.errors.map((e) => e.stack);
-        logger.error(
-          `${logPrefix}: JSON schema validation failed.  ${errs.join(', ')}`
-        );
-        throw new BadRequestError(errs);
-      }
+      runJsonSchemaValidator(contactInfoSchema, req.body, logPrefix);
 
       try {
         const contactInfo = await ContactInfo.get({
