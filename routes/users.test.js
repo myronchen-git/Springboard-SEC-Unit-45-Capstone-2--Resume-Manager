@@ -202,12 +202,14 @@ describe('PUT /users/:username/contact-info', () => {
   );
 
   test(
-    'Updates a contact info entry in the database ' + 'if it already exists.',
+    'Updates a contact info entry in the database if it already exists.  ' +
+      'Also, empty Strings should be allowed for optional properties.',
     async () => {
       // Arrange
-      const authToken = authTokens[0];
+      const authToken = authTokens[1];
 
-      let contactInfoData = { ...contactInfos[0] };
+      // Ensure that this contact info data has values for all properties.
+      let contactInfoData = { ...contactInfos[1] };
       delete contactInfoData.username;
 
       await request(app)
@@ -215,10 +217,17 @@ describe('PUT /users/:username/contact-info', () => {
         .send(contactInfoData)
         .set('authorization', `Bearer ${authToken}`);
 
-      contactInfoData = { ...contactInfos[1] };
+      contactInfoData = {
+        fullName: 'new name',
+        location: '',
+        email: '',
+        phone: '',
+        linkedin: '',
+        github: '',
+      };
       const expectedContactInfoData = {
         ...contactInfoData,
-        username: contactInfos[0].username,
+        username: contactInfos[1].username,
       };
       delete contactInfoData.username;
 

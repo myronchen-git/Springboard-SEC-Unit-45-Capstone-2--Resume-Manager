@@ -11,6 +11,7 @@
       "type": "string",
       "minLength": 3,
       "maxLength": 30,
+      "pattern": "^[a-zA-z\\d]*$",
       "examples": ["abc"]
     },
     "password": {

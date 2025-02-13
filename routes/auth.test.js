@@ -75,6 +75,8 @@ describe('POST /auth/register', () => {
   // Also tests the JSON schema.
   test.each([
     [{ username: 'us', password: user.password }],
+    [{ username: 'user 123', password: user.password }],
+    [{ username: 'user!', password: user.password }],
     [
       {
         username: 'user123456789012345678901234567890',
