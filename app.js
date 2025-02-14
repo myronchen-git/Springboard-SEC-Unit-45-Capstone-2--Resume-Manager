@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const { authenticateJWT } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
+const documentsRoutes = require('./routes/documents');
 
 const { NotFoundError } = require('./errors/appErrors');
 
@@ -30,6 +31,7 @@ const urlPrefix = '/api/v1';
 
 app.use(`${urlPrefix}/auth`, authRoutes);
 app.use(`${urlPrefix}/users`, usersRoutes);
+app.use(`${urlPrefix}/users/:username/documents`, documentsRoutes);
 
 /** Catch-all for handling 404 errors. */
 app.use(function (req, res, next) {
