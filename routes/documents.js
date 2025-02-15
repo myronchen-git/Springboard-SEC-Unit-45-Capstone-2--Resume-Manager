@@ -34,7 +34,7 @@ router.post('/', ensureLoggedIn, async (req, res, next) => {
     'POST /users/:username/documents (' +
     `user: ${JSON.stringify(userPayload)}, ` +
     `request body: ${JSON.stringify(req.body)})`;
-  logger.verbose(logPrefix + ': BEGIN');
+  logger.info(logPrefix + ' BEGIN');
 
   try {
     runJsonSchemaValidator(documentNewSchema, req.body, logPrefix);
@@ -66,7 +66,7 @@ router.get('/', ensureLoggedIn, async (req, res, next) => {
   const logPrefix =
     'GET /users/:username/documents (' +
     `user: ${JSON.stringify(userPayload)})`;
-  logger.verbose(logPrefix + ': BEGIN');
+  logger.info(logPrefix + ' BEGIN');
 
   try {
     const documents = await Document.getAll(userPayload.username);
@@ -88,7 +88,7 @@ router.patch('/:docId', ensureLoggedIn, async (req, res, next) => {
     'PATCH /users/:username/documents/:docId (' +
     `user: ${JSON.stringify(userPayload)}, ` +
     `request body: ${JSON.stringify(req.body)})`;
-  logger.verbose(logPrefix + ': BEGIN');
+  logger.info(logPrefix + ' BEGIN');
 
   try {
     runJsonSchemaValidator(documentUpdateSchema, req.body, logPrefix);

@@ -33,7 +33,7 @@ router.post('/register', async (req, res, next) => {
     ...req.body,
     password: '(password)',
   })})`;
-  logger.verbose(logPrefix + ': BEGIN');
+  logger.info(logPrefix + ' BEGIN');
 
   try {
     runJsonSchemaValidator(userRegisterSchema, req.body, logPrefix);
@@ -63,7 +63,7 @@ router.post('/signin', async (req, res, next) => {
     ...req.body,
     password: '(password)',
   })})`;
-  logger.verbose(logPrefix + ': BEGIN');
+  logger.info(logPrefix + ' BEGIN');
 
   try {
     runJsonSchemaValidator(userSigninSchema, req.body, logPrefix);

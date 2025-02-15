@@ -41,7 +41,7 @@ router.patch('/:username', ensureLoggedIn, async (req, res, next) => {
     'PATCH /users/:username (' +
     `user: ${JSON.stringify(userPayload)}, ` +
     `request body: ${JSON.stringify(requestBodyForLog)})`;
-  logger.verbose(logPrefix + ': BEGIN');
+  logger.info(logPrefix + ' BEGIN');
 
   try {
     // Check that old password is supplied if setting new password.
@@ -109,7 +109,7 @@ router.put(
       'PUT /users/:username/contact-info (' +
       `user: ${JSON.stringify(userPayload)}, ` +
       `request body: ${JSON.stringify(req.body)})`;
-    logger.verbose(logPrefix + ': BEGIN');
+    logger.info(logPrefix + ' BEGIN');
 
     try {
       // Using JSON schema validator.
@@ -174,7 +174,7 @@ router.get(
     const logPrefix =
       'GET /users/:username/contact-info (' +
       `user: ${JSON.stringify(userPayload)})`;
-    logger.verbose(logPrefix + ': BEGIN');
+    logger.info(logPrefix + ' BEGIN');
 
     try {
       const contactInfo = await ContactInfo.get({
