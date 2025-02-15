@@ -4,6 +4,7 @@ const db = require('../database/db');
 const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
 
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
+const { ArgumentError } = require('../errors/modelErrors');
 
 const logger = require('../util/logger');
 
@@ -140,9 +141,9 @@ class Document {
   }
 
   /**
-   * Updates a document with new properties.  If no properties are passed, then
-   * the document is not updated.
+   * Updates a document entry with new properties.
    *
+   * @param {Number} id - Document ID given by the database.
    * @param {Object} docProps - Contains the updated properties.
    * @param {String} [docProps.documentName] - The new name of the document.
    * @param {Boolean} [docProps.isMaster] - The new value for whether this
@@ -151,21 +152,31 @@ class Document {
    *  document is a template.
    * @param {Boolean} [docProps.isLocked] - The new value for whether this
    *  document is locked.
-   * @returns {Document} The same Document instance that this method was called
-   *  on, but with updated property values.
+   * @param {String} [oldDocumentName] - The document name before the update,
+   *  used only for better error messages.
+   * @returns {Document} A new Document instance that contains the updated
+   *  document info.
+   * @throws {ArgumentError} If docProps does not contain any valid properties.
+   * @throws {NotFoundError} If the document does not exist.
    */
-  async update(docProps) {
+  static async update(id, docProps, oldDocumentName) {
     const logPrefix = `Document.update(${JSON.stringify(docProps)})`;
     logger.verbose(logPrefix);
 
+    // Processing document properties.
     const allowedProps = ['documentName', 'isMaster', 'isTemplate', 'isLocked'];
     const filteredProps = Object.fromEntries(
       Object.entries(docProps).filter((prop) => allowedProps.includes(prop[0]))
     );
 
-    // If given no arguments, return.
-    if (!Object.keys(filteredProps).length) return this;
+    // If given no arguments, throw an Error.
+    if (!Object.keys(filteredProps).length) {
+      const errorMessage = 'There are no valid properties for updating.';
+      logger.error(`${logPrefix}: ${errorMessage}`);
+      throw new ArgumentError(errorMessage);
+    }
 
+    // Making update to database.
     const [sqlSubstring, sqlValues] = convertPropsForSqlUpdate(filteredProps);
 
     const queryConfig = {
@@ -175,24 +186,54 @@ class Document {
     last_updated = (NOW() at time zone 'utc')
   WHERE id = $${sqlValues.length + 1}
   RETURNING ${Document._allDbColsAsJs};`,
-      values: [...sqlValues, this.id],
+      values: [...sqlValues, id],
     };
 
     const result = await db.query(queryConfig, logPrefix);
 
+    // If no database table rows were affected, then the document was not found.
     if (result.rowCount === 0) {
-      logger.error(
-        `${logPrefix}: Document ID ${this.id} with ` +
-          `name "${this.documentName}" was not found.`
-      );
-      throw new AppServerError(
-        `Document ID ${this.id} with ` +
-          `name "${this.documentName}" was not found.`
-      );
+      const errorMessage = `Document ID ${id} ${
+        oldDocumentName ? 'with name "' + oldDocumentName + '" ' : ''
+      }was not found.`;
+
+      logger.error(`${logPrefix}: ${errorMessage}`);
+      throw new NotFoundError(errorMessage);
+    }
+
+    // Returning a Document Object.
+    return new Document(...Object.values(result.rows[0]));
+  }
+
+  /**
+   * Updates a document with new properties.  If no properties are passed, then
+   * the document is not updated.
+   *
+   * @param {Object} docProps - Contains the updated properties.
+   * @returns {Document} The same Document instance that this method was called
+   *  on, but with updated property values.
+   * @throws {AppServerError} If the document that this instance represents has
+   *  already been deleted.
+   */
+  async update(docProps) {
+    let document;
+    try {
+      document = await Document.update(this.id, docProps, this.documentName);
+    } catch (err) {
+      if (err instanceof ArgumentError) {
+        // If given no arguments, return.
+        return this;
+      } else if (err instanceof NotFoundError) {
+        // If document is not found, then this Document instance is stale and
+        // represents a deleted document.
+        throw new AppServerError(err.message);
+      } else {
+        throw err;
+      }
     }
 
     // Update current instance's properties.
-    Object.entries(result.rows[0]).forEach(([colName, val]) => {
+    Object.entries(document).forEach(([colName, val]) => {
       this[colName] = val;
     });
 
