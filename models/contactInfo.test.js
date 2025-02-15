@@ -6,6 +6,7 @@ const ContactInfo = require('./contactInfo');
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const { users, contactInfos: dataForNewInstances } = require('./_testData');
+const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
 // ==================================================
 
@@ -47,21 +48,9 @@ describe('ContactInfo', () => {
     });
   });
 
-  beforeEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE ${ContactInfo.tableName} CASCADE;`,
-    });
-  });
+  beforeEach(() => commonBeforeEach(db, ContactInfo.tableName));
 
-  afterAll((done) => {
-    db.query({
-      text: `
-  TRUNCATE TABLE users, sections RESTART IDENTITY CASCADE;`,
-    })
-      .then(() => db.shutdown())
-      .then(() => done());
-  });
+  afterAll(() => commonAfterAll(db));
 
   // -------------------------------------------------- add
 

@@ -6,6 +6,7 @@ const app = require('../app');
 const db = require('../database/db');
 
 const { users, documents } = require('../models/_testData');
+const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
 // ==================================================
 
@@ -31,21 +32,9 @@ beforeAll((done) => {
     .then(() => done());
 });
 
-beforeEach(() => {
-  return db.query({
-    text: `
-TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`,
-  });
-});
+beforeEach(() => commonBeforeEach(db, 'documents'));
 
-afterAll((done) => {
-  db.query({
-    text: `
-  TRUNCATE TABLE users RESTART IDENTITY CASCADE;`,
-  })
-    .then(() => db.shutdown())
-    .then(() => done());
-});
+afterAll(() => commonAfterAll(db));
 
 // --------------------------------------------------
 // POST /users/:username/documents

@@ -6,20 +6,14 @@ const app = require('../app');
 const db = require('../database/db');
 
 const { users } = require('../models/_testData');
+const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
 // ==================================================
 
 const urlPrefix = '/api/v1';
 const urlRegisterUser = `${urlPrefix}/auth/register`;
 
-afterAll((done) => {
-  db.query({
-    text: `
-  TRUNCATE TABLE users RESTART IDENTITY CASCADE;`,
-  })
-    .then(() => db.shutdown())
-    .then(() => done());
-});
+afterAll(() => commonAfterAll(db));
 
 // --------------------------------------------------
 // POST /auth/register
@@ -28,12 +22,7 @@ describe('POST /auth/register', () => {
   const url = urlRegisterUser;
   const user = users[0];
 
-  beforeEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE users RESTART IDENTITY CASCADE;`,
-    });
-  });
+  beforeEach(() => commonBeforeEach(db, 'users'));
 
   test('Registers a user.', async () => {
     // Act

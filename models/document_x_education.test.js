@@ -15,6 +15,7 @@ const {
   educations,
   documents_x_educations,
 } = require('./_testData');
+const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
 // ==================================================
 
@@ -89,21 +90,9 @@ describe('Document_X_Education', () => {
       .then(() => done());
   });
 
-  beforeEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE ${Document_X_Education.tableName} RESTART IDENTITY CASCADE;`,
-    });
-  });
+  beforeEach(() => commonBeforeEach(db, Document_X_Education.tableName));
 
-  afterAll((done) => {
-    db.query({
-      text: `
-  TRUNCATE TABLE users, sections RESTART IDENTITY CASCADE;`,
-    })
-      .then(() => db.shutdown())
-      .then(() => done());
-  });
+  afterAll(() => commonAfterAll(db));
 
   // -------------------------------------------------- add
 

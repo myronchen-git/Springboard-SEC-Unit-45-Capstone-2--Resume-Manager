@@ -6,6 +6,7 @@ const app = require('../app');
 const db = require('../database/db');
 
 const { users, contactInfos } = require('../models/_testData');
+const { commonAfterAll } = require('../_testCommon');
 
 // ==================================================
 
@@ -29,14 +30,7 @@ beforeAll((done) => {
     .then(() => done());
 });
 
-afterAll((done) => {
-  db.query({
-    text: `
-  TRUNCATE TABLE users RESTART IDENTITY CASCADE;`,
-  })
-    .then(() => db.shutdown())
-    .then(() => done());
-});
+afterAll(() => commonAfterAll(db));
 
 // --------------------------------------------------
 // PATCH /users/:username

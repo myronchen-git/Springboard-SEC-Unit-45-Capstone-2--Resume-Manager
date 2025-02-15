@@ -5,6 +5,7 @@ const db = require('../database/db');
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const { users } = require('./_testData');
+const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
 // ==================================================
 
@@ -90,21 +91,9 @@ function runCommonTests(testConfig) {
       });
     });
 
-    beforeEach(() => {
-      return db.query({
-        text: `
-  TRUNCATE TABLE ${tableName} CASCADE;`,
-      });
-    });
+    beforeEach(() => commonBeforeEach(db, tableName));
 
-    afterAll((done) => {
-      db.query({
-        text: `
-  TRUNCATE TABLE users, sections RESTART IDENTITY CASCADE;`,
-      })
-        .then(() => db.shutdown())
-        .then(() => done());
-    });
+    afterAll(() => commonAfterAll(db));
 
     // -------------------------------------------------- add
 

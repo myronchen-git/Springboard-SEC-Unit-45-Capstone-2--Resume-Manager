@@ -6,6 +6,7 @@ const Skill = require('./skill');
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const { users, skills, textSnippets } = require('./_testData');
+const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
 // ==================================================
 
@@ -90,21 +91,9 @@ describe('Skill', () => {
       });
   });
 
-  beforeEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE skills CASCADE;`,
-    });
-  });
+  beforeEach(() => commonBeforeEach(db, 'skills'));
 
-  afterAll((done) => {
-    db.query({
-      text: `
-  TRUNCATE TABLE users, sections RESTART IDENTITY CASCADE;`,
-    })
-      .then(() => db.shutdown())
-      .then(() => done());
-  });
+  afterAll(() => commonAfterAll(db));
 
   // -------------------------------------------------- add
 

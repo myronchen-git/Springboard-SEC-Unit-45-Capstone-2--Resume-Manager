@@ -7,6 +7,7 @@ const { AppServerError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
 const { users } = require('./_testData');
+const { commonBeforeEach } = require('../_testCommon');
 
 // ==================================================
 
@@ -35,12 +36,7 @@ describe('User', () => {
   // To help with expects by filtering data retrieved from the database.
   const whereClauseToGetOne = 'WHERE username = $1';
 
-  beforeEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE users CASCADE;`,
-    });
-  });
+  beforeEach(() => commonBeforeEach(db, User.tableName));
 
   afterAll(() => db.shutdown());
 
