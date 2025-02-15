@@ -31,6 +31,13 @@ beforeAll((done) => {
     .then(() => done());
 });
 
+beforeEach(() => {
+  return db.query({
+    text: `
+TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`,
+  });
+});
+
 afterAll((done) => {
   db.query({
     text: `
@@ -52,13 +59,6 @@ describe('POST /users/:username/documents', () => {
   let authToken;
   beforeAll(() => {
     authToken = authTokens[0];
-  });
-
-  beforeEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`,
-    });
   });
 
   test('Adds a new document.', async () => {
@@ -129,13 +129,6 @@ describe('GET /users/:username/documents', () => {
     authToken = authTokens[0];
   });
 
-  beforeEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`,
-    });
-  });
-
   test('Retrieves all documents for a user.', async () => {
     // Arrange
     await Promise.all(
@@ -183,5 +176,103 @@ describe('GET /users/:username/documents', () => {
     // Assert
     expect(resp.statusCode).toBe(200);
     expect(resp.body).toEqual({ documents: [] });
+  });
+});
+
+// --------------------------------------------------
+// PATCH /users/:username/documents/:docId
+
+describe('PATCH /users/:username/documents/:docId', () => {
+  const getUrl = (username, docId) =>
+    `${urlPrefix}/users/${username}/documents/${docId}`;
+  const user = users[0];
+  const document = documents[0];
+  let authToken;
+  let docId;
+
+  // Need to set authToken in beforeAll, because all variable declarations
+  // outside of these setup functions are run first.
+  beforeAll(() => {
+    authToken = authTokens[0];
+  });
+
+  beforeEach((done) => {
+    request(app)
+      .post(getUrlNewDocument(user.username))
+      .send({
+        documentName: document.documentName,
+        isTemplate: document.isTemplate,
+      })
+      .set('authorization', `Bearer ${authToken}`)
+      .then((resp) => (docId = resp.body.document.id))
+      .then(() => done());
+  });
+
+  test('Updates a document.', async () => {
+    // Arrange
+    const updateData = Object.freeze({
+      documentName: 'New name',
+      isTemplate: !document.isTemplate,
+      isLocked: true,
+    });
+
+    // Act
+    const resp = await request(app)
+      .patch(getUrl(user.username, docId))
+      .send(updateData)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+
+    const expectedDocument = {
+      id: expect.any(Number),
+      documentName: updateData.documentName,
+      owner: user.username,
+      createdOn: expect.any(String),
+      lastUpdated: expect.any(String),
+      isMaster: false,
+      isTemplate: updateData.isTemplate,
+      isLocked: true,
+    };
+
+    expect(resp.body).toEqual({ document: expectedDocument });
+    expect(Date.parse(resp.body.document.createdOn)).not.toBeNaN();
+    expect(Date.parse(resp.body.document.lastUpdated)).not.toBeNaN();
+  });
+
+  test('Updating with no properties should return 400 status.', async () => {
+    // Arrange
+    const updateData = {};
+
+    // Act
+    const resp = await request(app)
+      .patch(getUrl(user.username, docId))
+      .send(updateData)
+      .set('authorization', `Bearer ${authToken}`);
+
+    expect(resp.statusCode).toBe(400);
+    expect(resp.body).not.toHaveProperty('document');
+  });
+
+  test('Updating a nonexistent document should return 404 status.', async () => {
+    // Arrange
+    const nonexistentDocId = 999;
+
+    const updateData = Object.freeze({
+      documentName: 'New name',
+      isTemplate: !document.isTemplate,
+      isLocked: true,
+    });
+
+    // Act
+    const resp = await request(app)
+      .patch(getUrl(user.username, nonexistentDocId))
+      .send(updateData)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(404);
+    expect(resp.body).not.toHaveProperty('document');
   });
 });

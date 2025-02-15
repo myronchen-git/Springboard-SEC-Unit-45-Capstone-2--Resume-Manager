@@ -3,6 +3,7 @@
 const express = require('express');
 
 const documentNewSchema = require('../schemas/documentNew.json');
+const documentUpdateSchema = require('../schemas/documentUpdate.json');
 
 const Document = require('../models/document');
 const { ensureLoggedIn } = require('../middleware/auth');
@@ -71,6 +72,30 @@ router.get('/', ensureLoggedIn, async (req, res, next) => {
     const documents = await Document.getAll(userPayload.username);
 
     return res.json({ documents });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
+ * PATCH /users/:username/documents/:docId
+ * { documentName, isTemplate, isLocked } => { document }
+ */
+router.patch('/:docId', ensureLoggedIn, async (req, res, next) => {
+  const userPayload = res.locals.user;
+
+  const logPrefix =
+    'PATCH /users/:username/documents/:docId (' +
+    `user: ${JSON.stringify(userPayload)}, ` +
+    `request body: ${JSON.stringify(req.body)})`;
+  logger.verbose(logPrefix + ': BEGIN');
+
+  try {
+    runJsonSchemaValidator(documentUpdateSchema, req.body, logPrefix);
+
+    const document = await Document.update(req.params.docId, req.body);
+
+    return res.json({ document });
   } catch (err) {
     return next(err);
   }
