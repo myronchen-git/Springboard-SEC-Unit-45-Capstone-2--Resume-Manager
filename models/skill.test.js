@@ -5,6 +5,8 @@ const Skill = require('./skill');
 
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
+const TextSnippet = require('./textSnippet');
+const User = require('./user');
 const { users, skills, textSnippets } = require('./_testData');
 const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
@@ -37,7 +39,7 @@ describe('Skill', () => {
     owner,
     text_snippet_id AS "textSnippetId",
     text_snippet_version AS "textSnippetVersion"
-  FROM skills
+  FROM ${Skill.tableName}
   WHERE id = $1;`;
 
   const sqlToGetByOwner = `
@@ -47,20 +49,20 @@ describe('Skill', () => {
     owner,
     text_snippet_id AS "textSnippetId",
     text_snippet_version AS "textSnippetVersion"
-  FROM skills
+  FROM ${Skill.tableName}
   WHERE owner = $1;`;
 
   beforeAll((done) => {
     db.query({
       text: `
-  INSERT INTO users VALUES
-  ($1, $2);`,
+  INSERT INTO ${User.tableName}
+  VALUES ($1, $2);`,
       values: [users[0].username, users[0].password],
     })
       .then(() =>
         db.query({
           text: `
-  INSERT INTO text_snippets (owner, type, content)
+  INSERT INTO ${TextSnippet.tableName} (owner, type, content)
   VALUES ($1, $2, $3)
   RETURNING id, version;`,
           values: [
@@ -91,7 +93,7 @@ describe('Skill', () => {
       });
   });
 
-  beforeEach(() => commonBeforeEach(db, 'skills'));
+  beforeEach(() => commonBeforeEach(db, Skill.tableName));
 
   afterAll(() => commonAfterAll(db));
 

@@ -66,7 +66,7 @@ const testCasesForGet = [
 
 runCommonTests({
   class: Document,
-  tableName: 'documents',
+  tableName: Document.tableName,
   dataForNewInstances,
   dataForDuplicationCheck,
   dataForUpdate,

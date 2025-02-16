@@ -14,6 +14,8 @@ const logger = require('../util/logger');
  * experience.
  */
 class Section {
+  static tableName = 'sections';
+
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
   static _allDbColsAsJs = `
@@ -42,7 +44,7 @@ class Section {
 
     const queryConfig = {
       text: `
-  INSERT INTO sections (section_name)
+  INSERT INTO ${Section.tableName} (section_name)
   VALUES ($1)
   RETURNING ${Section._allDbColsAsJs};`,
       values: [sectionName],
@@ -65,7 +67,7 @@ class Section {
     const queryConfig = {
       text: `
   SELECT ${Section._allDbColsAsJs}
-  FROM sections;`,
+  FROM ${Section.tableName};`,
     };
 
     const result = await db.query(queryConfig, logPrefix);
@@ -93,7 +95,7 @@ class Section {
     const queryConfig = {
       text: `
   SELECT ${Section._allDbColsAsJs}
-  FROM sections
+  FROM ${Section.tableName}
   WHERE ${id == undefined ? 'section_name' : 'id'} = $1;`,
       values: [id == undefined ? sectionName : id],
     };
@@ -137,7 +139,7 @@ class Section {
     // Comma at end of sqlSubstring will be removed.
     const queryConfig = {
       text: `
-  UPDATE sections
+  UPDATE ${Section.tableName}
   SET ${sqlSubstring.slice(0, -1)}
   WHERE id = $${sqlValues.length + 1}
   RETURNING ${Section._allDbColsAsJs};`,
@@ -175,7 +177,7 @@ class Section {
 
     const queryConfig = {
       text: `
-  DELETE FROM sections
+  DELETE FROM ${Section.tableName}
   WHERE id = $1;`,
       values: [this.id],
     };

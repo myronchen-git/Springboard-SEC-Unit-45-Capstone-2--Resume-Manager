@@ -13,6 +13,8 @@ const logger = require('../util/logger');
  * Represents a skill.
  */
 class Skill {
+  static tableName = 'skills';
+
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
   static _allDbColsAsJs = `
@@ -51,7 +53,7 @@ class Skill {
 
     const queryConfig = {
       text: `
-  INSERT INTO skills (
+  INSERT INTO ${Skill.tableName} (
     name,
     owner,
     text_snippet_id,
@@ -90,7 +92,7 @@ class Skill {
     const queryConfig = {
       text: `
   SELECT ${Skill._allDbColsAsJs}
-  FROM skills
+  FROM ${Skill.tableName}
   WHERE owner = $1;`,
       values: [owner],
     };
@@ -119,7 +121,7 @@ class Skill {
     const queryConfig = {
       text: `
   SELECT ${Skill._allDbColsAsJs}
-  FROM skills
+  FROM ${Skill.tableName}
   WHERE ${id == undefined ? 'name' : 'id'} = $1;`,
       values: [id == undefined ? name : id],
     };
@@ -163,7 +165,7 @@ class Skill {
     // Comma at end of sqlSubstring will be removed.
     const queryConfig = {
       text: `
-  UPDATE skills
+  UPDATE ${Skill.tableName}
   SET ${sqlSubstring.slice(0, -1)}
   WHERE id = $${sqlValues.length + 1}
   RETURNING ${Skill._allDbColsAsJs};`,
@@ -195,7 +197,7 @@ class Skill {
 
     const queryConfig = {
       text: `
-  DELETE FROM skills
+  DELETE FROM ${Skill.tableName}
   WHERE id = $1;`,
       values: [this.id],
     };

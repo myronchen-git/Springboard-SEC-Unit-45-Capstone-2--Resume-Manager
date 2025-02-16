@@ -16,7 +16,7 @@ const {
 
 runCommonTests({
   class: TextSnippet,
-  tableName: 'text_snippets',
+  tableName: TextSnippet.tableName,
   dataForNewInstances,
   dataForUpdate,
   expectedDataInNewInstances,

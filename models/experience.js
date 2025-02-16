@@ -13,6 +13,8 @@ const logger = require('../util/logger');
  * Represents an experience.
  */
 class Experience {
+  static tableName = 'experiences';
+
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
   static _allDbColsAsJs = `
@@ -57,7 +59,7 @@ class Experience {
 
     const queryConfig = {
       text: `
-  INSERT INTO experiences (
+  INSERT INTO ${Experience.tableName} (
     owner,
     title,
     organization,
@@ -88,7 +90,7 @@ class Experience {
     const queryConfig = {
       text: `
   SELECT ${Experience._allDbColsAsJs}
-  FROM experiences
+  FROM ${Experience.tableName}
   WHERE owner = $1;`,
       values: [owner],
     };
@@ -117,7 +119,7 @@ class Experience {
     const queryConfig = {
       text: `
   SELECT ${Experience._allDbColsAsJs}
-  FROM experiences
+  FROM ${Experience.tableName}
   WHERE id = $1;`,
       values: [id],
     };
@@ -170,7 +172,7 @@ class Experience {
     // Comma at end of sqlSubstring will be removed.
     const queryConfig = {
       text: `
-  UPDATE experiences
+  UPDATE ${Experience.tableName}
   SET ${sqlSubstring.slice(0, -1)}
   WHERE id = $${sqlValues.length + 1}
   RETURNING ${Experience._allDbColsAsJs};`,
@@ -204,7 +206,7 @@ class Experience {
 
     const queryConfig = {
       text: `
-  DELETE FROM experiences
+  DELETE FROM ${Experience.tableName}
   WHERE id = $1;`,
       values: [this.id],
     };

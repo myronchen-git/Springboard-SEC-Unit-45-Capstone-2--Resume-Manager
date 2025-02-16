@@ -14,6 +14,8 @@ const logger = require('../util/logger');
  * a new text snippet is created, instead of modifying an existing one.
  */
 class TextSnippet {
+  static tableName = 'text_snippets';
+
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
   static _allDbColsAsJs = `
@@ -53,7 +55,7 @@ class TextSnippet {
 
     const queryConfig = {
       text: `
-  INSERT INTO text_snippets (owner, type, content)
+  INSERT INTO ${TextSnippet.tableName} (owner, type, content)
   VALUES ($1, $2, $3)
   RETURNING ${TextSnippet._allDbColsAsJs};`,
       values: [owner, type, content],
@@ -77,7 +79,7 @@ class TextSnippet {
     const queryConfig = {
       text: `
   SELECT ${TextSnippet._allDbColsAsJs}
-  FROM text_snippets
+  FROM ${TextSnippet.tableName}
   WHERE owner = $1;`,
       values: [owner],
     };
@@ -107,7 +109,7 @@ class TextSnippet {
     const queryConfig = {
       text: `
   SELECT ${TextSnippet._allDbColsAsJs}
-  FROM text_snippets
+  FROM ${TextSnippet.tableName}
   WHERE id = $1 AND version = $2;`,
       values: [id, version],
     };
@@ -148,7 +150,7 @@ class TextSnippet {
     let queryConfig = {
       text: `
   SELECT id, version
-  FROM text_snippets
+  FROM ${TextSnippet.tableName}
   WHERE id = $1 AND version = $2;`,
       values: [this.id, this.version],
     };
@@ -168,7 +170,7 @@ class TextSnippet {
     // Make a new entry so that the old version is kept.
     queryConfig = {
       text: `
-  INSERT INTO text_snippets (id, owner, parent, type, content)
+  INSERT INTO ${TextSnippet.tableName} (id, owner, parent, type, content)
   VALUES ($1, $2, $3, $4, $5)
   RETURNING ${TextSnippet._allDbColsAsJs};`,
       values: [
@@ -199,7 +201,7 @@ class TextSnippet {
 
     const queryConfig = {
       text: `
-  DELETE FROM text_snippets
+  DELETE FROM ${TextSnippet.tableName}
   WHERE id = $1 AND version = $2;`,
       values: [this.id, this.version],
     };

@@ -50,7 +50,7 @@ const testCasesForGet = [
 
 runCommonTests({
   class: Section,
-  tableName: 'sections',
+  tableName: Section.tableName,
   hasOwner: false,
   dataForNewInstances,
   dataForDuplicationCheck,

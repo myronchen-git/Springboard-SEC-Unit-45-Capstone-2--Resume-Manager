@@ -13,6 +13,8 @@ const logger = require('../util/logger');
  * Represents an education.
  */
 class Education {
+  static tableName = 'educations';
+
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
   static _allDbColsAsJs = `
@@ -90,7 +92,7 @@ class Education {
 
     const queryConfig = {
       text: `
-  INSERT INTO educations (
+  INSERT INTO ${Education.tableName} (
     owner,
     school,
     location,
@@ -134,7 +136,7 @@ class Education {
     const queryConfig = {
       text: `
   SELECT ${Education._allDbColsAsJs}
-  FROM educations
+  FROM ${Education.tableName}
   WHERE owner = $1;`,
       values: [owner],
     };
@@ -163,7 +165,7 @@ class Education {
     const queryConfig = {
       text: `
   SELECT ${Education._allDbColsAsJs}
-  FROM educations
+  FROM ${Education.tableName}
   WHERE id = $1;`,
       values: [id],
     };
@@ -223,7 +225,7 @@ class Education {
     // Comma at end of sqlSubstring will be removed.
     const queryConfig = {
       text: `
-  UPDATE educations
+  UPDATE ${Education.tableName}
   SET ${sqlSubstring.slice(0, -1)}
   WHERE id = $${sqlValues.length + 1}
   RETURNING ${Education._allDbColsAsJs};`,
@@ -255,7 +257,7 @@ class Education {
 
     const queryConfig = {
       text: `
-  DELETE FROM educations
+  DELETE FROM ${Education.tableName}
   WHERE id = $1;`,
       values: [this.id],
     };

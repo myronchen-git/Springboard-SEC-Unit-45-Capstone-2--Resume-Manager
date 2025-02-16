@@ -1,5 +1,8 @@
 'use strict';
 
+const Section = require('./models/section');
+const User = require('./models/user');
+
 // ==================================================
 
 async function commonBeforeEach(db, tableName) {
@@ -12,8 +15,10 @@ async function commonBeforeEach(db, tableName) {
 async function commonAfterAll(db) {
   return await db
     .query({
-      text: `
-  TRUNCATE TABLE users, sections RESTART IDENTITY CASCADE;`,
+      text:
+        `
+  TRUNCATE TABLE ${User.tableName}, ${Section.tableName} ` +
+        'RESTART IDENTITY CASCADE;',
     })
     .then(() => db.shutdown());
 }

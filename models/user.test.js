@@ -31,7 +31,7 @@ describe('User', () => {
   SELECT
     username,
     password
-  FROM users`;
+  FROM ${User.tableName}`;
 
   // To help with expects by filtering data retrieved from the database.
   const whereClauseToGetOne = 'WHERE username = $1';

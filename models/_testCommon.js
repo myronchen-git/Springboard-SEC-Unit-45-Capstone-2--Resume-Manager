@@ -4,6 +4,7 @@ const db = require('../database/db');
 
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
+const User = require('./user');
 const { users } = require('./_testData');
 const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
@@ -85,8 +86,8 @@ function runCommonTests(testConfig) {
     beforeAll(() => {
       return db.query({
         text: `
-  INSERT INTO users VALUES
-  ($1, $2);`,
+  INSERT INTO ${User.tableName}
+  VALUES ($1, $2);`,
         values: [users[0].username, users[0].password],
       });
     });

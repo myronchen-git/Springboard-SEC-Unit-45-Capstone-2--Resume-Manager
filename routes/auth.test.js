@@ -5,6 +5,7 @@ const request = require('supertest');
 const app = require('../app');
 const db = require('../database/db');
 
+const User = require('../models/user');
 const { users } = require('../models/_testData');
 const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
@@ -22,7 +23,7 @@ describe('POST /auth/register', () => {
   const url = urlRegisterUser;
   const user = users[0];
 
-  beforeEach(() => commonBeforeEach(db, 'users'));
+  beforeEach(() => commonBeforeEach(db, User.tableName));
 
   test('Registers a user.', async () => {
     // Act
@@ -106,7 +107,7 @@ describe('POST /auth/signin', () => {
   beforeAll((done) => {
     db.query({
       text: `
-  TRUNCATE TABLE users RESTART IDENTITY CASCADE;`,
+  TRUNCATE TABLE ${User.tableName} RESTART IDENTITY CASCADE;`,
     })
       .then(() =>
         request(app).post(urlRegisterUser).send({

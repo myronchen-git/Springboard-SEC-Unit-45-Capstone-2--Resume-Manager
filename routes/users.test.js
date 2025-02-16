@@ -5,6 +5,7 @@ const request = require('supertest');
 const app = require('../app');
 const db = require('../database/db');
 
+const ContactInfo = require('../models/contactInfo');
 const { users, contactInfos } = require('../models/_testData');
 const { commonAfterAll } = require('../_testCommon');
 
@@ -163,7 +164,7 @@ describe('PUT /users/:username/contact-info', () => {
   afterEach(() => {
     return db.query({
       text: `
-  TRUNCATE TABLE contact_info RESTART IDENTITY CASCADE;`,
+  TRUNCATE TABLE ${ContactInfo.tableName} RESTART IDENTITY CASCADE;`,
     });
   });
 
@@ -275,7 +276,7 @@ describe('GET /users/:username/contact-info', () => {
   afterEach(() => {
     return db.query({
       text: `
-  TRUNCATE TABLE contact_info RESTART IDENTITY CASCADE;`,
+  TRUNCATE TABLE ${ContactInfo.tableName} RESTART IDENTITY CASCADE;`,
     });
   });
 

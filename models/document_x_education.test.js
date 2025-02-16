@@ -9,6 +9,9 @@ const {
   BadRequestError,
 } = require('../errors/appErrors');
 
+const Document = require('./document');
+const Education = require('./education');
+const User = require('./user');
 const {
   users,
   documents,
@@ -37,15 +40,20 @@ describe('Document_X_Education', () => {
   beforeAll((done) => {
     db.query({
       text: `
-  INSERT INTO users VALUES
-    ($1, $2);`,
+  INSERT INTO ${User.tableName}
+  VALUES ($1, $2);`,
       values: [users[0].username, users[0].password],
     })
       .then(() =>
         db.query({
           text: `
-  INSERT INTO documents (id, document_name, owner, is_master, is_template)
-  VALUES ($1, $2, $3, $4, $5);`,
+  INSERT INTO ${Document.tableName} (
+    id,
+    document_name,
+    owner,
+    is_master,
+    is_template
+  ) VALUES ($1, $2, $3, $4, $5);`,
           values: [
             documentId,
             documents[0].documentName,
@@ -67,7 +75,7 @@ describe('Document_X_Education', () => {
 
         return db.query({
           text: `
-  INSERT INTO educations (
+  INSERT INTO ${Education.tableName} (
     id,
     owner,
     school,

@@ -5,6 +5,10 @@ const Document_X_Skill = require('./document_x_skill');
 
 const { NotFoundError } = require('../errors/appErrors');
 
+const Document = require('./document');
+const Skill = require('./skill');
+const TextSnippet = require('./textSnippet');
+const User = require('./user');
 const {
   users,
   documents,
@@ -34,15 +38,20 @@ describe('Document_X_Skill', () => {
   beforeAll((done) => {
     db.query({
       text: `
-  INSERT INTO users VALUES
-    ($1, $2);`,
+  INSERT INTO ${User.tableName}
+  VALUES ($1, $2);`,
       values: [users[0].username, users[0].password],
     })
       .then(() =>
         db.query({
           text: `
-  INSERT INTO documents (id, document_name, owner, is_master, is_template)
-  VALUES ($1, $2, $3, $4, $5);`,
+  INSERT INTO ${Document.tableName} (
+    id,
+    document_name,
+    owner,
+    is_master,
+    is_template
+  ) VALUES ($1, $2, $3, $4, $5);`,
           values: [
             documentId,
             documents[0].documentName,
@@ -64,7 +73,7 @@ describe('Document_X_Skill', () => {
 
         return db.query({
           text: `
-  INSERT INTO text_snippets (
+  INSERT INTO ${TextSnippet.tableName} (
     id,
     version,
     owner,
@@ -95,7 +104,7 @@ describe('Document_X_Skill', () => {
 
         return db.query({
           text: `
-  INSERT INTO skills (
+  INSERT INTO ${Skill.tableName} (
     id,
     name,
     owner,

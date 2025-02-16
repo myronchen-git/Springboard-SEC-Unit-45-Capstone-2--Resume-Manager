@@ -9,6 +9,9 @@ const {
   BadRequestError,
 } = require('../errors/appErrors');
 
+const Document = require('./document');
+const Section = require('./section');
+const User = require('./user');
 const {
   users,
   documents,
@@ -27,27 +30,30 @@ jest.mock('../app', () => ({
 // ==================================================
 
 describe('Document_X_Section', () => {
-  const tableName = 'documents_x_sections';
-
   // To help with expects by directly getting data from the database.
   const sqlTextSelectAll = `
   SELECT ${Document_X_Section._allDbColsAsJs}
-  FROM ${tableName}`;
+  FROM ${Document_X_Section.tableName}`;
 
   const documentId = 1;
 
   beforeAll((done) => {
     db.query({
       text: `
-  INSERT INTO users VALUES
-    ($1, $2);`,
+  INSERT INTO ${User.tableName}
+  VALUES ($1, $2);`,
       values: [users[0].username, users[0].password],
     })
       .then(() =>
         db.query({
           text: `
-  INSERT INTO documents (id, document_name, owner, is_master, is_template)
-  VALUES ($1, $2, $3, $4, $5);`,
+  INSERT INTO ${Document.tableName} (
+    id,
+    document_name,
+    owner,
+    is_master,
+    is_template
+  ) VALUES ($1, $2, $3, $4, $5);`,
           values: [
             documentId,
             documents[0].documentName,
@@ -65,7 +71,8 @@ describe('Document_X_Section', () => {
 
         db.query({
           text: `
-  INSERT INTO sections VALUES
+  INSERT INTO ${Section.tableName}
+  VALUES
     ($1, $2),
     ($3, $4);`,
           values: [
@@ -77,7 +84,7 @@ describe('Document_X_Section', () => {
       .then(() => done());
   });
 
-  beforeEach(() => commonBeforeEach(db, tableName));
+  beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
 
   afterAll(() => commonAfterAll(db));
 

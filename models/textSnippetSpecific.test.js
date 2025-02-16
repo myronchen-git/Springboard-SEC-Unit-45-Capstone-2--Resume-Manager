@@ -3,6 +3,7 @@
 const db = require('../database/db');
 const TextSnippet = require('./textSnippet');
 
+const User = require('./user');
 const { users } = require('./_testData');
 const {
   dataForNewInstances,
@@ -22,7 +23,6 @@ jest.mock('../app', () => ({
 
 const ClassRef = TextSnippet;
 const className = 'TextSnippet';
-const tableName = 'text_snippets';
 
 // ================================================== Specific Tests
 
@@ -30,18 +30,18 @@ describe(className, () => {
   // To help with expects by directly getting data from the database.
   const sqlTextSelectAll = `
 SELECT ${ClassRef._allDbColsAsJs}
-FROM ${tableName}`;
+FROM ${TextSnippet.tableName}`;
 
   beforeAll(() => {
     return db.query({
       text: `
-INSERT INTO users VALUES
-($1, $2);`,
+INSERT INTO ${User.tableName}
+VALUES ($1, $2);`,
       values: [users[0].username, users[0].password],
     });
   });
 
-  beforeEach(() => commonBeforeEach(db, tableName));
+  beforeEach(() => commonBeforeEach(db, TextSnippet.tableName));
 
   afterAll(() => commonAfterAll(db));
 

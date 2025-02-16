@@ -47,7 +47,7 @@ const testCasesForGet = [
 
 runCommonTests({
   class: Education,
-  tableName: 'educations',
+  tableName: Education.tableName,
   dataForNewInstances,
   dataForUpdate,
   expectedDataInNewInstances,

@@ -9,6 +9,11 @@ const {
   BadRequestError,
 } = require('../errors/appErrors');
 
+const Document = require('./document');
+const Document_X_Experience = require('./document_x_experience');
+const Experience = require('./experience');
+const TextSnippet = require('./textSnippet');
+const User = require('./user');
 const {
   users,
   documents,
@@ -38,15 +43,20 @@ describe('Experience_X_Text_Snippet', () => {
   beforeAll((done) => {
     db.query({
       text: `
-  INSERT INTO users VALUES
-    ($1, $2);`,
+  INSERT INTO ${User.tableName}
+  VALUES ($1, $2);`,
       values: [users[0].username, users[0].password],
     })
       .then(() =>
         db.query({
           text: `
-  INSERT INTO documents (id, document_name, owner, is_master, is_template)
-  VALUES ($1, $2, $3, $4, $5);`,
+  INSERT INTO ${Document.tableName} (
+    id,
+    document_name,
+    owner,
+    is_master,
+    is_template
+  ) VALUES ($1, $2, $3, $4, $5);`,
           values: [
             1,
             documents[0].documentName,
@@ -66,7 +76,7 @@ describe('Experience_X_Text_Snippet', () => {
 
         return db.query({
           text: `
-  INSERT INTO experiences (
+  INSERT INTO ${Experience.tableName} (
     id,
     owner,
     title,
@@ -74,8 +84,7 @@ describe('Experience_X_Text_Snippet', () => {
     location,
     start_date,
     end_date
-  ) VALUES
-    ($1, $2, $3, $4, $5, $6, $7);`,
+  ) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
           values: [...Object.values(insertData[0])],
         });
       })
@@ -87,13 +96,12 @@ describe('Experience_X_Text_Snippet', () => {
 
         return db.query({
           text: `
-  INSERT INTO documents_x_experiences (
+  INSERT INTO ${Document_X_Experience.tableName} (
     id,
     document_id,
     experience_id,
     position
-  ) VALUES
-    ($1, $2, $3, $4);`,
+  ) VALUES ($1, $2, $3, $4);`,
           values: [...Object.values(insertData[0])],
         });
       })
@@ -109,7 +117,7 @@ describe('Experience_X_Text_Snippet', () => {
 
         return db.query({
           text: `
-  INSERT INTO text_snippets (
+  INSERT INTO ${TextSnippet.tableName} (
     id,
     version,
     owner,

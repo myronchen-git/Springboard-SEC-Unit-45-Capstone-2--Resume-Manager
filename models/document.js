@@ -15,6 +15,8 @@ const logger = require('../util/logger');
  * actual content.
  */
 class Document {
+  static tableName = 'documents';
+
   // To use in SQL statements to return all column data.  Ensure the properties
   // are in the same order and amount as constructor parameters.
   static _allDbColsAsJs = `
@@ -68,8 +70,12 @@ class Document {
 
     const queryConfig = {
       text: `
-  INSERT INTO documents (document_name, owner, is_master, is_template)
-  VALUES ($1, $2, $3, $4)
+  INSERT INTO ${Document.tableName} (
+    document_name,
+    owner,
+    is_master,
+    is_template
+  ) VALUES ($1, $2, $3, $4)
   RETURNING ${Document._allDbColsAsJs};`,
       values: [documentName, owner, isMaster, isTemplate],
     };
@@ -92,7 +98,7 @@ class Document {
     const queryConfig = {
       text: `
   SELECT ${Document._allDbColsAsJs}
-  FROM documents
+  FROM ${Document.tableName}
   WHERE owner = $1;`,
       values: [owner],
     };
@@ -122,7 +128,7 @@ class Document {
     const queryConfig = {
       text: `
   SELECT ${Document._allDbColsAsJs}
-  FROM documents
+  FROM ${Document.tableName}
   WHERE ${id == undefined ? 'document_name' : 'id'} = $1;`,
       values: [id == undefined ? documentName : id],
     };
@@ -181,7 +187,7 @@ class Document {
 
     const queryConfig = {
       text: `
-  UPDATE documents
+  UPDATE ${Document.tableName}
   SET ${sqlSubstring}
     last_updated = (NOW() at time zone 'utc')
   WHERE id = $${sqlValues.length + 1}
@@ -250,7 +256,7 @@ class Document {
 
     const queryConfig = {
       text: `
-  DELETE FROM documents
+  DELETE FROM ${Document.tableName}
   WHERE id = $1;`,
       values: [this.id],
     };

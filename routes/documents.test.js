@@ -5,6 +5,7 @@ const request = require('supertest');
 const app = require('../app');
 const db = require('../database/db');
 
+const Document = require('../models/document');
 const { users, documents } = require('../models/_testData');
 const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
 
@@ -32,7 +33,7 @@ beforeAll((done) => {
     .then(() => done());
 });
 
-beforeEach(() => commonBeforeEach(db, 'documents'));
+beforeEach(() => commonBeforeEach(db, Document.tableName));
 
 afterAll(() => commonAfterAll(db));
 
