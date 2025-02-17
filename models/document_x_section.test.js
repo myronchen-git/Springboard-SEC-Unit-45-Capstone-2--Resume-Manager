@@ -26,13 +26,6 @@ const {
 
 // ==================================================
 
-// Mock to bypass executing app code, but use actual "db" instance.
-jest.mock('../app', () => ({
-  db: require('../database/db'),
-}));
-
-// ==================================================
-
 describe('Document_X_Section', () => {
   // To help with expects by directly getting data from the database.
   const sqlTextSelectAll = `

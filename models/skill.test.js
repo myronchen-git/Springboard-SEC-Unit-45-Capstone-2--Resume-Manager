@@ -16,13 +16,6 @@ const {
 
 // ==================================================
 
-// Mock to bypass executing app code, but use actual "db" instance.
-jest.mock('../app', () => ({
-  db: require('../database/db'),
-}));
-
-// ==================================================
-
 describe('Skill', () => {
   let textSnippetData;
   let newSkillData;

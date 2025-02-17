@@ -11,13 +11,6 @@ const { commonBeforeAll, commonBeforeEach } = require('../_testCommon');
 
 // ==================================================
 
-// Mock to bypass executing app code, but use actual "db" instance.
-jest.mock('../app', () => ({
-  db: require('../database/db'),
-}));
-
-// ==================================================
-
 describe('User', () => {
   const testUser = users[0];
 

@@ -14,13 +14,6 @@ const {
 
 // ==================================================
 
-// Mock to bypass executing app code, but use actual "db" instance.
-jest.mock('../app', () => ({
-  db: require('../database/db'),
-}));
-
-// ==================================================
-
 /**
  * Runs standard tests for create, read, update, and delete operations.  Uses
  * first item of lists for certain operations, such as the first user for the

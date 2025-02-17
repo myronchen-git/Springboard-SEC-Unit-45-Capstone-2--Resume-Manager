@@ -16,13 +16,6 @@ const {
   commonAfterAll,
 } = require('../_testCommon');
 
-// ==================================================
-
-// Mock to bypass executing app code, but use actual "db" instance.
-jest.mock('../app', () => ({
-  db: require('../database/db'),
-}));
-
 // ================================================== Set Up Variables
 
 const ClassRef = TextSnippet;
