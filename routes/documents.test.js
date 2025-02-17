@@ -7,7 +7,11 @@ const db = require('../database/db');
 
 const Document = require('../models/document');
 const { users, documents } = require('../models/_testData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -18,20 +22,22 @@ const getUrlNewDocument = (username) =>
 
 const authTokens = [];
 
-beforeAll((done) => {
-  Promise.all(
-    users.map((user) =>
-      request(app).post(urlRegisterUser).send({
-        username: user.username,
-        password: user.password,
-      })
+beforeAll(() =>
+  commonBeforeAll(db)
+    .then(() =>
+      Promise.all(
+        users.map((user) =>
+          request(app).post(urlRegisterUser).send({
+            username: user.username,
+            password: user.password,
+          })
+        )
+      )
     )
-  )
     .then((responses) => {
       responses.forEach((resp) => authTokens.push(resp.body.authToken));
     })
-    .then(() => done());
-});
+);
 
 beforeEach(() => commonBeforeEach(db, Document.tableName));
 

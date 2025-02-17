@@ -6,7 +6,11 @@ const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const User = require('./user');
 const { users } = require('./_testData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -83,14 +87,16 @@ function runCommonTests(testConfig) {
   SELECT ${ClassRef._allDbColsAsJs}
   FROM ${tableName}`;
 
-    beforeAll(() => {
-      return db.query({
-        text: `
+    beforeAll(() =>
+      commonBeforeAll(db).then(() =>
+        db.query({
+          text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-        values: [users[0].username, users[0].password],
-      });
-    });
+          values: [users[0].username, users[0].password],
+        })
+      )
+    );
 
     beforeEach(() => commonBeforeEach(db, tableName));
 

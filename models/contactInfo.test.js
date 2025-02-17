@@ -7,7 +7,11 @@ const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const User = require('./user');
 const { users, contactInfos: dataForNewInstances } = require('./_testData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -34,21 +38,23 @@ describe('ContactInfo', () => {
     github: data.github || null,
   }));
 
-  beforeAll(() => {
-    return db.query({
-      text: `
+  beforeAll(() =>
+    commonBeforeAll(db).then(() =>
+      db.query({
+        text: `
   INSERT INTO ${User.tableName}
   VALUES
     ($1, $2),
     ($3, $4);`,
-      values: [
-        users[0].username,
-        users[0].password,
-        users[1].username,
-        users[1].password,
-      ],
-    });
-  });
+        values: [
+          users[0].username,
+          users[0].password,
+          users[1].username,
+          users[1].password,
+        ],
+      })
+    )
+  );
 
   beforeEach(() => commonBeforeEach(db, ContactInfo.tableName));
 

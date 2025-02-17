@@ -10,7 +10,11 @@ const {
   dataForUpdate,
   whereClauseToGetAll,
 } = require('./_textSnippetTestData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -29,17 +33,19 @@ const className = 'TextSnippet';
 describe(className, () => {
   // To help with expects by directly getting data from the database.
   const sqlTextSelectAll = `
-SELECT ${ClassRef._allDbColsAsJs}
-FROM ${TextSnippet.tableName}`;
+  SELECT ${ClassRef._allDbColsAsJs}
+  FROM ${TextSnippet.tableName}`;
 
-  beforeAll(() => {
-    return db.query({
-      text: `
-INSERT INTO ${User.tableName}
-VALUES ($1, $2);`,
-      values: [users[0].username, users[0].password],
-    });
-  });
+  beforeAll(() =>
+    commonBeforeAll(db).then(() =>
+      db.query({
+        text: `
+  INSERT INTO ${User.tableName}
+  VALUES ($1, $2);`,
+        values: [users[0].username, users[0].password],
+      })
+    )
+  );
 
   beforeEach(() => commonBeforeEach(db, TextSnippet.tableName));
 

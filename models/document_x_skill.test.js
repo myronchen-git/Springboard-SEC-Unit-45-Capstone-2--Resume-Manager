@@ -16,7 +16,11 @@ const {
   skills,
   documents_x_skills,
 } = require('./_testData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -35,13 +39,16 @@ describe('Document_X_Skill', () => {
 
   const documentId = 1;
 
-  beforeAll((done) => {
-    db.query({
-      text: `
+  beforeAll(() =>
+    commonBeforeAll(db)
+      .then(() =>
+        db.query({
+          text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-      values: [users[0].username, users[0].password],
-    })
+          values: [users[0].username, users[0].password],
+        })
+      )
       .then(() =>
         db.query({
           text: `
@@ -119,8 +126,7 @@ describe('Document_X_Skill', () => {
           ],
         });
       })
-      .then(() => done());
-  });
+  );
 
   beforeEach(() => commonBeforeEach(db, Document_X_Skill.tableName));
 

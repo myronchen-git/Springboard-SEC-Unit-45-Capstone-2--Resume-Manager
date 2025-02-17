@@ -8,7 +8,11 @@ const { AppServerError, NotFoundError } = require('../errors/appErrors');
 const TextSnippet = require('./textSnippet');
 const User = require('./user');
 const { users, skills, textSnippets } = require('./_testData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -52,13 +56,16 @@ describe('Skill', () => {
   FROM ${Skill.tableName}
   WHERE owner = $1;`;
 
-  beforeAll((done) => {
-    db.query({
-      text: `
+  beforeAll(() =>
+    commonBeforeAll(db)
+      .then(() =>
+        db.query({
+          text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-      values: [users[0].username, users[0].password],
-    })
+          values: [users[0].username, users[0].password],
+        })
+      )
       .then(() =>
         db.query({
           text: `
@@ -89,9 +96,8 @@ describe('Skill', () => {
           id: expect.any(Number),
           ...data,
         }));
-        done();
-      });
-  });
+      })
+  );
 
   beforeEach(() => commonBeforeEach(db, Skill.tableName));
 

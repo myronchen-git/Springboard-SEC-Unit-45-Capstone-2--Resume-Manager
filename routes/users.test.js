@@ -7,7 +7,11 @@ const db = require('../database/db');
 
 const ContactInfo = require('../models/contactInfo');
 const { users, contactInfos } = require('../models/_testData');
-const { commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -16,20 +20,22 @@ const urlRegisterUser = `${urlPrefix}/auth/register`;
 
 const authTokens = [];
 
-beforeAll((done) => {
-  Promise.all(
-    users.map((user) =>
-      request(app).post(urlRegisterUser).send({
-        username: user.username,
-        password: user.password,
-      })
+beforeAll(() =>
+  commonBeforeAll(db)
+    .then(() =>
+      Promise.all(
+        users.map((user) =>
+          request(app).post(urlRegisterUser).send({
+            username: user.username,
+            password: user.password,
+          })
+        )
+      )
     )
-  )
     .then((responses) => {
       responses.forEach((resp) => authTokens.push(resp.body.authToken));
     })
-    .then(() => done());
-});
+);
 
 afterAll(() => commonAfterAll(db));
 
@@ -161,12 +167,7 @@ describe('PATCH /users/:username', () => {
 describe('PUT /users/:username/contact-info', () => {
   const getUrl = (username) => `${urlPrefix}/users/${username}/contact-info`;
 
-  afterEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE ${ContactInfo.tableName} RESTART IDENTITY CASCADE;`,
-    });
-  });
+  beforeEach(() => commonBeforeEach(db, ContactInfo.tableName));
 
   test.each(contactInfos.map((info, idx) => [idx, { ...info }]))(
     'Adds a contact info entry into database if one does not exist.  ' +
@@ -273,12 +274,7 @@ describe('PUT /users/:username/contact-info', () => {
 describe('GET /users/:username/contact-info', () => {
   const getUrl = (username) => `${urlPrefix}/users/${username}/contact-info`;
 
-  afterEach(() => {
-    return db.query({
-      text: `
-  TRUNCATE TABLE ${ContactInfo.tableName} RESTART IDENTITY CASCADE;`,
-    });
-  });
+  beforeEach(() => commonBeforeEach(db, ContactInfo.tableName));
 
   test.each(contactInfos.map((info, idx) => [idx, { ...info }]))(
     'Retrieves contact info for a user.  Field %i: %o.',

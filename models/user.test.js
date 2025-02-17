@@ -7,7 +7,7 @@ const { AppServerError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
 const { users } = require('./_testData');
-const { commonBeforeEach } = require('../_testCommon');
+const { commonBeforeAll, commonBeforeEach } = require('../_testCommon');
 
 // ==================================================
 
@@ -34,7 +34,9 @@ describe('User', () => {
   FROM ${User.tableName}`;
 
   // To help with expects by filtering data retrieved from the database.
-  const whereClauseToGetOne = 'WHERE username = $1';
+  const whereClauseToGetOne = '\n  WHERE username = $1';
+
+  beforeAll(() => commonBeforeAll(db));
 
   beforeEach(() => commonBeforeEach(db, User.tableName));
 
@@ -53,7 +55,7 @@ describe('User', () => {
 
       const databaseEntry = (
         await db.query({
-          text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
+          text: sqlTextSelectAll + `${whereClauseToGetOne};`,
           values: [user.username],
         })
       ).rows[0];
@@ -144,7 +146,7 @@ describe('User', () => {
 
       const databaseEntry = (
         await db.query({
-          text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
+          text: sqlTextSelectAll + `${whereClauseToGetOne};`,
           values: [user.username],
         })
       ).rows[0];
@@ -208,7 +210,7 @@ describe('User', () => {
       // Assert
       const databaseEntries = (
         await db.query({
-          text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
+          text: sqlTextSelectAll + `${whereClauseToGetOne};`,
           values: [user.username],
         })
       ).rows;

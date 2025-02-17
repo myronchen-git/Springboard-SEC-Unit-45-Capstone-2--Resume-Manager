@@ -23,7 +23,11 @@ const {
   documents_x_experiences,
   experiences_x_text_snippets,
 } = require('./_testData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+} = require('../_testCommon');
 
 // ==================================================
 
@@ -40,13 +44,16 @@ describe('Experience_X_Text_Snippet', () => {
   SELECT ${Experience_X_Text_Snippet._allDbColsAsJs}
   FROM ${Experience_X_Text_Snippet.tableName}`;
 
-  beforeAll((done) => {
-    db.query({
-      text: `
+  beforeAll(() =>
+    commonBeforeAll(db)
+      .then(() =>
+        db.query({
+          text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-      values: [users[0].username, users[0].password],
-    })
+          values: [users[0].username, users[0].password],
+        })
+      )
       .then(() =>
         db.query({
           text: `
@@ -133,8 +140,7 @@ describe('Experience_X_Text_Snippet', () => {
           ],
         });
       })
-      .then(() => done());
-  });
+  );
 
   beforeEach(() => commonBeforeEach(db, Experience_X_Text_Snippet.tableName));
 
