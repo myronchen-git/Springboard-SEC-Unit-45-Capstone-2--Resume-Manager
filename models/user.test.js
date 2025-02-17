@@ -3,7 +3,7 @@
 const db = require('../database/db');
 const User = require('./user');
 
-const { AppServerError } = require('../errors/appErrors');
+const { AppServerError, NotFoundError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
 const { users } = require('./_testData');
@@ -164,16 +164,12 @@ describe('User', () => {
       }
 
       // Assert
-      await expect(runFunc).rejects.toThrow(AppServerError);
+      await expect(runFunc).rejects.toThrow(NotFoundError);
     });
   });
 
   describe('instance update unit tests', () => {
     let origUpdate = User.update;
-
-    beforeAll(() => {
-      User.update = jest.fn().mockResolvedValue(new User(testUser.username));
-    });
 
     afterAll(() => {
       User.update = origUpdate;
@@ -183,6 +179,8 @@ describe('User', () => {
       // Arrange
       const user = await User.register(testUser);
       const updatedInfo = Object.freeze({ password: 'updated' });
+
+      User.update = jest.fn().mockResolvedValue(new User(testUser.username));
 
       // Act
       const updatedUser = await user.update(updatedInfo);
@@ -194,6 +192,26 @@ describe('User', () => {
       delete expectedUser.password;
 
       expect(updatedUser).toEqual(expectedUser);
+    });
+
+    test('Rethrows NotFoundError as AppServerError.', async () => {
+      // Arrange
+      const user = await User.register(testUser);
+      const updatedInfo = Object.freeze({ password: 'updated' });
+
+      const errorMessage = 'An error message.';
+      User.update = jest
+        .fn()
+        .mockRejectedValue(new NotFoundError(errorMessage));
+
+      // Act
+      async function runFunc() {
+        await user.update(updatedInfo);
+      }
+
+      // Assert
+      await expect(runFunc).rejects.toThrow(AppServerError);
+      await expect(runFunc).rejects.toThrow(errorMessage);
     });
   });
 

@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 const db = require('../database/db');
 
-const { AppServerError } = require('../errors/appErrors');
+const { AppServerError, NotFoundError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
 const { BCRYPT_WORK_FACTOR } = require('../config');
@@ -109,6 +109,7 @@ class User {
    * @param {Object} data - Contains data for updating an account.
    * @param {String} data.password - New password for the account.
    * @returns {User} A new User instance that contains the user's data.
+   * @throws {NotFoundError} If user does not exist.
    */
   static async update(username, { password }) {
     const logPrefix =
@@ -128,7 +129,7 @@ class User {
 
     if (result.rowCount === 0) {
       logger.error(`${logPrefix}: Username "${username}" not found.`);
-      throw new AppServerError(`Username "${username}" not found.`);
+      throw new NotFoundError(`Username "${username}" not found.`);
     }
 
     const data = result.rows[0];
@@ -141,9 +142,22 @@ class User {
    * @param {Object} data - Contains data for updating an account.
    * @returns {User} The same User instance that this method was called on, but
    *  with updated property values.
+   * @throws {AppServerError} If the user that this instance represents has
+   *  already been deleted.
    */
   async update(data) {
-    const user = await User.update(this.username, data);
+    let user;
+    try {
+      user = await User.update(this.username, data);
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        // If user is not found, then this User instance is stale and represents
+        // a deleted user.
+        throw new AppServerError(err.message);
+      } else {
+        throw err;
+      }
+    }
 
     // Update current instance's properties.
     Object.entries(user).forEach(([colName, val]) => {
