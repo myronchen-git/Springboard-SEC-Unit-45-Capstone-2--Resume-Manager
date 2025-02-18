@@ -6,6 +6,7 @@ const documentNewSchema = require('../schemas/documentNew.json');
 const documentUpdateSchema = require('../schemas/documentUpdate.json');
 
 const Document = require('../models/document');
+const documentService = require('../services/documentService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
 
@@ -96,6 +97,32 @@ router.patch('/:docId', ensureLoggedIn, async (req, res, next) => {
     const document = await Document.update(req.params.docId, req.body);
 
     return res.json({ document });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
+ * DELETE /users/:username/documents/:docId
+ * {} => {}
+ *
+ * Authorization required: login
+ */
+router.delete('/:docId', ensureLoggedIn, async (req, res, next) => {
+  const userPayload = res.locals.user;
+
+  const logPrefix =
+    'DELETE /users/:username/documents/:docId (' +
+    `user: ${JSON.stringify(userPayload)})`;
+  logger.info(logPrefix + ' BEGIN');
+
+  try {
+    await documentService.deleteDocument(
+      userPayload.username,
+      req.params.docId
+    );
+
+    return res.sendStatus(200);
   } catch (err) {
     return next(err);
   }

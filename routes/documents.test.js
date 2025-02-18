@@ -272,3 +272,78 @@ describe('PATCH /users/:username/documents/:docId', () => {
     expect(resp.body).not.toHaveProperty('document');
   });
 });
+
+// --------------------------------------------------
+// DELETE /users/:username/documents/:docId
+
+describe('DELETE /users/:username/documents/:docId', () => {
+  const getUrl = (username, docId) =>
+    `${urlPrefix}/users/${username}/documents/${docId}`;
+  const user = users[0];
+  const document = documents[0];
+  let authToken;
+  let docId;
+
+  // Need to set authToken in beforeAll, because all variable declarations
+  // outside of these setup functions are run first.
+  beforeAll(() => {
+    authToken = authTokens[0];
+  });
+
+  test('Deletes an existing document.', async () => {
+    // Arrange
+    await request(app)
+      .post(getUrlNewDocument(user.username))
+      .send({
+        documentName: document.documentName,
+        isTemplate: document.isTemplate,
+      })
+      .set('authorization', `Bearer ${authToken}`)
+      .then((resp) => (docId = resp.body.document.id));
+
+    // Act
+    const resp = await request(app)
+      .delete(getUrl(user.username, docId))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+  });
+
+  test('Deleting a nonexistent document should return 200 status.', async () => {
+    // Arrange
+    const nonexistentDocId = 999;
+
+    // Act
+    const resp = await request(app)
+      .delete(getUrl(user.username, nonexistentDocId))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+  });
+
+  test(
+    "Attempting to delete another user's document " +
+      'should return 403 status.',
+    async () => {
+      // Arrange
+      await request(app)
+        .post(getUrlNewDocument(users[0].username))
+        .send({
+          documentName: documents[0].documentName,
+          isTemplate: documents[0].isTemplate,
+        })
+        .set('authorization', `Bearer ${authTokens[0]}`)
+        .then((resp) => (docId = resp.body.document.id));
+
+      // Act
+      const resp = await request(app)
+        .delete(getUrl(users[1].username, docId))
+        .set('authorization', `Bearer ${authTokens[1]}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
+    }
+  );
+});
