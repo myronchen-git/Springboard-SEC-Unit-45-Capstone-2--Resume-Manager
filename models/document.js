@@ -166,7 +166,11 @@ class Document {
    * @throws {NotFoundError} If the document does not exist.
    */
   static async update(id, docProps, oldDocumentName) {
-    const logPrefix = `Document.update(${JSON.stringify(docProps)})`;
+    const logPrefix =
+      'Document.update(' +
+      `id = ${id}, ` +
+      `docProps = ${JSON.stringify(docProps)}, ` +
+      `oldDocumentName = "${oldDocumentName}")`;
     logger.verbose(logPrefix);
 
     // Processing document properties.
@@ -247,29 +251,38 @@ class Document {
   }
 
   /**
-   * Deletes a document entry in the database.  Does not delete the instance
-   * properties/fields.  Remember to delete the instance this belongs to!
+   * Deletes a document entry in the database.
+   *
+   * @param {Number} id - Document ID of the document to delete.
    */
-  async delete() {
-    const logPrefix = `Document.delete()`;
+  static async delete(id) {
+    const logPrefix = `Document.delete(id = ${id})`;
     logger.verbose(logPrefix);
 
     const queryConfig = {
       text: `
   DELETE FROM ${Document.tableName}
   WHERE id = $1;`,
-      values: [this.id],
+      values: [id],
     };
 
     const result = await db.query(queryConfig, logPrefix);
 
     if (result.rowCount) {
       logger.info(
-        `${logPrefix}: ${result.rowCount} document(s) deleted: id = ${this.id}.`
+        `${logPrefix}: ${result.rowCount} document(s) deleted: id = ${id}.`
       );
     } else {
       logger.info(`${logPrefix}: 0 documents deleted.`);
     }
+  }
+
+  /**
+   * Deletes a document entry in the database.  Does not delete the instance
+   * properties/fields.  Remember to delete the instance this belongs to!
+   */
+  async delete() {
+    await Document.delete(this.id);
   }
 }
 
