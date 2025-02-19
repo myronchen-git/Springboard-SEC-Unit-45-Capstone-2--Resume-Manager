@@ -84,9 +84,9 @@ router.get('/', ensureLoggedIn, async (req, res, next) => {
  *
  * Authorization required: login
  *
- * @param {String} documentName - New name of the document.
- * @param {Boolean} isTemplate - Whether this document should be a template.
- * @param {Boolean} isLocked - Whether this document should be locked.
+ * @param {String} [documentName] - New name of the document.
+ * @param {Boolean} [isTemplate] - Whether this document should be a template.
+ * @param {Boolean} [isLocked] - Whether this document should be locked.
  * @returns {Object} document - Returns all info of the updated document.
  */
 router.patch('/:docId', ensureLoggedIn, async (req, res, next) => {

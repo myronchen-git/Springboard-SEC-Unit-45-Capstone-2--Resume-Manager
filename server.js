@@ -1,6 +1,6 @@
 'use strict';
 
-const { app } = require('./app');
+const app = require('./app');
 const { PORT } = require('./config');
 const logger = require('./util/logger');
 

@@ -41,9 +41,11 @@ function ensureLoggedIn(req, res, next) {
 
   try {
     if (!res.locals.user) {
-      logger.error(`${logPrefix}: No user logged in.`);
+      logger.error(
+        `${logPrefix}: No user logged in / No authentication token.`
+      );
 
-      throw new UnauthorizedError();
+      throw new UnauthorizedError('Authentication token required.');
     }
 
     return next();
