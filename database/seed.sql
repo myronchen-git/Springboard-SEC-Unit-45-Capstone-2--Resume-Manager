@@ -8,37 +8,39 @@ INSERT INTO contact_info VALUES
 
 -- ==================================================
 
-INSERT INTO documents (id, document_name, owner, is_master, is_template) VALUES
-    (1, 'Master', 'user1', TRUE, FALSE);
+INSERT INTO documents (document_name, owner, is_master, is_template) VALUES
+    ('Master', 'user1', TRUE, FALSE),
+    ('Doc 1', 'user1', FALSE, FALSE),
+    ('Doc 1', 'user2', FALSE, FALSE);
 
-INSERT INTO sections VALUES
-    (1, 'Education'),
-    (2, 'Work Experience'),
-    (3, 'Skills'),
-    (4, 'Certifications'),
-    (5, 'Projects');
+INSERT INTO sections (section_name) VALUES
+    ('Education'),
+    ('Work Experience'),
+    ('Skills'),
+    ('Certifications'),
+    ('Projects');
 
 -- ==================================================
 
-INSERT INTO text_snippets (id, owner, type, content) VALUES
-    (101, 'user1', 'plain', 'abc');
+INSERT INTO text_snippets (owner, type, content) VALUES
+    ('user1', 'plain', 'abc');
 
-INSERT INTO text_snippets (id, version, owner, type, content) VALUES
-    (102, '2025-01-01 12:00:00-08', 'user1', 'plain', 'Languages: JavaScript, HTML, CSS\nTools: Node, Express, Bootstrap');
+INSERT INTO text_snippets (version, owner, type, content) VALUES
+    ('2025-01-01 12:00:00-08', 'user1', 'plain', 'Languages: JavaScript, HTML, CSS\nTools: Node, Express, Bootstrap'),
+    ('2025-01-02 12:00:00-08', 'user1', 'plain', 'achievement 1');
 
 INSERT INTO text_snippets (id, version, owner, parent, type, content) VALUES
-    (103, '2025-01-02 12:00:00-08', 'user1', NULL, 'plain', 'achievement 1'),
-    (103, '2025-01-03 12:00:00-08', 'user1', '2025-01-02 12:00:00-08', 'plain', 'achieve 1');
+    (3, '2025-01-03 12:00:00-08', 'user1', '2025-01-02 12:00:00-08', 'plain', 'achieve 1');
 
-INSERT INTO educations (id, owner, school, location, start_date, end_date, degree, gpa) VALUES
-    (1, 'user1', 'University', 'Loc, USA', '2000-01-01', '2004-01-01', 'Degree', '4.0 / 4.0');
+INSERT INTO educations (owner, school, location, start_date, end_date, degree, gpa) VALUES
+    ('user1', 'University', 'Loc, USA', '2000-01-01', '2004-01-01', 'Degree', '4.0 / 4.0');
 
-INSERT INTO experiences VALUES
-    (1, 'user1', 'Job 3', 'Company 3', 'Company Location 3', '2025-01-01', NULL),
-    (2, 'user1', 'Job 2', 'Company 2', 'Company Location 2', '2020-01-01', '2024-12-30');
+INSERT INTO experiences (owner, title, organization, location, start_date, end_date) VALUES
+    ('user1', 'Job 3', 'Company 3', 'Company Location 3', '2025-01-01', NULL),
+    ('user1', 'Job 2', 'Company 2', 'Company Location 2', '2020-01-01', '2024-12-30');
 
-INSERT INTO skills VALUES
-    (1, 'software engineering', 'user1', 102, '2025-01-01 12:00:00-08');
+INSERT INTO skills (name, owner, text_snippet_id, text_snippet_version) VALUES
+    ('software engineering', 'user1', 2, '2025-01-01 12:00:00-08');
 
 -- ==================================================
 
@@ -50,12 +52,12 @@ INSERT INTO documents_x_sections VALUES
 INSERT INTO documents_x_educations VALUES
     (1, 1, 0);
 
-INSERT INTO documents_x_experiences VALUES
-    (101, 1, 1, 0),
-    (102, 1, 2, 1);
+INSERT INTO documents_x_experiences (document_id, experience_id, position) VALUES
+    (1, 1, 0),
+    (1, 2, 1);
 
 INSERT INTO documents_x_skills VALUES
     (1, 1);
 
 INSERT INTO experiences_x_text_snippets VALUES
-    (101, 103, '2025-01-02 12:00:00-08', 0);
+    (1, 3, '2025-01-02 12:00:00-08', 0);
