@@ -81,6 +81,13 @@ router.get('/', ensureLoggedIn, async (req, res, next) => {
 /**
  * PATCH /users/:username/documents/:docId
  * { documentName, isTemplate, isLocked } => { document }
+ *
+ * Authorization required: login
+ *
+ * @param {String} documentName - New name of the document.
+ * @param {Boolean} isTemplate - Whether this document should be a template.
+ * @param {Boolean} isLocked - Whether this document should be locked.
+ * @returns {Object} document - Returns all info of the updated document.
  */
 router.patch('/:docId', ensureLoggedIn, async (req, res, next) => {
   const userPayload = res.locals.user;
@@ -94,7 +101,11 @@ router.patch('/:docId', ensureLoggedIn, async (req, res, next) => {
   try {
     runJsonSchemaValidator(documentUpdateSchema, req.body, logPrefix);
 
-    const document = await Document.update(req.params.docId, req.body);
+    const document = await documentService.updateDocument(
+      userPayload.username,
+      req.params.docId,
+      req.body
+    );
 
     return res.json({ document });
   } catch (err) {

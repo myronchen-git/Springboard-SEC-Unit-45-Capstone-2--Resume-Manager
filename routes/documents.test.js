@@ -271,6 +271,29 @@ describe('PATCH /users/:username/documents/:docId', () => {
     expect(resp.statusCode).toBe(404);
     expect(resp.body).not.toHaveProperty('document');
   });
+
+  test(
+    "Attempting to update another user's document " +
+      'should return 403 status.',
+    async () => {
+      // Arrange
+      const updateData = Object.freeze({
+        documentName: 'New name',
+        isTemplate: !documents[0].isTemplate,
+        isLocked: true,
+      });
+
+      // Act
+      const resp = await request(app)
+        .patch(getUrl(users[0].username, docId))
+        .send(updateData)
+        .set('authorization', `Bearer ${authTokens[1]}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
+      expect(resp.body).not.toHaveProperty('document');
+    }
+  );
 });
 
 // --------------------------------------------------
