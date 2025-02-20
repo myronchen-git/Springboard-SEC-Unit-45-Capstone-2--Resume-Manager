@@ -186,6 +186,12 @@ describe('PATCH /users/:username/documents/:docId', () => {
   let authToken;
   let docId;
 
+  const updateData = Object.freeze({
+    documentName: 'New name',
+    isTemplate: !document.isTemplate,
+    isLocked: true,
+  });
+
   // Need to set authToken in beforeAll, because all variable declarations
   // outside of these setup functions are run first.
   beforeAll(() => {
@@ -204,14 +210,7 @@ describe('PATCH /users/:username/documents/:docId', () => {
       .then(() => done());
   });
 
-  test('Updates a document.', async () => {
-    // Arrange
-    const updateData = Object.freeze({
-      documentName: 'New name',
-      isTemplate: !document.isTemplate,
-      isLocked: true,
-    });
-
+  test("Updates a document that's not the master resume.", async () => {
     // Act
     const resp = await request(app)
       .patch(getUrl(user.username, docId))
@@ -237,6 +236,49 @@ describe('PATCH /users/:username/documents/:docId', () => {
     expect(Date.parse(resp.body.document.lastUpdated)).not.toBeNaN();
   });
 
+  test.each([
+    [Object.freeze({ documentName: updateData.documentName })],
+    [updateData],
+  ])('Updates the master resume with a new name.', async (updateData) => {
+    // Arrange
+    // Have to directly insert a master resume document, because the only way
+    // thru the API is to create a new user and the documents table gets
+    // truncated before each test.
+    const result = await db.query({
+      text: `
+  INSERT INTO documents (document_name, owner, is_master, is_template)
+  VALUES ('Master', $1, true, false)
+  RETURNING id;`,
+      values: [user.username],
+    });
+
+    const docId = result.rows[0].id;
+
+    // Act
+    const resp = await request(app)
+      .patch(getUrl(user.username, docId))
+      .send(updateData)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+
+    const expectedDocument = {
+      id: docId,
+      documentName: updateData.documentName,
+      owner: user.username,
+      createdOn: expect.any(String),
+      lastUpdated: expect.any(String),
+      isMaster: true,
+      isTemplate: false,
+      isLocked: false,
+    };
+
+    expect(resp.body).toEqual({ document: expectedDocument });
+    expect(Date.parse(resp.body.document.createdOn)).not.toBeNaN();
+    expect(Date.parse(resp.body.document.lastUpdated)).not.toBeNaN();
+  });
+
   test('Updating with no properties should return 400 status.', async () => {
     // Arrange
     const updateData = {};
@@ -247,6 +289,7 @@ describe('PATCH /users/:username/documents/:docId', () => {
       .send(updateData)
       .set('authorization', `Bearer ${authToken}`);
 
+    // Assert
     expect(resp.statusCode).toBe(400);
     expect(resp.body).not.toHaveProperty('document');
   });
@@ -254,12 +297,6 @@ describe('PATCH /users/:username/documents/:docId', () => {
   test('Updating a nonexistent document should return 404 status.', async () => {
     // Arrange
     const nonexistentDocId = 999;
-
-    const updateData = Object.freeze({
-      documentName: 'New name',
-      isTemplate: !document.isTemplate,
-      isLocked: true,
-    });
 
     // Act
     const resp = await request(app)
@@ -271,6 +308,39 @@ describe('PATCH /users/:username/documents/:docId', () => {
     expect(resp.statusCode).toBe(404);
     expect(resp.body).not.toHaveProperty('document');
   });
+
+  test.each([
+    [{ isLocked: updateData.isLocked }],
+    [(({ documentName, ...rest }) => rest)(updateData)],
+  ])(
+    'Updating a master resume without changing the document name ' +
+      'should return 400 status.',
+    async (updateData) => {
+      // Arrange
+      // Have to directly insert a master resume document, because the only way
+      // thru the API is to create a new user and the documents table gets
+      // truncated before each test.
+      const result = await db.query({
+        text: `
+  INSERT INTO documents (document_name, owner, is_master, is_template)
+  VALUES ('Master', $1, true, false)
+  RETURNING id;`,
+        values: [user.username],
+      });
+
+      const docId = result.rows[0].id;
+
+      // Act
+      const resp = await request(app)
+        .patch(getUrl(user.username, docId))
+        .send(updateData)
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(400);
+      expect(resp.body).not.toHaveProperty('document');
+    }
+  );
 
   test(
     "Attempting to update another user's document " +

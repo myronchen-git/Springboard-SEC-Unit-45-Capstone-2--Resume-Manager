@@ -84,6 +84,8 @@ router.get('/', ensureLoggedIn, async (req, res, next) => {
  *
  * Authorization required: login
  *
+ * If document is master resume, then only documentName can be updated.
+ *
  * @param {String} [documentName] - New name of the document.
  * @param {Boolean} [isTemplate] - Whether this document should be a template.
  * @param {Boolean} [isLocked] - Whether this document should be locked.

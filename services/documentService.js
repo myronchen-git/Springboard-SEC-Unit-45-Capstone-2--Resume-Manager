@@ -5,6 +5,7 @@ const fileName = path.basename(__filename, '.js');
 
 const Document = require('../models/document');
 
+const { ArgumentError } = require('../errors/modelErrors');
 const { ForbiddenError, NotFoundError } = require('../errors/appErrors');
 
 const logger = require('../util/logger');
@@ -13,13 +14,18 @@ const logger = require('../util/logger');
 
 /**
  * Updates a document by first verifying that it belongs to the specified user.
+ * If document is the master resume, then only the document name is allowed to
+ * be changed.
  *
  * @param {String} username - Name of user that wants to update the document.
  * @param {Number} documentId - ID of the document to be updated.
- * @param {Object} props - Properties of the document to be updated.
+ * @param {Object} props - Properties of the document to be updated.  See route
+ *  for full list.
  * @returns {Document} An Document instance containing the updated info.
  * @throws {ForbiddenError} If the document does not belong to the specified
  *  user.
+ * @throws {ArgumentError} If the document is a master resume and document name
+ *  is not being updated.
  */
 async function updateDocument(username, documentId, props) {
   const logPrefix =
@@ -42,7 +48,23 @@ async function updateDocument(username, documentId, props) {
     );
   }
 
-  return await document.update(props);
+  if (document.isMaster) {
+    const logMessage =
+      `${logPrefix}: User "${username}" attempted to update master resume ` +
+      `with ID ${documentId} with properties other than documentName.`;
+
+    if (props.documentName) {
+      if (props.length > 1) logger.warn(logMessage);
+      return await document.update({ documentName: props.documentName });
+    } else {
+      logger.error(logMessage);
+      throw new ArgumentError(
+        'Only document name can be updated for master resumes.'
+      );
+    }
+  } else {
+    return await document.update(props);
+  }
 }
 
 /**

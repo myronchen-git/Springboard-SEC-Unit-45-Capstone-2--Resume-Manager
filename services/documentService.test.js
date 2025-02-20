@@ -3,6 +3,7 @@
 const Document = require('../models/document');
 const { updateDocument, deleteDocument } = require('./documentService');
 
+const { ArgumentError } = require('../errors/modelErrors');
 const { ForbiddenError, NotFoundError } = require('../errors/appErrors');
 
 // ==================================================
@@ -10,6 +11,9 @@ const { ForbiddenError, NotFoundError } = require('../errors/appErrors');
 jest.mock('../models/document');
 
 // ==================================================
+
+// --------------------------------------------------
+// updateDocument
 
 describe('updateDocument', () => {
   const username = 'user1';
@@ -30,7 +34,7 @@ describe('updateDocument', () => {
 
   test('Calls document.update if document is found and belongs to user.', async () => {
     // Arrange
-    const document = { owner: username };
+    const document = { owner: username, isMaster: false };
 
     Document.get = mockGet.mockResolvedValue(document);
     document.update = mockUpdate.mockResolvedValue(document);
@@ -46,9 +50,33 @@ describe('updateDocument', () => {
     expect(document.update).toHaveBeenCalledWith(props);
   });
 
+  test.each([[Object.freeze({ documentName: props.documentName })], [props]])(
+    'If document is the master resume, calls document.update ' +
+      'if documentName is given.',
+    async (props) => {
+      // Arrange
+      const document = { owner: username, isMaster: true };
+
+      Document.get = mockGet.mockResolvedValue(document);
+      document.update = mockUpdate.mockResolvedValue(document);
+
+      Object.freeze(document);
+
+      // Act
+      const updatedDocument = await updateDocument(username, documentId, props);
+
+      // Assert
+      expect(updatedDocument).toBe(document);
+      expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+      expect(document.update).toHaveBeenCalledWith({
+        documentName: props.documentName,
+      });
+    }
+  );
+
   test('Throws an Error if document does not belong to user.', async () => {
     // Arrange
-    const document = { owner: 'otherUser' };
+    const document = { owner: 'otherUser', isMaster: false };
 
     Document.get = mockGet.mockResolvedValue(document);
     document.update = mockUpdate.mockResolvedValue(document);
@@ -64,9 +92,35 @@ describe('updateDocument', () => {
     expect(document.update).not.toHaveBeenCalled();
   });
 
+  test.each([[{}], [(({ documentName, ...rest }) => rest)(props)]])(
+    'Throws an Error if document is the master resume ' +
+      'and documentName is not given.',
+    async (props) => {
+      // Arrange
+      const document = { owner: username, isMaster: true };
+
+      Document.get = mockGet.mockResolvedValue(document);
+      document.update = mockUpdate.mockResolvedValue(document);
+
+      Object.freeze(document);
+
+      // Act
+      async function runFunc() {
+        await updateDocument(username, documentId, props);
+      }
+
+      // Assert
+      await expect(runFunc).rejects.toThrow(ArgumentError);
+      expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+      expect(document.update).not.toHaveBeenCalled();
+    }
+  );
+
+  // This test may not be necessary, because the standard is to continue
+  // throwing up Errors.
   test('Passes along other Errors from Document.get.', async () => {
     // Arrange
-    const document = { owner: username };
+    const document = { owner: username, isMaster: false };
 
     Document.get = mockGet.mockRejectedValue(new Error());
     document.update = mockUpdate.mockResolvedValue(document);
@@ -82,9 +136,11 @@ describe('updateDocument', () => {
     expect(document.update).not.toHaveBeenCalled();
   });
 
+  // This test may not be necessary, because the standard is to continue
+  // throwing up Errors.
   test('Passes along other Errors from Document.update.', async () => {
     // Arrange
-    const document = { owner: username };
+    const document = { owner: username, isMaster: false };
 
     Document.get = mockGet.mockResolvedValue(document);
     document.update = mockUpdate.mockRejectedValue(new Error());
@@ -100,6 +156,9 @@ describe('updateDocument', () => {
     expect(document.update).toHaveBeenCalledWith(props);
   });
 });
+
+// --------------------------------------------------
+// deleteDocument
 
 describe('deleteDocument', () => {
   const username = 'user1';
