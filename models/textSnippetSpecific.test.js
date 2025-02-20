@@ -4,7 +4,7 @@ const db = require('../database/db');
 const TextSnippet = require('./textSnippet');
 
 const User = require('./user');
-const { users } = require('./_testData');
+const { users } = require('../_testData');
 const {
   dataForNewInstances,
   dataForUpdate,

@@ -17,7 +17,7 @@ const {
   documents,
   sections,
   documents_x_sections,
-} = require('./_testData');
+} = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

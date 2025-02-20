@@ -22,7 +22,7 @@ const {
   experiences,
   documents_x_experiences,
   experiences_x_text_snippets,
-} = require('./_testData');
+} = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

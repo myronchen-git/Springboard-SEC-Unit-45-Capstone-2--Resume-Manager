@@ -5,8 +5,11 @@ const fileName = path.basename(__filename, '.js');
 
 const Document = require('../models/document');
 
-const { ArgumentError } = require('../errors/modelErrors');
-const { ForbiddenError, NotFoundError } = require('../errors/appErrors');
+const {
+  ForbiddenError,
+  NotFoundError,
+  ArgumentError,
+} = require('../errors/appErrors');
 
 const logger = require('../util/logger');
 

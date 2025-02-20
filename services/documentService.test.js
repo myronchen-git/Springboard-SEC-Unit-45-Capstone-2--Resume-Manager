@@ -3,8 +3,11 @@
 const Document = require('../models/document');
 const { updateDocument, deleteDocument } = require('./documentService');
 
-const { ArgumentError } = require('../errors/modelErrors');
-const { ForbiddenError, NotFoundError } = require('../errors/appErrors');
+const {
+  ForbiddenError,
+  NotFoundError,
+  ArgumentError,
+} = require('../errors/appErrors');
 
 // ==================================================
 

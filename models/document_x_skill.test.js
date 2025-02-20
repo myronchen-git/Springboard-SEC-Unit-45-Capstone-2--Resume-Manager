@@ -15,7 +15,7 @@ const {
   textSnippets,
   skills,
   documents_x_skills,
-} = require('./_testData');
+} = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

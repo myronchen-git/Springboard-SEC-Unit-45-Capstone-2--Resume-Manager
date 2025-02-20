@@ -3,7 +3,7 @@
 const Education = require('./education');
 
 const { runCommonTests } = require('./_testCommon');
-const { users, educations } = require('./_testData');
+const { users, educations } = require('../_testData');
 
 // ==================================================
 

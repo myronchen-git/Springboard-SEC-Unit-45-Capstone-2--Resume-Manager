@@ -66,6 +66,18 @@ class NotFoundError extends AppClientError {
   }
 }
 
+// --------------------------------------------------
+
+/**
+ * Represents any issue with the arguments of a function.
+ */
+class ArgumentError extends BadRequestError {
+  constructor(message) {
+    super(message);
+    this.name = 'ArgumentError';
+  }
+}
+
 // ==================================================
 
 module.exports = {
@@ -76,4 +88,5 @@ module.exports = {
   UnauthorizedError,
   ForbiddenError,
   NotFoundError,
+  ArgumentError,
 };

@@ -17,7 +17,7 @@ const {
   documents,
   educations,
   documents_x_educations,
-} = require('./_testData');
+} = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

@@ -6,7 +6,7 @@ const app = require('../app');
 const db = require('../database/db');
 
 const Document = require('../models/document');
-const { users, documents } = require('../models/_testData');
+const { users, documents } = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

@@ -3,7 +3,7 @@
 const Experience = require('./experience');
 
 const { runCommonTests } = require('./_testCommon');
-const { users, experiences } = require('./_testData');
+const { users, experiences } = require('../_testData');
 
 // ==================================================
 

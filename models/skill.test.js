@@ -7,7 +7,7 @@ const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const TextSnippet = require('./textSnippet');
 const User = require('./user');
-const { users, skills, textSnippets } = require('./_testData');
+const { users, skills, textSnippets } = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

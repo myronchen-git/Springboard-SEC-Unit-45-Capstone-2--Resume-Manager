@@ -3,7 +3,7 @@
 const Section = require('./section');
 
 const { runCommonTests } = require('./_testCommon');
-const { sections } = require('./_testData');
+const { sections } = require('../_testData');
 
 // ==================================================
 

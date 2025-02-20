@@ -3,8 +3,11 @@
 const db = require('../database/db');
 const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
 
-const { AppServerError, NotFoundError } = require('../errors/appErrors');
-const { ArgumentError } = require('../errors/modelErrors');
+const {
+  AppServerError,
+  NotFoundError,
+  ArgumentError,
+} = require('../errors/appErrors');
 
 const logger = require('../util/logger');
 

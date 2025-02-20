@@ -3,7 +3,7 @@
 const Document = require('./document');
 
 const { runCommonTests } = require('./_testCommon');
-const { users, documents } = require('./_testData');
+const { users, documents } = require('../_testData');
 
 // ==================================================
 

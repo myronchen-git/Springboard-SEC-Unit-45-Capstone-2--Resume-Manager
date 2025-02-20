@@ -7,7 +7,7 @@ const userRegisterSchema = require('../schemas/userRegister.json');
 const { BadRequestError } = require('../errors/appErrors');
 
 const User = require('../models/user');
-const { contactInfos, users } = require('../models/_testData');
+const { contactInfos, users } = require('../_testData');
 
 // ==================================================
 

@@ -5,7 +5,7 @@ const db = require('../database/db');
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const User = require('./user');
-const { users } = require('./_testData');
+const { users } = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

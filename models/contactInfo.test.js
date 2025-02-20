@@ -6,7 +6,7 @@ const ContactInfo = require('./contactInfo');
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
 const User = require('./user');
-const { users, contactInfos: dataForNewInstances } = require('./_testData');
+const { users, contactInfos: dataForNewInstances } = require('../_testData');
 const {
   commonBeforeAll,
   commonBeforeEach,

@@ -6,7 +6,7 @@ const User = require('./user');
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
-const { users } = require('./_testData');
+const { users } = require('../_testData');
 const { commonBeforeAll, commonBeforeEach } = require('../_testCommon');
 
 // ==================================================

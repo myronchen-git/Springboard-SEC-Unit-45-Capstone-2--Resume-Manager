@@ -2,7 +2,7 @@
 
 'use strict';
 
-const { users, textSnippets } = require('./_testData');
+const { users, textSnippets } = require('../_testData');
 
 // ==================================================
 
