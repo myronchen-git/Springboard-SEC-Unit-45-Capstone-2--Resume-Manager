@@ -72,9 +72,11 @@ async function updateDocument(username, documentId, props) {
 
 /**
  * Deletes a document by first verifying that it belongs to the specified user.
+ * Master resumes can not be deleted.
  *
  * @param {String} username - Name of user that wants to delete the document.
  * @param {Number} documentId - ID of the document to be deleted.
+ * @throws {ForbiddenError} If the document is the master resume.
  * @throws {ForbiddenError} If the document does not belong to the specified
  *  user.
  */
@@ -94,6 +96,11 @@ async function deleteDocument(username, documentId) {
     } else {
       throw err;
     }
+  }
+
+  if (document.isMaster) {
+    logger.error(`${logPrefix}: User attempted to delete the master resume.`);
+    throw new ForbiddenError('Can not delete master resume.');
   }
 
   if (document.owner !== username) {

@@ -416,6 +416,30 @@ describe('DELETE /users/:username/documents/:docId', () => {
     expect(resp.statusCode).toBe(200);
   });
 
+  test('Attempting to delete the master resume should return 403 status.', async () => {
+    // Arrange
+    // Have to directly insert a master resume document, because the only way
+    // thru the API is to create a new user and the documents table gets
+    // truncated before each test.
+    const result = await db.query({
+      text: `
+  INSERT INTO documents (document_name, owner, is_master, is_template)
+  VALUES ('Master', $1, true, false)
+  RETURNING id;`,
+      values: [user.username],
+    });
+
+    const docId = result.rows[0].id;
+
+    // Act
+    const resp = await request(app)
+      .delete(getUrl(user.username, docId))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(403);
+  });
+
   test(
     "Attempting to delete another user's document " +
       'should return 403 status.',
