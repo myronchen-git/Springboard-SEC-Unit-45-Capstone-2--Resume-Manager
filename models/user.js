@@ -42,7 +42,7 @@ class User {
    */
   static async register({ username, password }) {
     const logPrefix =
-      `User.register(` + `{ username: '${username}', password: (password) })`;
+      'User.register(' + `{ username: '${username}', password: (password) })`;
     logger.verbose(logPrefix);
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);

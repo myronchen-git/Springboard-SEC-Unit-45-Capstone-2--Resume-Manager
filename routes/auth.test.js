@@ -5,6 +5,7 @@ const request = require('supertest');
 const app = require('../app');
 const db = require('../database/db');
 
+const Document = require('../models/document');
 const User = require('../models/user');
 const { users } = require('../models/_testData');
 const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
@@ -25,7 +26,7 @@ describe('POST /auth/register', () => {
 
   beforeEach(() => commonBeforeEach(db, User.tableName));
 
-  test('Registers a user.', async () => {
+  test('Registers a user and creates master resume.', async () => {
     // Act
     const resp = await request(app).post(url).send({
       username: user.username,
@@ -35,6 +36,10 @@ describe('POST /auth/register', () => {
     // Assert
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({ authToken: expect.any(String) });
+
+    const documents = await Document.getAll(user.username);
+    expect(documents.length).toBe(1);
+    expect(documents[0].isMaster).toBeTruthy();
   });
 
   test('Registering an already taken username returns 400 status.', async () => {
@@ -48,6 +53,9 @@ describe('POST /auth/register', () => {
     // Assert
     expect(resp.statusCode).toEqual(400);
     expect(resp.body).not.toHaveProperty('authToken');
+
+    const documents = await Document.getAll(user.username);
+    expect(documents.length).toBe(1);
   });
 
   test.each([[{ username: user.username }], [{ password: user.password }]])(
@@ -59,6 +67,9 @@ describe('POST /auth/register', () => {
       // Assert
       expect(resp.statusCode).toEqual(400);
       expect(resp.body).not.toHaveProperty('authToken');
+
+      const documents = await Document.getAll(user.username);
+      expect(documents.length).toBe(0);
     }
   );
 
@@ -93,6 +104,9 @@ describe('POST /auth/register', () => {
       // Assert
       expect(resp.statusCode).toEqual(400);
       expect(resp.body).not.toHaveProperty('authToken');
+
+      const documents = await Document.getAll(user.username);
+      expect(documents.length).toBe(0);
     }
   );
 });

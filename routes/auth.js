@@ -6,6 +6,7 @@ const userRegisterSchema = require('../schemas/userRegister.json');
 const userSigninSchema = require('../schemas/userSignin.json');
 
 const User = require('../models/user');
+const { createUser } = require('../services/userService');
 const { createJWT } = require('../util/tokens');
 const { runJsonSchemaValidator } = require('../util/validators');
 
@@ -38,8 +39,7 @@ router.post('/register', async (req, res, next) => {
   try {
     runJsonSchemaValidator(userRegisterSchema, req.body, logPrefix);
 
-    const newUser = await User.register(req.body);
-    const authToken = createJWT(newUser);
+    const authToken = await createUser(req.body);
 
     return res.status(201).json({ authToken });
   } catch (err) {
