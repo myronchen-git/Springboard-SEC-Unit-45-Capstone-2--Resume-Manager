@@ -2,6 +2,9 @@
 
 const Document = require('../models/document');
 const { updateDocument, deleteDocument } = require('./documentService');
+const {
+  validateDocumentOwner: mockValidateDocumentOwner,
+} = require('../util/serviceHelpers');
 
 const {
   ForbiddenError,
@@ -11,6 +14,7 @@ const {
 
 // ==================================================
 
+jest.mock('../util/serviceHelpers');
 jest.mock('../models/document');
 
 // ==================================================
@@ -27,19 +31,18 @@ describe('updateDocument', () => {
     isLocked: true,
   });
 
-  const mockGet = jest.fn();
   const mockUpdate = jest.fn();
 
   beforeEach(() => {
-    mockGet.mockReset();
+    mockValidateDocumentOwner.mockReset();
     mockUpdate.mockReset();
   });
 
-  test('Calls document.update if document is found and belongs to user.', async () => {
+  test('Calls document.update if document belongs to user.', async () => {
     // Arrange
     const document = { owner: username, isMaster: false };
 
-    Document.get = mockGet.mockResolvedValue(document);
+    mockValidateDocumentOwner.mockResolvedValue(document);
     document.update = mockUpdate.mockResolvedValue(document);
 
     Object.freeze(document);
@@ -49,7 +52,11 @@ describe('updateDocument', () => {
 
     // Assert
     expect(updatedDocument).toBe(document);
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      username,
+      documentId,
+      expect.any(String)
+    );
     expect(document.update).toHaveBeenCalledWith(props);
   });
 
@@ -60,7 +67,7 @@ describe('updateDocument', () => {
       // Arrange
       const document = { owner: username, isMaster: true };
 
-      Document.get = mockGet.mockResolvedValue(document);
+      mockValidateDocumentOwner.mockResolvedValue(document);
       document.update = mockUpdate.mockResolvedValue(document);
 
       Object.freeze(document);
@@ -70,30 +77,16 @@ describe('updateDocument', () => {
 
       // Assert
       expect(updatedDocument).toBe(document);
-      expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+        username,
+        documentId,
+        expect.any(String)
+      );
       expect(document.update).toHaveBeenCalledWith({
         documentName: props.documentName,
       });
     }
   );
-
-  test('Throws an Error if document does not belong to user.', async () => {
-    // Arrange
-    const document = { owner: 'otherUser', isMaster: false };
-
-    Document.get = mockGet.mockResolvedValue(document);
-    document.update = mockUpdate.mockResolvedValue(document);
-
-    // Act
-    async function runFunc() {
-      await updateDocument(username, documentId, props);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow(ForbiddenError);
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
-    expect(document.update).not.toHaveBeenCalled();
-  });
 
   test.each([[{}], [(({ documentName, ...rest }) => rest)(props)]])(
     'Throws an Error if document is the master resume ' +
@@ -102,7 +95,7 @@ describe('updateDocument', () => {
       // Arrange
       const document = { owner: username, isMaster: true };
 
-      Document.get = mockGet.mockResolvedValue(document);
+      mockValidateDocumentOwner.mockResolvedValue(document);
       document.update = mockUpdate.mockResolvedValue(document);
 
       Object.freeze(document);
@@ -114,50 +107,14 @@ describe('updateDocument', () => {
 
       // Assert
       await expect(runFunc).rejects.toThrow(ArgumentError);
-      expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+        username,
+        documentId,
+        expect.any(String)
+      );
       expect(document.update).not.toHaveBeenCalled();
     }
   );
-
-  // This test may not be necessary, because the standard is to continue
-  // throwing up Errors.
-  test('Passes along other Errors from Document.get.', async () => {
-    // Arrange
-    const document = { owner: username, isMaster: false };
-
-    Document.get = mockGet.mockRejectedValue(new Error());
-    document.update = mockUpdate.mockResolvedValue(document);
-
-    // Act
-    async function runFunc() {
-      await updateDocument(username, documentId, props);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow();
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
-    expect(document.update).not.toHaveBeenCalled();
-  });
-
-  // This test may not be necessary, because the standard is to continue
-  // throwing up Errors.
-  test('Passes along other Errors from Document.update.', async () => {
-    // Arrange
-    const document = { owner: username, isMaster: false };
-
-    Document.get = mockGet.mockResolvedValue(document);
-    document.update = mockUpdate.mockRejectedValue(new Error());
-
-    // Act
-    async function runFunc() {
-      await updateDocument(username, documentId, props);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow();
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
-    expect(document.update).toHaveBeenCalledWith(props);
-  });
 });
 
 // --------------------------------------------------
@@ -167,11 +124,10 @@ describe('deleteDocument', () => {
   const username = 'user1';
   const documentId = '1';
 
-  const mockGet = jest.fn();
   const mockDelete = jest.fn();
 
   beforeEach(() => {
-    mockGet.mockReset();
+    mockValidateDocumentOwner.mockReset();
     mockDelete.mockReset();
   });
 
@@ -179,14 +135,18 @@ describe('deleteDocument', () => {
     // Arrange
     const document = { owner: username, isMaster: false };
 
-    Document.get = mockGet.mockResolvedValue(document);
+    mockValidateDocumentOwner.mockResolvedValue(document);
     document.delete = mockDelete;
 
     // Act
     await deleteDocument(username, documentId);
 
     // Assert
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      username,
+      documentId,
+      expect.any(String)
+    );
     expect(document.delete).toHaveBeenCalled();
   });
 
@@ -194,7 +154,7 @@ describe('deleteDocument', () => {
     // Arrange
     const document = { owner: username, isMaster: true };
 
-    Document.get = mockGet.mockResolvedValue(document);
+    mockValidateDocumentOwner.mockResolvedValue(document);
     document.delete = mockDelete;
 
     // Act
@@ -204,25 +164,11 @@ describe('deleteDocument', () => {
 
     // Assert
     await expect(runFunc).rejects.toThrow(ForbiddenError);
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
-    expect(document.delete).not.toHaveBeenCalled();
-  });
-
-  test('Throws an Error if document does not belong to user.', async () => {
-    // Arrange
-    const document = { owner: 'otherUser', isMaster: false };
-
-    Document.get = mockGet.mockResolvedValue(document);
-    document.delete = mockDelete;
-
-    // Act
-    async function runFunc() {
-      await deleteDocument(username, documentId);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow(ForbiddenError);
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      username,
+      documentId,
+      expect.any(String)
+    );
     expect(document.delete).not.toHaveBeenCalled();
   });
 
@@ -230,22 +176,26 @@ describe('deleteDocument', () => {
     // Arrange
     const document = { owner: username, isMaster: false };
 
-    Document.get = mockGet.mockRejectedValue(new NotFoundError());
+    mockValidateDocumentOwner.mockRejectedValue(new NotFoundError());
     document.delete = mockDelete;
 
     // Act
     await deleteDocument(username, documentId);
 
     // Assert
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      username,
+      documentId,
+      expect.any(String)
+    );
     expect(document.delete).not.toHaveBeenCalled();
   });
 
-  test('Passes along other Errors from Document.get.', async () => {
+  test('Passes along other Errors from validateDocumentOwner.', async () => {
     // Arrange
     const document = { owner: username, isMaster: false };
 
-    Document.get = mockGet.mockRejectedValue(new Error());
+    mockValidateDocumentOwner.mockRejectedValue(new Error());
     document.delete = mockDelete;
 
     // Act
@@ -255,25 +205,11 @@ describe('deleteDocument', () => {
 
     // Assert
     await expect(runFunc).rejects.toThrow();
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      username,
+      documentId,
+      expect.any(String)
+    );
     expect(document.delete).not.toHaveBeenCalled();
-  });
-
-  test('Passes along other Errors from document.delete.', async () => {
-    // Arrange
-    const document = { owner: username, isMaster: false };
-
-    Document.get = mockGet.mockResolvedValue(document);
-    document.delete = mockDelete.mockRejectedValue(new Error());
-
-    // Act
-    async function runFunc() {
-      await deleteDocument(username, documentId);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow();
-    expect(Document.get).toHaveBeenCalledWith({ id: documentId });
-    expect(document.delete).toHaveBeenCalled();
   });
 });

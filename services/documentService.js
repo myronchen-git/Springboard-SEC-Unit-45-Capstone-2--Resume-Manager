@@ -4,6 +4,7 @@ const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
 const Document = require('../models/document');
+const { validateDocumentOwner } = require('../util/serviceHelpers');
 
 const {
   ForbiddenError,
@@ -38,18 +39,7 @@ async function updateDocument(username, documentId, props) {
     `props = ${JSON.stringify(props)})`;
   logger.verbose(logPrefix);
 
-  const document = await Document.get({ id: documentId });
-
-  if (document.owner !== username) {
-    logger.error(
-      `${logPrefix}: User "${username}" attempted to update document ` +
-        `with ID ${documentId}, which belongs to "${document.owner}".`
-    );
-    throw new ForbiddenError(
-      `Can not update document with ID ${documentId}, ` +
-        'as it belongs to another user.'
-    );
-  }
+  const document = await validateDocumentOwner(username, documentId, logPrefix);
 
   if (document.isMaster) {
     const logMessage =
@@ -89,7 +79,7 @@ async function deleteDocument(username, documentId) {
 
   let document;
   try {
-    document = await Document.get({ id: documentId });
+    document = await validateDocumentOwner(username, documentId, logPrefix);
   } catch (err) {
     if (err instanceof NotFoundError) {
       return;
@@ -101,17 +91,6 @@ async function deleteDocument(username, documentId) {
   if (document.isMaster) {
     logger.error(`${logPrefix}: User attempted to delete the master resume.`);
     throw new ForbiddenError('Can not delete master resume.');
-  }
-
-  if (document.owner !== username) {
-    logger.error(
-      `${logPrefix}: User "${username}" attempted to delete document ` +
-        `with ID ${documentId}, which belongs to "${document.owner}".`
-    );
-    throw new ForbiddenError(
-      `Can not delete document with ID ${documentId}, ` +
-        'as it belongs to another user.'
-    );
   }
 
   await document.delete();
