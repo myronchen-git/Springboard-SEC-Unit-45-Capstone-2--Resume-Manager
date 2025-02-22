@@ -1,6 +1,7 @@
 INSERT INTO users VALUES
-    ('user1', '1234'),
-    ('user2', '1234');
+-- password is "123Ab!"
+    ('user1', '$2b$12$QHVPeXc1U1/loLbNE92d0uTk8M61m0Mcv5aHVqw9AEtckiDxdYpqq'),
+    ('user2', '$2b$12$QHVPeXc1U1/loLbNE92d0uTk8M61m0Mcv5aHVqw9AEtckiDxdYpqq');
 
 INSERT INTO contact_info VALUES
     ('user1', 'First Last', 'Location', 'email@email.com', '123-456-7890', 'https://www.linkedin.com/in/example/', NULL),
