@@ -3,9 +3,13 @@
 const express = require('express');
 
 const document_x_sectionNewSchema = require('../schemas/document_x_sectionNew.json');
+const urlParamsSchema = require('../schemas/urlParams.json');
 
 const Section = require('../models/section');
-const { createDocument_x_section } = require('../services/sectionService');
+const {
+  createDocument_x_section,
+  getSections,
+} = require('../services/sectionService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
 
@@ -76,6 +80,43 @@ router.post(
       );
 
       res.status(201).json({ document_x_section });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/**
+ * GET /users/:username/documents/:documentId/sections
+ * {} => { sections }
+ *
+ * Authorization required: login
+ *
+ * Gets all sections in a document.  The sections' order is related to their
+ * positions.
+ *
+ * @returns {Object} sections - A list of Objects containing section data and
+ *  position.
+ */
+router.get(
+  '/users/:username/documents/:documentId/sections',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+
+    const { username, documentId } = req.params;
+
+    const logPrefix =
+      `GET /users/${username}/documents/${documentId}/sections (` +
+      `user: ${JSON.stringify(userPayload)})`;
+    logger.info(logPrefix + ' BEGIN');
+
+    try {
+      runJsonSchemaValidator(urlParamsSchema, { documentId }, logPrefix);
+
+      const sections = await getSections(userPayload.username, documentId);
+
+      res.json({ sections });
     } catch (err) {
       return next(err);
     }

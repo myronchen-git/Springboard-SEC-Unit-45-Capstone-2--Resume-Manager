@@ -18,6 +18,8 @@ const {
 
 const urlPrefix = '/api/v1';
 const urlRegisterUser = `${urlPrefix}/auth/register`;
+const getCreateDocumentSectionRelationshipUrl = (username, docId, sectionId) =>
+  `${urlPrefix}/users/${username}/documents/${docId}/sections/${sectionId}`;
 
 const authTokens = [];
 
@@ -81,8 +83,6 @@ describe('GET /sections', () => {
 // POST /users/:username/documents/:docId/sections/:sectionId
 
 describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
-  const getUrl = (username, docId, sectionId) =>
-    `${urlPrefix}/users/${username}/documents/${docId}/sections/${sectionId}`;
   const user = users[0];
 
   // Need to set authToken in beforeAll, because all variable declarations
@@ -101,7 +101,9 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
 
     // Act
     const resp = await request(app)
-      .post(getUrl(user.username, docId, sectionId))
+      .post(
+        getCreateDocumentSectionRelationshipUrl(user.username, docId, sectionId)
+      )
       .set('authorization', `Bearer ${authToken}`);
 
     // Assert
@@ -129,12 +131,12 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
       const docId = (await Document.getAll(user.username))[0].id;
 
       await request(app)
-        .post(getUrl(user.username, docId, 1))
+        .post(getCreateDocumentSectionRelationshipUrl(user.username, docId, 1))
         .set('authorization', `Bearer ${authToken}`);
 
       // Act
       const resp = await request(app)
-        .post(getUrl(user.username, docId, 2))
+        .post(getCreateDocumentSectionRelationshipUrl(user.username, docId, 2))
         .set('authorization', `Bearer ${authToken}`);
 
       // Assert
@@ -162,7 +164,13 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
 
       // Act
       const resp = await request(app)
-        .post(getUrl(user.username, nonexistentDocId, sectionId))
+        .post(
+          getCreateDocumentSectionRelationshipUrl(
+            user.username,
+            nonexistentDocId,
+            sectionId
+          )
+        )
         .set('authorization', `Bearer ${authToken}`);
 
       // Assert
@@ -184,12 +192,133 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
 
       // Act
       const resp = await request(app)
-        .post(getUrl(users[0].username, docId, sectionId))
+        .post(
+          getCreateDocumentSectionRelationshipUrl(
+            users[0].username,
+            docId,
+            sectionId
+          )
+        )
         .set('authorization', `Bearer ${authTokens[1]}`);
 
       // Assert
       expect(resp.statusCode).toBe(403);
       expect(resp.body).not.toHaveProperty('document_x_section');
+    }
+  );
+});
+
+// --------------------------------------------------
+// GET /users/:username/documents/:documentId/sections
+
+describe('GET /users/:username/documents/:documentId/sections', () => {
+  const getUrl = (username, documentId) =>
+    `${urlPrefix}/users/${username}/documents/${documentId}/sections`;
+  const user = users[0];
+  let authToken;
+  let documentId;
+  const existingSections = sections.map((section, idx) => ({
+    id: idx + 1,
+    sectionName: section.sectionName,
+  }));
+
+  beforeAll(async () => {
+    authToken = authTokens[0];
+
+    // Getting document ID
+    const resp = await request(app)
+      .get(`${urlPrefix}/users/${user.username}/documents`)
+      .set('authorization', `Bearer ${authToken}`);
+
+    documentId = resp.body.documents[0].id;
+  });
+
+  beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
+
+  test.each([[[]], [existingSections]])(
+    'Gets all sections of a document in the correct order.',
+    async (sectionsToAttach) => {
+      // Arrange
+      // Adding document_x_section relationships.
+      for (let i = sectionsToAttach.length - 1; i >= 0; i--) {
+        await request(app)
+          .post(
+            getCreateDocumentSectionRelationshipUrl(
+              user.username,
+              documentId,
+              sectionsToAttach[i].id
+            )
+          )
+          .set('authorization', `Bearer ${authToken}`);
+      }
+
+      // Act
+      const resp = await request(app)
+        .get(getUrl(user.username, documentId))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(200);
+      expect(resp.body).toEqual({ sections: sectionsToAttach.toReversed() });
+    }
+  );
+
+  test(
+    'Getting sections of a nonexistent document ' + 'should return 404 status.',
+    async () => {
+      // Arrange
+      const nonexistentDocumentId = 99;
+
+      // Adding document_x_section relationships.
+      for (const section of existingSections) {
+        await request(app)
+          .post(
+            getCreateDocumentSectionRelationshipUrl(
+              user.username,
+              documentId,
+              section.id
+            )
+          )
+          .set('authorization', `Bearer ${authToken}`);
+      }
+
+      // Act
+      const resp = await request(app)
+        .get(getUrl(user.username, nonexistentDocumentId))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(404);
+      expect(resp.body).not.toHaveProperty('sections');
+    }
+  );
+
+  test(
+    "Attempting to access another user's document " +
+      'should return 403 status.',
+    async () => {
+      // Arrange
+      // Adding document_x_section relationships.
+      for (const section of existingSections) {
+        await request(app)
+          .post(
+            getCreateDocumentSectionRelationshipUrl(
+              user.username,
+              documentId,
+              section.id
+            )
+          )
+          .set('authorization', `Bearer ${authToken}`);
+      }
+
+      // Act
+      const resp = await request(app)
+        .get(getUrl(users[0].username, documentId))
+        .set('authorization', `Bearer ${authTokens[1]}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
+      expect(resp.body).not.toHaveProperty('sections');
     }
   );
 });

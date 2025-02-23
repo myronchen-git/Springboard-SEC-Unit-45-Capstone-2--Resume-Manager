@@ -3,6 +3,7 @@
 const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
+const Section = require('../models/section');
 const Document_X_Section = require('../models/document_x_section');
 const { validateDocumentOwner } = require('../util/serviceHelpers');
 
@@ -40,6 +41,28 @@ async function createDocument_x_section(username, documentId, sectionId) {
   return await Document_X_Section.add({ documentId, sectionId, position });
 }
 
+/**
+ * Gets all sections belonging to a document.  Document ownership is first
+ * verified.
+ *
+ * @param {String} username - Name of user that wants to interact with the
+ *  document.  This should be the owner.
+ * @param {Number} documentId - ID of the document to get sections from.
+ * @returns {Section[]} A list of Section instances, which also include the
+ *  position.
+ */
+async function getSections(username, documentId) {
+  const logPrefix =
+    `${fileName}.getSections(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId})`;
+  logger.verbose(logPrefix);
+
+  await validateDocumentOwner(username, documentId, logPrefix);
+
+  return await Section.getAllInDocument(documentId);
+}
+
 // ==================================================
 
-module.exports = { createDocument_x_section };
+module.exports = { createDocument_x_section, getSections };
