@@ -1,6 +1,7 @@
 'use strict';
 
 const db = require('../database/db');
+const Document_X_Section = require('./document_x_section');
 const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
 
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
@@ -68,6 +69,33 @@ class Section {
       text: `
   SELECT ${Section._allDbColsAsJs}
   FROM ${Section.tableName};`,
+    };
+
+    const result = await db.query(queryConfig, logPrefix);
+
+    return result.rows.map((data) => new Section(...Object.values(data)));
+  }
+
+  /**
+   * Gets all sections belonging to a document.  The returned Sections' order is
+   * related to their positions.
+   *
+   * @param {Number} documentId - ID of the document to get sections from.
+   * @returns {Section[]} A list of Section instances.
+   */
+  static async getAllInDocument(documentId) {
+    const logPrefix = `Section.getAllInDocument(documentId = ${documentId})`;
+    logger.verbose(logPrefix);
+
+    const queryConfig = {
+      text: `
+  SELECT ${Section._allDbColsAsJs}
+  FROM ${Document_X_Section.tableName} AS dxs
+  JOIN ${Section.tableName} AS s
+  ON dxs.section_id = s.id
+  WHERE dxs.document_id = $1
+  ORDER BY dxs.position;`,
+      values: [documentId],
     };
 
     const result = await db.query(queryConfig, logPrefix);
