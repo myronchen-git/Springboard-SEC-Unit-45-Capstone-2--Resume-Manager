@@ -379,7 +379,10 @@ describe('Document_X_Experience', () => {
       const instance = await Document_X_Experience.add(existingData);
 
       // Act
-      await instance.delete();
+      await Document_X_Experience.delete(
+        instance.documentId,
+        instance.experienceId
+      );
 
       // Assert
       const databaseData = await db.query({
@@ -393,11 +396,8 @@ describe('Document_X_Experience', () => {
     });
 
     test('Does not throw an Error if document_x_experience is not found.', async () => {
-      // Arrange
-      const nonexistentInstance = new Document_X_Experience(999, 999, 999);
-
       // Act
-      await nonexistentInstance.delete();
+      await Document_X_Experience.delete(999, 999, 999);
     });
   });
 });

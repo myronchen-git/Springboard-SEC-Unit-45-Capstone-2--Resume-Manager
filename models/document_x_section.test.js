@@ -349,7 +349,7 @@ describe('Document_X_Section', () => {
       const instance = await Document_X_Section.add(existingData);
 
       // Act
-      await instance.delete();
+      await Document_X_Section.delete(instance.documentId, instance.sectionId);
 
       // Assert
       const databaseData = await db.query({
@@ -362,11 +362,8 @@ describe('Document_X_Section', () => {
     });
 
     test('Does not throw an Error if document_x_section is not found.', async () => {
-      // Arrange
-      const nonexistentInstance = new Document_X_Section(999, 999);
-
       // Act
-      await nonexistentInstance.delete();
+      await Document_X_Section.delete(999, 999);
     });
   });
 });

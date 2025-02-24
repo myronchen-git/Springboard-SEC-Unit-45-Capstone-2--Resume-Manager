@@ -252,7 +252,7 @@ describe('Document_X_Skill', () => {
       const instance = await Document_X_Skill.add(existingData);
 
       // Act
-      await instance.delete();
+      await Document_X_Skill.delete(instance.documentId, instance.skillId);
 
       // Assert
       const databaseData = await db.query({
@@ -265,11 +265,8 @@ describe('Document_X_Skill', () => {
     });
 
     test('Does not throw an Error if document_x_skill is not found.', async () => {
-      // Arrange
-      const nonexistentInstance = new Document_X_Skill(999, 999);
-
       // Act
-      await nonexistentInstance.delete();
+      await Document_X_Skill.delete(999, 999);
     });
   });
 });

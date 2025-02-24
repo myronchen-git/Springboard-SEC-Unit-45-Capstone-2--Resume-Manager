@@ -105,23 +105,33 @@ class Document_X_Skill extends Relationship {
   }
 
   /**
+   * Deletes a document_x_skill entry in the database.
+   *
+   * @param {Number} documentId - ID of the document to remove the skill from.
+   * @param {Number} skillId - ID of the skill to be removed.
+   */
+  static async delete(documentId, skillId) {
+    const queryConfig = {
+      text: `
+  DELETE FROM ${Document_X_Skill.tableName}
+  WHERE document_id = $1 AND skill_id = $2;`,
+      values: [documentId, skillId],
+    };
+
+    const deletedLog =
+      'document_x_skill(s) deleted: ' +
+      `documentId = ${documentId}, skillId = ${skillId}.`;
+
+    await super.delete(queryConfig, deletedLog);
+  }
+
+  /**
    * Deletes a document_x_skill entry in the database.  Does not delete the
    * instance properties/fields.  Remember to delete the instance this belongs
    * to!
    */
   async delete() {
-    const queryConfig = {
-      text: `
-  DELETE FROM ${Document_X_Skill.tableName}
-  WHERE document_id = $1 AND skill_id = $2;`,
-      values: [this.documentId, this.skillId],
-    };
-
-    const deletedLog =
-      'document_x_skill(s) deleted: ' +
-      `documentId = ${this.documentId}, skillId = ${this.skillId}.`;
-
-    await super.delete(queryConfig, deletedLog);
+    await Document_X_Skill.delete(this.documentId, this.skillId);
   }
 }
 

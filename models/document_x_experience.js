@@ -155,23 +155,34 @@ class Document_X_Experience extends Relationship {
   }
 
   /**
+   * Deletes a document_x_experience entry in the database.
+   *
+   * @param {Number} documentId - ID of the document to remove the experience
+   *  from.
+   * @param {Number} experienceId - ID of the experience to be removed.
+   */
+  static async delete(documentId, experienceId) {
+    const queryConfig = {
+      text: `
+  DELETE FROM ${Document_X_Experience.tableName}
+  WHERE document_id = $1 AND experience_id = $2;`,
+      values: [documentId, experienceId],
+    };
+
+    const deletedLog =
+      'document_x_experience(s) deleted: ' +
+      `documentId = ${documentId}, experienceId = ${experienceId}.`;
+
+    await super.delete(queryConfig, deletedLog);
+  }
+
+  /**
    * Deletes a document_x_experience entry in the database.  Does not delete the
    * instance properties/fields.  Remember to delete the instance this belongs
    * to!
    */
   async delete() {
-    const queryConfig = {
-      text: `
-  DELETE FROM ${Document_X_Experience.tableName}
-  WHERE document_id = $1 AND experience_id = $2;`,
-      values: [this.documentId, this.experienceId],
-    };
-
-    const deletedLog =
-      'document_x_experience(s) deleted: ' +
-      `documentId = ${this.documentId}, experienceId = ${this.experienceId}.`;
-
-    await super.delete(queryConfig, deletedLog);
+    await Document_X_Experience.delete(this.documentId, this.experienceId);
   }
 }
 

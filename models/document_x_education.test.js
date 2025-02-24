@@ -366,7 +366,10 @@ describe('Document_X_Education', () => {
       const instance = await Document_X_Education.add(existingData);
 
       // Act
-      await instance.delete();
+      await Document_X_Education.delete(
+        instance.documentId,
+        instance.educationId
+      );
 
       // Assert
       const databaseData = await db.query({
@@ -380,11 +383,8 @@ describe('Document_X_Education', () => {
     });
 
     test('Does not throw an Error if document_x_education is not found.', async () => {
-      // Arrange
-      const nonexistentInstance = new Document_X_Education(999, 999);
-
       // Act
-      await nonexistentInstance.delete();
+      await Document_X_Education.delete(999, 999);
     });
   });
 });

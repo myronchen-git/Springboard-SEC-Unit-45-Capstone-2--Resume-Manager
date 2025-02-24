@@ -160,7 +160,7 @@ class Relationship {
    * @param {String} deletedLog - Text to be appended after row count in the log
    *  message, describing what was deleted.  See code.
    */
-  async delete(queryConfig, deletedLog) {
+  static async delete(queryConfig, deletedLog) {
     const logPrefix = `${this.constructor.name}.delete()`;
     logger.verbose(logPrefix);
 

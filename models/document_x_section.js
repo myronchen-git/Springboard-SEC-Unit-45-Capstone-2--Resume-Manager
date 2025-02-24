@@ -151,23 +151,33 @@ class Document_X_Section extends Relationship {
   }
 
   /**
+   * Deletes a document_x_section entry in the database.
+   *
+   * @param {Number} documentId - ID of the document to remove the section from.
+   * @param {Number} sectionId - ID of the section to be removed.
+   */
+  static async delete(documentId, sectionId) {
+    const queryConfig = {
+      text: `
+  DELETE FROM ${Document_X_Section.tableName}
+  WHERE document_id = $1 AND section_id = $2;`,
+      values: [documentId, sectionId],
+    };
+
+    const deletedLog =
+      'document_x_section(s) deleted: ' +
+      `documentId = ${documentId}, sectionId = ${sectionId}.`;
+
+    await super.delete(queryConfig, deletedLog);
+  }
+
+  /**
    * Deletes a document_x_section entry in the database.  Does not delete the
    * instance properties/fields.  Remember to delete the instance this belongs
    * to!
    */
   async delete() {
-    const queryConfig = {
-      text: `
-  DELETE FROM ${Document_X_Section.tableName}
-  WHERE document_id = $1 AND section_id = $2;`,
-      values: [this.documentId, this.sectionId],
-    };
-
-    const deletedLog =
-      'document_x_section(s) deleted: ' +
-      `documentId = ${this.documentId}, sectionId = ${this.sectionId}.`;
-
-    await super.delete(queryConfig, deletedLog);
+    await Document_X_Section.delete(this.documentId, this.sectionId);
   }
 }
 

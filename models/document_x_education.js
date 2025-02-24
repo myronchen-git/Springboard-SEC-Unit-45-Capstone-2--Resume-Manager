@@ -151,23 +151,34 @@ class Document_X_Education extends Relationship {
   }
 
   /**
+   * Deletes a document_x_education entry in the database.
+   *
+   * @param {Number} documentId - ID of the document to remove the education
+   *  from.
+   * @param {Number} educationId - ID of the education to be removed.
+   */
+  static async delete(documentId, educationId) {
+    const queryConfig = {
+      text: `
+  DELETE FROM ${Document_X_Education.tableName}
+  WHERE document_id = $1 AND education_id = $2;`,
+      values: [documentId, educationId],
+    };
+
+    const deletedLog =
+      'document_x_education(s) deleted: ' +
+      `documentId = ${documentId}, educationId = ${educationId}.`;
+
+    await super.delete(queryConfig, deletedLog);
+  }
+
+  /**
    * Deletes a document_x_education entry in the database.  Does not delete the
    * instance properties/fields.  Remember to delete the instance this belongs
    * to!
    */
   async delete() {
-    const queryConfig = {
-      text: `
-  DELETE FROM ${Document_X_Education.tableName}
-  WHERE document_id = $1 AND education_id = $2;`,
-      values: [this.documentId, this.educationId],
-    };
-
-    const deletedLog =
-      'document_x_education(s) deleted: ' +
-      `documentId = ${this.documentId}, educationId = ${this.educationId}.`;
-
-    await super.delete(queryConfig, deletedLog);
+    await Document_X_Education.delete(this.documentId, this.educationId);
   }
 }
 

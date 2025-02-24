@@ -176,24 +176,34 @@ class Experience_X_Text_Snippet extends Relationship {
   }
 
   /**
+   * Deletes a experience_x_text_snippet entry in the database.
+   *
+   * @param {Number} documentXExperienceId - ID of the documents_x_experiences to remove the text snippet from.
+   * @param {Number} textSnippetId - ID of the text snippet to be removed.
+   */
+  static async delete(documentXExperienceId, textSnippetId) {
+    const queryConfig = {
+      text: `
+  DELETE FROM ${Experience_X_Text_Snippet.tableName}
+  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;`,
+      values: [documentXExperienceId, textSnippetId],
+    };
+
+    const deletedLog =
+      'experience_x_text_snippet(s) deleted: ' +
+      `documentXExperienceId = ${documentXExperienceId}, ` +
+      `textSnippetId = ${textSnippetId}.`;
+
+    await super.delete(queryConfig, deletedLog);
+  }
+
+  /**
    * Deletes a experience_x_text_snippet entry in the database.  Does not delete
    * the instance properties/fields.  Remember to delete the instance this
    * belongs to!
    */
   async delete() {
-    const queryConfig = {
-      text: `
-  DELETE FROM ${Experience_X_Text_Snippet.tableName}
-  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;`,
-      values: [this.documentXExperienceId, this.textSnippetId],
-    };
-
-    const deletedLog =
-      'experience_x_text_snippet(s) deleted: ' +
-      `documentXExperienceId = ${this.documentXExperienceId}, ` +
-      `textSnippetId = ${this.textSnippetId}.`;
-
-    await super.delete(queryConfig, deletedLog);
+    await Experience_X_Text_Snippet.delete(this.documentId, this.educationId);
   }
 }
 

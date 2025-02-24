@@ -412,7 +412,10 @@ describe('Experience_X_Text_Snippet', () => {
       const instance = await Experience_X_Text_Snippet.add(existingData);
 
       // Act
-      await instance.delete();
+      await Experience_X_Text_Snippet.delete(
+        instance.documentXExperienceId,
+        instance.textSnippetId
+      );
 
       // Assert
       const databaseData = await db.query({
@@ -426,11 +429,8 @@ describe('Experience_X_Text_Snippet', () => {
     });
 
     test('Does not throw an Error if experience_x_text_snippet is not found.', async () => {
-      // Arrange
-      const nonexistentInstance = new Experience_X_Text_Snippet(999, 999);
-
       // Act
-      await nonexistentInstance.delete();
+      await Experience_X_Text_Snippet.delete(999, 999);
     });
   });
 });
