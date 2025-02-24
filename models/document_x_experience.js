@@ -75,7 +75,8 @@ class Document_X_Experience extends Relationship {
       text: `
   SELECT ${Document_X_Experience._allDbColsAsJs}
   FROM ${Document_X_Experience.tableName}
-  WHERE document_id = $1;`,
+  WHERE document_id = $1
+  ORDER BY position;`,
       values: [documentId],
     };
 

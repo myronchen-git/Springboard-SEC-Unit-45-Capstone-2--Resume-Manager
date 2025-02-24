@@ -33,7 +33,7 @@ const documents = Object.freeze([
   }),
 ]);
 
-const numSections = 2;
+const numSections = 3;
 const sections = new Array(numSections);
 for (let i = 1; i <= numSections; i++) {
   sections[i - 1] = Object.freeze({ sectionName: `section ${i}` });

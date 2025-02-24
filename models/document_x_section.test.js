@@ -64,21 +64,17 @@ describe('Document_X_Section', () => {
         })
       )
       .then(() => {
-        const insertData = sections.map((section, idx) => ({
-          id: idx + 1,
-          ...section,
-        }));
+        const sqlValuesText = sections
+          .map(
+            (sectionData, idx) =>
+              `\n    (${idx + 1}, '${sectionData.sectionName}')`
+          )
+          .join();
 
         db.query({
           text: `
   INSERT INTO ${Section.tableName}
-  VALUES
-    ($1, $2),
-    ($3, $4);`,
-          values: [
-            ...Object.values(insertData[0]),
-            ...Object.values(insertData[1]),
-          ],
+  VALUES ${sqlValuesText};`,
         });
       })
   );
@@ -204,6 +200,32 @@ describe('Document_X_Section', () => {
         });
       }
     );
+
+    test('Get all documents_x_sections in the correct order.', async () => {
+      const len = documents_x_sections.length;
+      expect(len).toBeGreaterThanOrEqual(3);
+
+      // Arrange
+      // Change positions so that they are not sequential and are reversed.
+      const modifiedDocuments_x_sections = Object.freeze(
+        documents_x_sections.map((document_x_section, idx) => {
+          return Object.freeze({
+            ...document_x_section,
+            position: len * (len - idx),
+          });
+        })
+      );
+
+      for (const props of modifiedDocuments_x_sections) {
+        await Document_X_Section.add(props);
+      }
+
+      // Act
+      const instances = await Document_X_Section.getAll(documentId);
+
+      // Assert
+      expect(instances).toEqual(modifiedDocuments_x_sections.toReversed());
+    });
   });
 
   // -------------------------------------------------- get

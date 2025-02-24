@@ -218,6 +218,31 @@ describe('Document_X_Education', () => {
         });
       }
     );
+
+    test('Get all documents_x_educations in the correct order.', async () => {
+      const len = documents_x_educations.length;
+
+      // Arrange
+      // Change positions so that they are not sequential and are reversed.
+      const modifiedDocuments_x_educations = Object.freeze(
+        documents_x_educations.map((document_x_education, idx) => {
+          return Object.freeze({
+            ...document_x_education,
+            position: len * (len - idx),
+          });
+        })
+      );
+
+      for (const props of modifiedDocuments_x_educations) {
+        await Document_X_Education.add(props);
+      }
+
+      // Act
+      const instances = await Document_X_Education.getAll(documentId);
+
+      // Assert
+      expect(instances).toEqual(modifiedDocuments_x_educations.toReversed());
+    });
   });
 
   // -------------------------------------------------- get

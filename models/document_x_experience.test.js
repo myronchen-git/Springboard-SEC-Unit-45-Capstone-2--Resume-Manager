@@ -221,6 +221,37 @@ describe('Document_X_Experience', () => {
         });
       }
     );
+
+    test('Get all documents_x_experiences in the correct order.', async () => {
+      const len = documents_x_experiences.length;
+
+      // Arrange
+      // Change positions so that they are not sequential and are reversed.
+      const modifiedDocuments_x_experiences = documents_x_experiences.map(
+        (document_x_experience, idx) => {
+          return {
+            ...document_x_experience,
+            position: len * (len - idx),
+          };
+        }
+      );
+      for (const props of modifiedDocuments_x_experiences) {
+        await Document_X_Experience.add(props);
+      }
+
+      // Act
+      const instances = await Document_X_Experience.getAll(documentId);
+
+      // Assert
+      const expectedDocuments_x_experiences = modifiedDocuments_x_experiences
+        .map((document_x_experience) => ({
+          ...document_x_experience,
+          id: expect.any(Number),
+        }))
+        .reverse();
+
+      expect(instances).toEqual(expectedDocuments_x_experiences);
+    });
   });
 
   // -------------------------------------------------- get

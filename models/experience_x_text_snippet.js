@@ -94,7 +94,8 @@ class Experience_X_Text_Snippet extends Relationship {
       text: `
   SELECT ${Experience_X_Text_Snippet._allDbColsAsJs}
   FROM ${Experience_X_Text_Snippet.tableName}
-  WHERE document_x_experience_id = $1;`,
+  WHERE document_x_experience_id = $1
+  ORDER BY position;`,
       values: [documentXExperienceId],
     };
 

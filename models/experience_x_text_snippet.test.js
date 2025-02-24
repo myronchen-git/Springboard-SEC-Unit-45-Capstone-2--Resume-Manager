@@ -259,6 +259,35 @@ describe('Experience_X_Text_Snippet', () => {
         });
       }
     );
+
+    test('Get all experiences_x_text_snippets in the correct order.', async () => {
+      const len = experiences_x_text_snippets.length;
+
+      // Arrange
+      // Change positions so that they are not sequential and are reversed.
+      const modifiedExperiences_x_text_snippets = Object.freeze(
+        experiences_x_text_snippets.map((experience_x_text_snippet, idx) => {
+          return Object.freeze({
+            ...experience_x_text_snippet,
+            position: len * (len - idx),
+          });
+        })
+      );
+
+      for (const props of modifiedExperiences_x_text_snippets) {
+        await Experience_X_Text_Snippet.add(props);
+      }
+
+      // Act
+      const instances = await Experience_X_Text_Snippet.getAll(
+        experiences_x_text_snippets[0].documentXExperienceId
+      );
+
+      // Assert
+      expect(instances).toEqual(
+        modifiedExperiences_x_text_snippets.toReversed()
+      );
+    });
   });
 
   // -------------------------------------------------- get
