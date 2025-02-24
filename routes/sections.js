@@ -79,7 +79,7 @@ router.post(
         sectionId
       );
 
-      res.status(201).json({ document_x_section });
+      return res.status(201).json({ document_x_section });
     } catch (err) {
       return next(err);
     }
@@ -116,7 +116,7 @@ router.get(
 
       const sections = await getSections(userPayload.username, documentId);
 
-      res.json({ sections });
+      return res.json({ sections });
     } catch (err) {
       return next(err);
     }

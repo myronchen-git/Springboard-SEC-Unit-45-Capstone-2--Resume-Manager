@@ -48,7 +48,7 @@ router.post('/', ensureLoggedIn, async (req, res, next) => {
 
     return res.status(201).json({ document });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
