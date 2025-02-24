@@ -34,11 +34,16 @@ async function createDocument_x_section(username, documentId, sectionId) {
 
   await validateDocumentOwner(username, documentId, logPrefix);
 
-  // Find number of Document_X_Section records for document and set position to
-  // next new position.
-  const position = (await Document_X_Section.getAll(documentId)).length;
+  // Find Document_X_Section records for document and set position to be after
+  // last / highest.
+  const documents_x_sections = await Document_X_Section.getAll(documentId);
+  const nextPosition = (documents_x_sections.at(-1)?.position ?? -1) + 1;
 
-  return await Document_X_Section.add({ documentId, sectionId, position });
+  return await Document_X_Section.add({
+    documentId,
+    sectionId,
+    position: nextPosition,
+  });
 }
 
 /**
