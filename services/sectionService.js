@@ -68,6 +68,32 @@ async function getSections(username, documentId) {
   return await Section.getAllInDocument(documentId);
 }
 
+/**
+ * Deletes a document-section relationship.  Document ownership is first
+ * verified.
+ *
+ * @param {String} username - Name of user that wants to delete the
+ *  document-section relationship.
+ * @param {Number} documentId - ID of the document to remove the section from.
+ * @param {Number} sectionId - ID of the section to be removed.
+ */
+async function deleteDocument_x_section(username, documentId, sectionId) {
+  const logPrefix =
+    `${fileName}.deleteDocument_x_section(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId}, ` +
+    `sectionId = ${sectionId})`;
+  logger.verbose(logPrefix);
+
+  await validateDocumentOwner(username, documentId, logPrefix);
+
+  await Document_X_Section.delete(documentId, sectionId);
+}
+
 // ==================================================
 
-module.exports = { createDocument_x_section, getSections };
+module.exports = {
+  createDocument_x_section,
+  getSections,
+  deleteDocument_x_section,
+};

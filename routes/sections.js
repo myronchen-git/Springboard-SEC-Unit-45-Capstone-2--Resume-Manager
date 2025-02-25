@@ -9,6 +9,7 @@ const Section = require('../models/section');
 const {
   createDocument_x_section,
   getSections,
+  deleteDocument_x_section,
 } = require('../services/sectionService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
@@ -117,6 +118,47 @@ router.get(
       const sections = await getSections(userPayload.username, documentId);
 
       return res.json({ sections });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/**
+ * DELETE /users/:username/documents/:documentId/sections/:sectionId
+ * {} => {}
+ *
+ * Authorization required: login
+ *
+ * Deletes a document-section relationship.
+ */
+router.delete(
+  '/users/:username/documents/:documentId/sections/:sectionId',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+
+    const { username, documentId, sectionId } = req.params;
+
+    const logPrefix =
+      `DELETE /users/${username}/documents/${documentId}/sections/${sectionId} ` +
+      `(user: ${JSON.stringify(userPayload)})`;
+    logger.info(logPrefix + ' BEGIN');
+
+    try {
+      runJsonSchemaValidator(
+        urlParamsSchema,
+        { documentId, sectionId },
+        logPrefix
+      );
+
+      await deleteDocument_x_section(
+        userPayload.username,
+        documentId,
+        sectionId
+      );
+
+      return res.sendStatus(200);
     } catch (err) {
       return next(err);
     }

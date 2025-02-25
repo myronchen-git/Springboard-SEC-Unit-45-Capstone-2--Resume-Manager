@@ -20,6 +20,8 @@ const urlPrefix = '/api/v1';
 const urlRegisterUser = `${urlPrefix}/auth/register`;
 const getCreateDocumentSectionRelationshipUrl = (username, docId, sectionId) =>
   `${urlPrefix}/users/${username}/documents/${docId}/sections/${sectionId}`;
+const getGetAllDocumentsUrl = (username) =>
+  `${urlPrefix}/users/${username}/documents`;
 
 const authTokens = [];
 
@@ -214,20 +216,22 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
 describe('GET /users/:username/documents/:documentId/sections', () => {
   const getUrl = (username, documentId) =>
     `${urlPrefix}/users/${username}/documents/${documentId}/sections`;
+
   const user = users[0];
-  let authToken;
-  let documentId;
   const existingSections = sections.map((section, idx) => ({
     id: idx + 1,
     sectionName: section.sectionName,
   }));
+
+  let authToken;
+  let documentId;
 
   beforeAll(async () => {
     authToken = authTokens[0];
 
     // Getting document ID
     const resp = await request(app)
-      .get(`${urlPrefix}/users/${user.username}/documents`)
+      .get(getGetAllDocumentsUrl(user.username))
       .set('authorization', `Bearer ${authToken}`);
 
     documentId = resp.body.documents[0].id;
@@ -319,6 +323,112 @@ describe('GET /users/:username/documents/:documentId/sections', () => {
       // Assert
       expect(resp.statusCode).toBe(403);
       expect(resp.body).not.toHaveProperty('sections');
+    }
+  );
+});
+
+// --------------------------------------------------
+// DELETE /users/:username/documents/:documentId/sections/:sectionId
+
+describe('DELETE /users/:username/documents/:documentId/sections/:sectionId', () => {
+  const getUrl = (username, documentId, sectionId) =>
+    `${urlPrefix}/users/${username}/documents/${documentId}/sections/${sectionId}`;
+
+  const user = users[0];
+  const existingSections = sections.map((section, idx) => ({
+    id: idx + 1,
+    sectionName: section.sectionName,
+  }));
+  const section = existingSections[0];
+
+  let authToken;
+  let documentId;
+
+  beforeAll(async () => {
+    authToken = authTokens[0];
+
+    // Getting document ID
+    const resp = await request(app)
+      .get(getGetAllDocumentsUrl(user.username))
+      .set('authorization', `Bearer ${authToken}`);
+
+    documentId = resp.body.documents[0].id;
+  });
+
+  beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
+
+  test('Removes a section from a document.', async () => {
+    // Arrange
+    await request(app)
+      .post(
+        getCreateDocumentSectionRelationshipUrl(
+          user.username,
+          documentId,
+          section.id
+        )
+      )
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Act
+    const resp = await request(app)
+      .delete(getUrl(user.username, documentId, section.id))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+  });
+
+  test(
+    'Attempting to remove a section that is not in a document ' +
+      'should return 200 status.',
+    async () => {
+      // Arrange
+      const nonexistentSectionId = 999;
+
+      await request(app)
+        .post(
+          getCreateDocumentSectionRelationshipUrl(
+            user.username,
+            documentId,
+            section.id
+          )
+        )
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Act
+      const resp = await request(app)
+        .delete(getUrl(user.username, documentId, nonexistentSectionId))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(200);
+    }
+  );
+
+  test('Returns 404 status if document is not found.', async () => {
+    // Arrange
+    const nonexistentDocumentId = 999;
+
+    // Act
+    const resp = await request(app)
+      .delete(getUrl(user.username, nonexistentDocumentId, section.id))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(404);
+  });
+
+  test(
+    "Attempting to access another user's document " +
+      'should return 403 status.',
+    async () => {
+      // Act
+      const resp = await request(app)
+        .delete(getUrl(users[0].username, documentId, section.id))
+        .set('authorization', `Bearer ${authTokens[1]}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
     }
   );
 });
