@@ -143,7 +143,7 @@ CREATE TABLE documents_x_sections (
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
     PRIMARY KEY (document_id, section_id),
-    UNIQUE (document_id, position)
+    UNIQUE (document_id, position) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE documents_x_educations (
@@ -154,7 +154,7 @@ CREATE TABLE documents_x_educations (
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
 	PRIMARY KEY (document_id, education_id),
-	UNIQUE (document_id, position)
+	UNIQUE (document_id, position) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE documents_x_experiences (
@@ -166,7 +166,7 @@ CREATE TABLE documents_x_experiences (
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
 	UNIQUE (document_id, experience_id),
-	UNIQUE (document_id, position)
+	UNIQUE (document_id, position) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE documents_x_skills (
@@ -185,7 +185,7 @@ CREATE TABLE documents_x_certifications (
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
 	PRIMARY KEY (document_id, certification_id),
-	UNIQUE (document_id, position)
+	UNIQUE (document_id, position) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE documents_x_projects (
@@ -197,7 +197,7 @@ CREATE TABLE documents_x_projects (
 	position INTEGER NOT NULL
 		CHECK (position >= 0),
 	UNIQUE (document_id, project_id),
-	UNIQUE (document_id, position)
+	UNIQUE (document_id, position) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE experiences_x_text_snippets (
@@ -210,7 +210,7 @@ CREATE TABLE experiences_x_text_snippets (
 	PRIMARY KEY (document_x_experience_id, text_snippet_id),
 	FOREIGN KEY (text_snippet_id, text_snippet_version)
 		REFERENCES text_snippets (id, version) ON DELETE CASCADE,
-	UNIQUE (document_x_experience_id, position)
+	UNIQUE (document_x_experience_id, position) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE projects_x_text_snippets (
@@ -223,5 +223,5 @@ CREATE TABLE projects_x_text_snippets (
 	PRIMARY KEY (document_x_project_id, text_snippet_id),
 	FOREIGN KEY (text_snippet_id, text_snippet_version)
 		REFERENCES text_snippets (id, version) ON DELETE CASCADE,
-	UNIQUE (document_x_project_id, position)
+	UNIQUE (document_x_project_id, position) DEFERRABLE INITIALLY DEFERRED
 );
