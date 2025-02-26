@@ -118,7 +118,7 @@ class Education {
       ],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return new Education(...Object.values(result.rows[0]));
   }
@@ -141,7 +141,7 @@ class Education {
       values: [owner],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return result.rows.map((data) => new Education(...Object.values(data)));
   }
@@ -170,7 +170,7 @@ class Education {
       values: [id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Education not found.`);
@@ -232,7 +232,7 @@ class Education {
       values: [...sqlValues, this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount === 0) {
       logger.error(`${logPrefix}: Education with ID ${this.id} was not found.`);
@@ -262,7 +262,7 @@ class Education {
       values: [this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(

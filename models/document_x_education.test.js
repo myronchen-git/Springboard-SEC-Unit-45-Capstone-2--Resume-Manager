@@ -38,15 +38,18 @@ describe('Document_X_Education', () => {
     commonBeforeAll(db)
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-          values: [users[0].username, users[0].password],
+            values: [users[0].username, users[0].password],
+          },
         })
       )
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Document.tableName} (
     id,
     document_name,
@@ -54,13 +57,14 @@ describe('Document_X_Education', () => {
     is_master,
     is_template
   ) VALUES ($1, $2, $3, $4, $5);`,
-          values: [
-            documentId,
-            documents[0].documentName,
-            documents[0].owner,
-            documents[0].isMaster,
-            documents[0].isTemplate,
-          ],
+            values: [
+              documentId,
+              documents[0].documentName,
+              documents[0].owner,
+              documents[0].isMaster,
+              documents[0].isTemplate,
+            ],
+          },
         })
       )
       .then(() => {
@@ -74,7 +78,8 @@ describe('Document_X_Education', () => {
         });
 
         return db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Education.tableName} (
     id,
     owner,
@@ -89,10 +94,11 @@ describe('Document_X_Education', () => {
   ) VALUES
     ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10),
     ($11, $12, $13, $14, $15, $16, $17, $18, $19, $20);`,
-          values: [
-            ...Object.values(insertData[0]),
-            ...Object.values(insertData[1]),
-          ],
+            values: [
+              ...Object.values(insertData[0]),
+              ...Object.values(insertData[1]),
+            ],
+          },
         });
       })
   );
@@ -116,10 +122,12 @@ describe('Document_X_Education', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_id = $1 AND education_id = $2;',
-          values: [dataToAdd.documentId, dataToAdd.educationId],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_id = $1 AND education_id = $2;',
+            values: [dataToAdd.documentId, dataToAdd.educationId],
+          },
         })
       ).rows[0];
 
@@ -146,8 +154,9 @@ describe('Document_X_Education', () => {
         // Assert
         await expect(runFunc).rejects.toThrow(NotFoundError);
 
-        const databaseEntries = (await db.query({ text: sqlTextSelectAll }))
-          .rows;
+        const databaseEntries = (
+          await db.query({ queryConfig: { text: sqlTextSelectAll } })
+        ).rows;
 
         // Ensure nothing gets added into database.
         expect(databaseEntries.length).toBe(0);
@@ -176,8 +185,10 @@ describe('Document_X_Education', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
-            values: [documentId],
+            queryConfig: {
+              text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
+              values: [documentId],
+            },
           })
         ).rows;
 
@@ -316,13 +327,15 @@ describe('Document_X_Education', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_id = $1 AND education_id = $2;',
-          values: [
-            preexistingInstance.documentId,
-            preexistingInstance.educationId,
-          ],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_id = $1 AND education_id = $2;',
+            values: [
+              preexistingInstance.documentId,
+              preexistingInstance.educationId,
+            ],
+          },
         })
       ).rows[0];
 
@@ -373,10 +386,12 @@ describe('Document_X_Education', () => {
 
       // Assert
       const databaseData = await db.query({
-        text:
-          sqlTextSelectAll +
-          '\n  WHERE document_id = $1 AND education_id = $2;',
-        values: [instance.documentId, instance.educationId],
+        queryConfig: {
+          text:
+            sqlTextSelectAll +
+            '\n  WHERE document_id = $1 AND education_id = $2;',
+          values: [instance.documentId, instance.educationId],
+        },
       });
 
       expect(databaseData.rows.length).toBe(0);

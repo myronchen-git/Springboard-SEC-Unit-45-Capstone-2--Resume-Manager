@@ -55,11 +55,17 @@ class User {
       values: [username, hashedPassword],
     };
 
-    const result = await db.query(queryConfig, logPrefix, (err) => {
-      // PostgreSQL error code 23505 is for unique constraint violation.
-      if (err.code === '23505') {
-        throw new RegistrationError(`Username "${username}" is not available.`);
-      }
+    const result = await db.query({
+      queryConfig,
+      logPrefix,
+      errorCallback: (err) => {
+        // PostgreSQL error code 23505 is for unique constraint violation.
+        if (err.code === '23505') {
+          throw new RegistrationError(
+            `Username "${username}" is not available.`
+          );
+        }
+      },
     });
 
     const data = result.rows[0];
@@ -87,7 +93,7 @@ class User {
       values: [username],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     const data = result.rows[0];
     if (data && (await bcrypt.compare(password, data.password))) {
@@ -125,7 +131,7 @@ class User {
       values: [password, username],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount === 0) {
       logger.error(`${logPrefix}: Username "${username}" not found.`);
@@ -182,7 +188,7 @@ class User {
       values: [this.username],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(

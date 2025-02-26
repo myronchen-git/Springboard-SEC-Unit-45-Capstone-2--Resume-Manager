@@ -77,7 +77,7 @@ class ContactInfo {
       values: [username, fullName, location, email, phone, linkedin, github],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return new ContactInfo(...Object.values(result.rows[0]));
   }
@@ -107,7 +107,7 @@ class ContactInfo {
       values: [username],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Contact info not found.`);
@@ -167,7 +167,7 @@ class ContactInfo {
       values: [...sqlValues, this.username],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount === 0) {
       logger.error(
@@ -202,7 +202,7 @@ class ContactInfo {
       values: [this.username],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(

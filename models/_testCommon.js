@@ -83,10 +83,12 @@ function runCommonTests(testConfig) {
     beforeAll(() =>
       commonBeforeAll(db).then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-          values: [users[0].username, users[0].password],
+            values: [users[0].username, users[0].password],
+          },
         })
       )
     );
@@ -112,11 +114,13 @@ function runCommonTests(testConfig) {
 
         const databaseEntry = (
           await db.query({
-            text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
-            values:
-              className === 'TextSnippet'
-                ? [instance.id, instance.version]
-                : [instance.id],
+            queryConfig: {
+              text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
+              values:
+                className === 'TextSnippet'
+                  ? [instance.id, instance.version]
+                  : [instance.id],
+            },
           })
         ).rows[0];
 
@@ -143,8 +147,10 @@ function runCommonTests(testConfig) {
             // fragile query config; consider redoing because of values
             const databaseEntries = (
               await db.query({
-                text: sqlTextSelectAll + `\n  ${whereClauseToGetAll};`,
-                values: whereClauseToGetAll ? [users[0].username] : [],
+                queryConfig: {
+                  text: sqlTextSelectAll + `\n  ${whereClauseToGetAll};`,
+                  values: whereClauseToGetAll ? [users[0].username] : [],
+                },
               })
             ).rows;
 
@@ -309,11 +315,13 @@ function runCommonTests(testConfig) {
 
           const databaseEntry = (
             await db.query({
-              text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
-              values:
-                className === 'TextSnippet'
-                  ? [preexistingInstance.id, updatedInstance.version]
-                  : [preexistingInstance.id],
+              queryConfig: {
+                text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
+                values:
+                  className === 'TextSnippet'
+                    ? [preexistingInstance.id, updatedInstance.version]
+                    : [preexistingInstance.id],
+              },
             })
           ).rows[0];
 
@@ -355,11 +363,13 @@ function runCommonTests(testConfig) {
 
         // Assert
         const databaseData = await db.query({
-          text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
-          values:
-            className === 'TextSnippet'
-              ? [instance.id, instance.version]
-              : [instance.id],
+          queryConfig: {
+            text: sqlTextSelectAll + `\n  ${whereClauseToGetOne};`,
+            values:
+              className === 'TextSnippet'
+                ? [instance.id, instance.version]
+                : [instance.id],
+          },
         });
 
         expect(databaseData.rows.length).toBe(0);

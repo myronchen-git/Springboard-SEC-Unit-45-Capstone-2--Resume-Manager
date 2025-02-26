@@ -41,15 +41,18 @@ describe('Experience_X_Text_Snippet', () => {
     commonBeforeAll(db)
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-          values: [users[0].username, users[0].password],
+            values: [users[0].username, users[0].password],
+          },
         })
       )
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Document.tableName} (
     id,
     document_name,
@@ -57,13 +60,14 @@ describe('Experience_X_Text_Snippet', () => {
     is_master,
     is_template
   ) VALUES ($1, $2, $3, $4, $5);`,
-          values: [
-            1,
-            documents[0].documentName,
-            documents[0].owner,
-            documents[0].isMaster,
-            documents[0].isTemplate,
-          ],
+            values: [
+              1,
+              documents[0].documentName,
+              documents[0].owner,
+              documents[0].isMaster,
+              documents[0].isTemplate,
+            ],
+          },
         })
       )
       .then(() => {
@@ -75,7 +79,8 @@ describe('Experience_X_Text_Snippet', () => {
         });
 
         return db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Experience.tableName} (
     id,
     owner,
@@ -85,7 +90,8 @@ describe('Experience_X_Text_Snippet', () => {
     start_date,
     end_date
   ) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
-          values: [...Object.values(insertData[0])],
+            values: [...Object.values(insertData[0])],
+          },
         });
       })
       .then(() => {
@@ -95,14 +101,16 @@ describe('Experience_X_Text_Snippet', () => {
         }));
 
         return db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Document_X_Experience.tableName} (
     id,
     document_id,
     experience_id,
     position
   ) VALUES ($1, $2, $3, $4);`,
-          values: [...Object.values(insertData[0])],
+            values: [...Object.values(insertData[0])],
+          },
         });
       })
       .then(() => {
@@ -116,7 +124,8 @@ describe('Experience_X_Text_Snippet', () => {
         }));
 
         return db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${TextSnippet.tableName} (
     id,
     version,
@@ -127,10 +136,11 @@ describe('Experience_X_Text_Snippet', () => {
   ) VALUES
     ($1, $2, $3, $4, $5, $6),
     ($7, $8, $9, $10, $11, $12);`,
-          values: [
-            ...Object.values(insertData[0]),
-            ...Object.values(insertData[1]),
-          ],
+            values: [
+              ...Object.values(insertData[0]),
+              ...Object.values(insertData[1]),
+            ],
+          },
         });
       })
   );
@@ -154,10 +164,12 @@ describe('Experience_X_Text_Snippet', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;',
-          values: [dataToAdd.documentXExperienceId, dataToAdd.textSnippetId],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;',
+            values: [dataToAdd.documentXExperienceId, dataToAdd.textSnippetId],
+          },
         })
       ).rows[0];
 
@@ -184,8 +196,9 @@ describe('Experience_X_Text_Snippet', () => {
         // Assert
         await expect(runFunc).rejects.toThrow(NotFoundError);
 
-        const databaseEntries = (await db.query({ text: sqlTextSelectAll }))
-          .rows;
+        const databaseEntries = (
+          await db.query({ queryConfig: { text: sqlTextSelectAll } })
+        ).rows;
 
         // Ensure nothing gets added into database.
         expect(databaseEntries.length).toBe(0);
@@ -215,8 +228,11 @@ describe('Experience_X_Text_Snippet', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + '\n  WHERE document_x_experience_id = $1;',
-            values: [dataToAdd.documentXExperienceId],
+            queryConfig: {
+              text:
+                sqlTextSelectAll + '\n  WHERE document_x_experience_id = $1;',
+              values: [dataToAdd.documentXExperienceId],
+            },
           })
         ).rows;
 
@@ -362,13 +378,15 @@ describe('Experience_X_Text_Snippet', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;',
-          values: [
-            preexistingInstance.documentXExperienceId,
-            preexistingInstance.textSnippetId,
-          ],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;',
+            values: [
+              preexistingInstance.documentXExperienceId,
+              preexistingInstance.textSnippetId,
+            ],
+          },
         })
       ).rows[0];
 
@@ -419,10 +437,12 @@ describe('Experience_X_Text_Snippet', () => {
 
       // Assert
       const databaseData = await db.query({
-        text:
-          sqlTextSelectAll +
-          '\n  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;',
-        values: [instance.documentXExperienceId, instance.textSnippetId],
+        queryConfig: {
+          text:
+            sqlTextSelectAll +
+            '\n  WHERE document_x_experience_id = $1 AND text_snippet_id = $2;',
+          values: [instance.documentXExperienceId, instance.textSnippetId],
+        },
       });
 
       expect(databaseData.rows.length).toBe(0);

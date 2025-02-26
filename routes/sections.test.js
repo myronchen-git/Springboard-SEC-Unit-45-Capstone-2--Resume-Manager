@@ -40,7 +40,7 @@ beforeAll(() =>
         sqlValuesText.join() +
         ';';
 
-      return db.query({ text });
+      return db.query({ queryConfig: { text } });
     })
     .then(() =>
       Promise.all(

@@ -72,7 +72,7 @@ class Experience {
       values: [owner, title, organization, location, startDate, endDate],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return new Experience(...Object.values(result.rows[0]));
   }
@@ -95,7 +95,7 @@ class Experience {
       values: [owner],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return result.rows.map((data) => new Experience(...Object.values(data)));
   }
@@ -124,7 +124,7 @@ class Experience {
       values: [id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Experience not found.`);
@@ -179,7 +179,7 @@ class Experience {
       values: [...sqlValues, this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount === 0) {
       logger.error(
@@ -211,7 +211,7 @@ class Experience {
       values: [this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(

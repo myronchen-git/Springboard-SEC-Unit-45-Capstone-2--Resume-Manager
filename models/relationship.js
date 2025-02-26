@@ -35,12 +35,16 @@ class Relationship {
     const logPrefix = `${this.name}.add(${JSON.stringify(props)})`;
     logger.verbose(logPrefix);
 
-    const result = await db.query(queryConfig, logPrefix, (err) => {
-      // PostgreSQL error code 23503 is for foreign key violation.
-      if (err.code === '23503') {
-        // Logging not needed as it's already done in PostgresDb.query.
-        throw new NotFoundError(notFoundMessage);
-      }
+    const result = await db.query({
+      queryConfig,
+      logPrefix,
+      errorCallback: (err) => {
+        // PostgreSQL error code 23503 is for foreign key violation.
+        if (err.code === '23503') {
+          // Logging not needed as it's already done in PostgresDb.query.
+          throw new NotFoundError(notFoundMessage);
+        }
+      },
     });
 
     return new this(...Object.values(result.rows[0]));
@@ -63,7 +67,7 @@ class Relationship {
     const logPrefix = `${this.name}.getAll(${documentId})`;
     logger.verbose(logPrefix);
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return result.rows.map((data) => new this(...Object.values(data)));
   }
@@ -87,7 +91,7 @@ class Relationship {
     const logPrefix = `${this.name}.get(${JSON.stringify(queryParams)})`;
     logger.verbose(logPrefix);
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: ${this.name} not found.`);
@@ -133,7 +137,7 @@ class Relationship {
       throw new BadRequestError(message);
     }
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount === 0) {
       logger.error(`${logPrefix}: ${notFoundLog}`);
@@ -164,7 +168,7 @@ class Relationship {
     const logPrefix = `${this.constructor.name}.delete()`;
     logger.verbose(logPrefix);
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(`${logPrefix}: ${result.rowCount} ${deletedLog}`);

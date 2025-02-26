@@ -61,7 +61,7 @@ class TextSnippet {
       values: [owner, type, content],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return new TextSnippet(...Object.values(result.rows[0]));
   }
@@ -84,7 +84,7 @@ class TextSnippet {
       values: [owner],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return result.rows.map((data) => new TextSnippet(...Object.values(data)));
   }
@@ -114,7 +114,7 @@ class TextSnippet {
       values: [id, version],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: TextSnippet not found.`);
@@ -155,7 +155,7 @@ class TextSnippet {
       values: [this.id, this.version],
     };
 
-    let result = await db.query(queryConfig, logPrefix);
+    let result = await db.query({ queryConfig, logPrefix });
 
     if (!result.rows.length) {
       logger.error(
@@ -182,7 +182,7 @@ class TextSnippet {
       ],
     };
 
-    result = await db.query(queryConfig, logPrefix);
+    result = await db.query({ queryConfig, logPrefix });
 
     return new TextSnippet(...Object.values(result.rows[0]));
   }
@@ -206,7 +206,7 @@ class TextSnippet {
       values: [this.id, this.version],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(

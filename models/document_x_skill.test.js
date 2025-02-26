@@ -36,15 +36,18 @@ describe('Document_X_Skill', () => {
     commonBeforeAll(db)
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-          values: [users[0].username, users[0].password],
+            values: [users[0].username, users[0].password],
+          },
         })
       )
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Document.tableName} (
     id,
     document_name,
@@ -52,13 +55,14 @@ describe('Document_X_Skill', () => {
     is_master,
     is_template
   ) VALUES ($1, $2, $3, $4, $5);`,
-          values: [
-            documentId,
-            documents[0].documentName,
-            documents[0].owner,
-            documents[0].isMaster,
-            documents[0].isTemplate,
-          ],
+            values: [
+              documentId,
+              documents[0].documentName,
+              documents[0].owner,
+              documents[0].isMaster,
+              documents[0].isTemplate,
+            ],
+          },
         })
       )
       .then(() => {
@@ -72,7 +76,8 @@ describe('Document_X_Skill', () => {
         }));
 
         return db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${TextSnippet.tableName} (
     id,
     version,
@@ -84,10 +89,11 @@ describe('Document_X_Skill', () => {
     ($1, $2, $3, $4, $5, $6),
     ($7, $8, $9, $10, $11, $12)
   RETURNING id, version;`,
-          values: [
-            ...Object.values(insertData[0]),
-            ...Object.values(insertData[1]),
-          ],
+            values: [
+              ...Object.values(insertData[0]),
+              ...Object.values(insertData[1]),
+            ],
+          },
         });
       })
       .then((textSnippetInsertResult) => {
@@ -103,7 +109,8 @@ describe('Document_X_Skill', () => {
         }));
 
         return db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Skill.tableName} (
     id,
     name,
@@ -113,10 +120,11 @@ describe('Document_X_Skill', () => {
   ) VALUES
     ($1, $2, $3, $4, $5),
     ($6, $7, $8, $9, $10);`,
-          values: [
-            ...Object.values(insertData[0]),
-            ...Object.values(insertData[1]),
-          ],
+            values: [
+              ...Object.values(insertData[0]),
+              ...Object.values(insertData[1]),
+            ],
+          },
         });
       })
   );
@@ -140,9 +148,12 @@ describe('Document_X_Skill', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll + '\n  WHERE document_id = $1 AND skill_id = $2;',
-          values: [dataToAdd.documentId, dataToAdd.skillId],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_id = $1 AND skill_id = $2;',
+            values: [dataToAdd.documentId, dataToAdd.skillId],
+          },
         })
       ).rows[0];
 
@@ -169,8 +180,9 @@ describe('Document_X_Skill', () => {
         // Assert
         await expect(runFunc).rejects.toThrow(NotFoundError);
 
-        const databaseEntries = (await db.query({ text: sqlTextSelectAll }))
-          .rows;
+        const databaseEntries = (
+          await db.query({ queryConfig: { text: sqlTextSelectAll } })
+        ).rows;
 
         // Ensure nothing gets added into database.
         expect(databaseEntries.length).toBe(0);
@@ -256,9 +268,11 @@ describe('Document_X_Skill', () => {
 
       // Assert
       const databaseData = await db.query({
-        text:
-          sqlTextSelectAll + '\n  WHERE document_id = $1 AND skill_id = $2;',
-        values: [instance.documentId, instance.skillId],
+        queryConfig: {
+          text:
+            sqlTextSelectAll + '\n  WHERE document_id = $1 AND skill_id = $2;',
+          values: [instance.documentId, instance.skillId],
+        },
       });
 
       expect(databaseData.rows.length).toBe(0);

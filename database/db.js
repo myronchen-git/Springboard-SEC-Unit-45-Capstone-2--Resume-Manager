@@ -41,21 +41,27 @@ class PostgresDb {
    * Acts as a liaison between the call to query the database and the app. This
    * is used to add things like logging to each query.
    *
-   * @param {Object} queryConfig - Contains parameters such as text (SQL
+   * @param {Object} props
+   * @param {Object} props.queryConfig - Contains parameters such as text (SQL
    *  strings), values (arguments for parameterized queries), and name (for
    *  creating prepared statements).  See
    *  [https://node-postgres.com/apis/client#queryconfig].
-   * @param {String} queryConfig.text - The SQL statement to execute.
-   * @param {Array} [queryConfig.values] - Query parameters for a parameterized
-   *  query.
-   * @param {String} [queryConfig.name] - Query name, for creating a prepared
-   * statement.
-   * @param {String} [logPrefix] - Text to be placed at the beginning of logs.
-   * @param {PostgresDb~queryErrorCallback} [errorCallback] - Callback that runs
-   *  if pg.Client.query throws an Error.
+   * @param {String} props.queryConfig.text - The SQL statement to execute.
+   * @param {Array} [props.queryConfig.values] - Query parameters for a
+   *  parameterized query.
+   * @param {String} [props.queryConfig.name] - Query name, for creating a
+   *  prepared statement.
+   * @param {String} [props.logPrefix] - Text to be placed at the beginning of
+   *  logs.
+   * @param {PostgresDb~queryErrorCallback} [props.errorCallback] - Callback
+   *  that runs if pg.Client.query throws an Error.
    * @returns The result from a database query.
    */
-  async query(queryConfig, logPrefix = 'PostgresDb.query(...)', errorCallback) {
+  async query({
+    queryConfig,
+    logPrefix = 'PostgresDb.query(...)',
+    errorCallback,
+  }) {
     logger.verbose(
       `${logPrefix}: Executing query on database: ${queryConfig.text}`
     );

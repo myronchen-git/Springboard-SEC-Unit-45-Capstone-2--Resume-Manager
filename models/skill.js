@@ -64,16 +64,20 @@ class Skill {
       values: [name, owner, textSnippetId, textSnippetVersion],
     };
 
-    const result = await db.query(queryConfig, logPrefix, (err) => {
-      // PostgreSQL error code 23503 is for foreign key violation.
-      if (err.code === '23503') {
-        throw new NotFoundError(
-          'Owner or text snippet was not found.  ' +
-            `Owner: ${props.owner}, ` +
-            `text snippet ID: ${props.textSnippetId}, ` +
-            `text snippet version: ${props.textSnippetVersion}.`
-        );
-      }
+    const result = await db.query({
+      queryConfig,
+      logPrefix,
+      errorCallback: (err) => {
+        // PostgreSQL error code 23503 is for foreign key violation.
+        if (err.code === '23503') {
+          throw new NotFoundError(
+            'Owner or text snippet was not found.  ' +
+              `Owner: ${props.owner}, ` +
+              `text snippet ID: ${props.textSnippetId}, ` +
+              `text snippet version: ${props.textSnippetVersion}.`
+          );
+        }
+      },
     });
 
     return new Skill(...Object.values(result.rows[0]));
@@ -97,7 +101,7 @@ class Skill {
       values: [owner],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return result.rows.map((data) => new Skill(...Object.values(data)));
   }
@@ -126,7 +130,7 @@ class Skill {
       values: [id == undefined ? name : id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Skill not found.`);
@@ -172,7 +176,7 @@ class Skill {
       values: [...sqlValues, this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount === 0) {
       logger.error(`${logPrefix}: Skill with ID ${this.id} was not found.`);
@@ -202,7 +206,7 @@ class Skill {
       values: [this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(

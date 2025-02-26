@@ -45,15 +45,18 @@ describe('Document_X_Experience', () => {
     commonBeforeAll(db)
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-          values: [users[0].username, users[0].password],
+            values: [users[0].username, users[0].password],
+          },
         })
       )
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Document.tableName} (
     id,
     document_name,
@@ -61,13 +64,14 @@ describe('Document_X_Experience', () => {
     is_master,
     is_template
   ) VALUES ($1, $2, $3, $4, $5);`,
-          values: [
-            documentId,
-            documents[0].documentName,
-            documents[0].owner,
-            documents[0].isMaster,
-            documents[0].isTemplate,
-          ],
+            values: [
+              documentId,
+              documents[0].documentName,
+              documents[0].owner,
+              documents[0].isMaster,
+              documents[0].isTemplate,
+            ],
+          },
         })
       )
       .then(() => {
@@ -79,7 +83,8 @@ describe('Document_X_Experience', () => {
         });
 
         return db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Experience.tableName} (
     id,
     owner,
@@ -91,10 +96,11 @@ describe('Document_X_Experience', () => {
   ) VALUES
     ($1, $2, $3, $4, $5, $6, $7),
     ($8, $9, $10, $11, $12, $13, $14);`,
-          values: [
-            ...Object.values(insertData[0]),
-            ...Object.values(insertData[1]),
-          ],
+            values: [
+              ...Object.values(insertData[0]),
+              ...Object.values(insertData[1]),
+            ],
+          },
         });
       })
   );
@@ -119,10 +125,12 @@ describe('Document_X_Experience', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_id = $1 AND experience_id = $2;',
-          values: [dataToAdd.documentId, dataToAdd.experienceId],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_id = $1 AND experience_id = $2;',
+            values: [dataToAdd.documentId, dataToAdd.experienceId],
+          },
         })
       ).rows[0];
 
@@ -149,8 +157,9 @@ describe('Document_X_Experience', () => {
         // Assert
         await expect(runFunc).rejects.toThrow(NotFoundError);
 
-        const databaseEntries = (await db.query({ text: sqlTextSelectAll }))
-          .rows;
+        const databaseEntries = (
+          await db.query({ queryConfig: { text: sqlTextSelectAll } })
+        ).rows;
 
         // Ensure nothing gets added into database.
         expect(databaseEntries.length).toBe(0);
@@ -179,8 +188,10 @@ describe('Document_X_Experience', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
-            values: [documentId],
+            queryConfig: {
+              text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
+              values: [documentId],
+            },
           })
         ).rows;
 
@@ -329,13 +340,15 @@ describe('Document_X_Experience', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_id = $1 AND experience_id = $2;',
-          values: [
-            preexistingInstance.documentId,
-            preexistingInstance.experienceId,
-          ],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_id = $1 AND experience_id = $2;',
+            values: [
+              preexistingInstance.documentId,
+              preexistingInstance.experienceId,
+            ],
+          },
         })
       ).rows[0];
 
@@ -386,10 +399,12 @@ describe('Document_X_Experience', () => {
 
       // Assert
       const databaseData = await db.query({
-        text:
-          sqlTextSelectAll +
-          '\n  WHERE document_id = $1 AND experience_id = $2;',
-        values: [instance.documentId, instance.experienceId],
+        queryConfig: {
+          text:
+            sqlTextSelectAll +
+            '\n  WHERE document_id = $1 AND experience_id = $2;',
+          values: [instance.documentId, instance.experienceId],
+        },
       });
 
       expect(databaseData.rows.length).toBe(0);

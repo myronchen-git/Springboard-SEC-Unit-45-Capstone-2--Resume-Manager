@@ -120,8 +120,10 @@ describe('POST /auth/signin', () => {
 
   beforeAll((done) => {
     db.query({
-      text: `
+      queryConfig: {
+        text: `
   TRUNCATE TABLE ${User.tableName} RESTART IDENTITY CASCADE;`,
+      },
     })
       .then(() =>
         request(app).post(urlRegisterUser).send({

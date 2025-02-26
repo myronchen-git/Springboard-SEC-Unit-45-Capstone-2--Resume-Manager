@@ -34,17 +34,19 @@ describe('ContactInfo', () => {
   beforeAll(() =>
     commonBeforeAll(db).then(() =>
       db.query({
-        text: `
+        queryConfig: {
+          text: `
   INSERT INTO ${User.tableName}
   VALUES
     ($1, $2),
     ($3, $4);`,
-        values: [
-          users[0].username,
-          users[0].password,
-          users[1].username,
-          users[1].password,
-        ],
+          values: [
+            users[0].username,
+            users[0].password,
+            users[1].username,
+            users[1].password,
+          ],
+        },
       })
     )
   );
@@ -73,8 +75,10 @@ describe('ContactInfo', () => {
 
         const databaseEntry = (
           await db.query({
-            text: sqlTextSelectAll + '\n  WHERE username = $1;',
-            values: [newInstanceData.username],
+            queryConfig: {
+              text: sqlTextSelectAll + '\n  WHERE username = $1;',
+              values: [newInstanceData.username],
+            },
           })
         ).rows[0];
 
@@ -178,8 +182,10 @@ describe('ContactInfo', () => {
 
         const databaseEntry = (
           await db.query({
-            text: sqlTextSelectAll + '\n  WHERE username = $1;',
-            values: [preexistingInstance.username],
+            queryConfig: {
+              text: sqlTextSelectAll + '\n  WHERE username = $1;',
+              values: [preexistingInstance.username],
+            },
           })
         ).rows[0];
 
@@ -215,8 +221,10 @@ describe('ContactInfo', () => {
 
       // Assert
       const databaseData = await db.query({
-        text: sqlTextSelectAll + `\n  WHERE username = $1;`,
-        values: [instance.username],
+        queryConfig: {
+          text: sqlTextSelectAll + `\n  WHERE username = $1;`,
+          values: [instance.username],
+        },
       });
 
       expect(databaseData.rows.length).toBe(0);

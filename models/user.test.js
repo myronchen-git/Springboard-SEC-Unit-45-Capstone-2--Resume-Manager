@@ -48,8 +48,10 @@ describe('User', () => {
 
       const databaseEntry = (
         await db.query({
-          text: sqlTextSelectAll + `${whereClauseToGetOne};`,
-          values: [user.username],
+          queryConfig: {
+            text: sqlTextSelectAll + `${whereClauseToGetOne};`,
+            values: [user.username],
+          },
         })
       ).rows[0];
 
@@ -70,7 +72,9 @@ describe('User', () => {
 
       const databaseEntries = (
         await db.query({
-          text: sqlTextSelectAll + ';',
+          queryConfig: {
+            text: sqlTextSelectAll + ';',
+          },
         })
       ).rows;
 
@@ -139,8 +143,10 @@ describe('User', () => {
 
       const databaseEntry = (
         await db.query({
-          text: sqlTextSelectAll + `${whereClauseToGetOne};`,
-          values: [user.username],
+          queryConfig: {
+            text: sqlTextSelectAll + `${whereClauseToGetOne};`,
+            values: [user.username],
+          },
         })
       ).rows[0];
 
@@ -221,8 +227,10 @@ describe('User', () => {
       // Assert
       const databaseEntries = (
         await db.query({
-          text: sqlTextSelectAll + `${whereClauseToGetOne};`,
-          values: [user.username],
+          queryConfig: {
+            text: sqlTextSelectAll + `${whereClauseToGetOne};`,
+            values: [user.username],
+          },
         })
       ).rows;
 

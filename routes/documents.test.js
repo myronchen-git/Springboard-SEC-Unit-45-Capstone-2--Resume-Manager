@@ -245,11 +245,13 @@ describe('PATCH /users/:username/documents/:docId', () => {
     // thru the API is to create a new user and the documents table gets
     // truncated before each test.
     const result = await db.query({
-      text: `
+      queryConfig: {
+        text: `
   INSERT INTO documents (document_name, owner, is_master, is_template)
   VALUES ('Master', $1, true, false)
   RETURNING id;`,
-      values: [user.username],
+        values: [user.username],
+      },
     });
 
     const docId = result.rows[0].id;
@@ -321,11 +323,13 @@ describe('PATCH /users/:username/documents/:docId', () => {
       // thru the API is to create a new user and the documents table gets
       // truncated before each test.
       const result = await db.query({
-        text: `
+        queryConfig: {
+          text: `
   INSERT INTO documents (document_name, owner, is_master, is_template)
   VALUES ('Master', $1, true, false)
   RETURNING id;`,
-        values: [user.username],
+          values: [user.username],
+        },
       });
 
       const docId = result.rows[0].id;
@@ -422,11 +426,13 @@ describe('DELETE /users/:username/documents/:docId', () => {
     // thru the API is to create a new user and the documents table gets
     // truncated before each test.
     const result = await db.query({
-      text: `
+      queryConfig: {
+        text: `
   INSERT INTO documents (document_name, owner, is_master, is_template)
   VALUES ('Master', $1, true, false)
   RETURNING id;`,
-      values: [user.username],
+        values: [user.username],
+      },
     });
 
     const docId = result.rows[0].id;

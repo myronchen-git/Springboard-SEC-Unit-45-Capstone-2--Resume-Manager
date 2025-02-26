@@ -51,7 +51,7 @@ class Section {
       values: [sectionName],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return new Section(...Object.values(result.rows[0]));
   }
@@ -71,7 +71,7 @@ class Section {
   FROM ${Section.tableName};`,
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return result.rows.map((data) => new Section(...Object.values(data)));
   }
@@ -98,7 +98,7 @@ class Section {
       values: [documentId],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     return result.rows.map((data) => new Section(...Object.values(data)));
   }
@@ -128,7 +128,7 @@ class Section {
       values: [id == undefined ? sectionName : id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rows.length === 0) {
       logger.error(`${logPrefix}: Section not found.`);
@@ -174,7 +174,7 @@ class Section {
       values: [...sqlValues, this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount === 0) {
       logger.error(
@@ -210,7 +210,7 @@ class Section {
       values: [this.id],
     };
 
-    const result = await db.query(queryConfig, logPrefix);
+    const result = await db.query({ queryConfig, logPrefix });
 
     if (result.rowCount) {
       logger.info(

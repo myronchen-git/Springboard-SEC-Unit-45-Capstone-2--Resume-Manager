@@ -38,15 +38,18 @@ describe('Document_X_Section', () => {
     commonBeforeAll(db)
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-          values: [users[0].username, users[0].password],
+            values: [users[0].username, users[0].password],
+          },
         })
       )
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Document.tableName} (
     id,
     document_name,
@@ -54,13 +57,14 @@ describe('Document_X_Section', () => {
     is_master,
     is_template
   ) VALUES ($1, $2, $3, $4, $5);`,
-          values: [
-            documentId,
-            documents[0].documentName,
-            documents[0].owner,
-            documents[0].isMaster,
-            documents[0].isTemplate,
-          ],
+            values: [
+              documentId,
+              documents[0].documentName,
+              documents[0].owner,
+              documents[0].isMaster,
+              documents[0].isTemplate,
+            ],
+          },
         })
       )
       .then(() => {
@@ -72,9 +76,11 @@ describe('Document_X_Section', () => {
           .join();
 
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${Section.tableName}
   VALUES ${sqlValuesText};`,
+          },
         });
       })
   );
@@ -98,10 +104,12 @@ describe('Document_X_Section', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_id = $1 AND section_id = $2;',
-          values: [dataToAdd.documentId, dataToAdd.sectionId],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_id = $1 AND section_id = $2;',
+            values: [dataToAdd.documentId, dataToAdd.sectionId],
+          },
         })
       ).rows[0];
 
@@ -130,8 +138,10 @@ describe('Document_X_Section', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
-            values: [documentId],
+            queryConfig: {
+              text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
+              values: [documentId],
+            },
           })
         ).rows;
 
@@ -162,8 +172,10 @@ describe('Document_X_Section', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
-            values: [documentId],
+            queryConfig: {
+              text: sqlTextSelectAll + '\n  WHERE document_id = $1;',
+              values: [documentId],
+            },
           })
         ).rows;
 
@@ -299,13 +311,15 @@ describe('Document_X_Section', () => {
 
       const databaseEntry = (
         await db.query({
-          text:
-            sqlTextSelectAll +
-            '\n  WHERE document_id = $1 AND section_id = $2;',
-          values: [
-            preexistingInstance.documentId,
-            preexistingInstance.sectionId,
-          ],
+          queryConfig: {
+            text:
+              sqlTextSelectAll +
+              '\n  WHERE document_id = $1 AND section_id = $2;',
+            values: [
+              preexistingInstance.documentId,
+              preexistingInstance.sectionId,
+            ],
+          },
         })
       ).rows[0];
 
@@ -353,9 +367,12 @@ describe('Document_X_Section', () => {
 
       // Assert
       const databaseData = await db.query({
-        text:
-          sqlTextSelectAll + '\n  WHERE document_id = $1 AND section_id = $2;',
-        values: [instance.documentId, instance.sectionId],
+        queryConfig: {
+          text:
+            sqlTextSelectAll +
+            '\n  WHERE document_id = $1 AND section_id = $2;',
+          values: [instance.documentId, instance.sectionId],
+        },
       });
 
       expect(databaseData.rows.length).toBe(0);

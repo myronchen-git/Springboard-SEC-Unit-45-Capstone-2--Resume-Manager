@@ -53,23 +53,27 @@ describe('Skill', () => {
     commonBeforeAll(db)
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-          values: [users[0].username, users[0].password],
+            values: [users[0].username, users[0].password],
+          },
         })
       )
       .then(() =>
         db.query({
-          text: `
+          queryConfig: {
+            text: `
   INSERT INTO ${TextSnippet.tableName} (owner, type, content)
   VALUES ($1, $2, $3)
   RETURNING id, version;`,
-          values: [
-            users[0].username,
-            textSnippets[0].type,
-            textSnippets[0].content,
-          ],
+            values: [
+              users[0].username,
+              textSnippets[0].type,
+              textSnippets[0].content,
+            ],
+          },
         })
       )
       .then((result) => {
@@ -109,8 +113,10 @@ describe('Skill', () => {
 
       const databaseEntry = (
         await db.query({
-          text: sqlToGetById,
-          values: [skill.id],
+          queryConfig: {
+            text: sqlToGetById,
+            values: [skill.id],
+          },
         })
       ).rows[0];
 
@@ -136,8 +142,10 @@ describe('Skill', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlToGetByOwner,
-            values: [users[0].username],
+            queryConfig: {
+              text: sqlToGetByOwner,
+              values: [users[0].username],
+            },
           })
         ).rows;
 
@@ -162,8 +170,10 @@ describe('Skill', () => {
 
         const databaseEntries = (
           await db.query({
-            text: sqlToGetByOwner,
-            values: [users[0].username],
+            queryConfig: {
+              text: sqlToGetByOwner,
+              values: [users[0].username],
+            },
           })
         ).rows;
 
@@ -299,8 +309,10 @@ describe('Skill', () => {
 
       const databaseEntry = (
         await db.query({
-          text: sqlToGetById,
-          values: [preexistingSkill.id],
+          queryConfig: {
+            text: sqlToGetById,
+            values: [preexistingSkill.id],
+          },
         })
       ).rows[0];
 
@@ -334,8 +346,10 @@ describe('Skill', () => {
       // Assert
       const databaseEntries = (
         await db.query({
-          text: sqlToGetById,
-          values: [skill.id],
+          queryConfig: {
+            text: sqlToGetById,
+            values: [skill.id],
+          },
         })
       ).rows;
 

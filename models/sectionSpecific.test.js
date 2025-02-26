@@ -21,10 +21,12 @@ describe('Section', () => {
   beforeAll(() =>
     commonBeforeAll(db).then(() =>
       db.query({
-        text: `
+        queryConfig: {
+          text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-        values: [users[0].username, users[0].password],
+          values: [users[0].username, users[0].password],
+        },
       })
     )
   );

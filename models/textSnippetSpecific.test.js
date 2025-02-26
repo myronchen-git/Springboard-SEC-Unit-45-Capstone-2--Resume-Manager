@@ -32,10 +32,12 @@ describe(className, () => {
   beforeAll(() =>
     commonBeforeAll(db).then(() =>
       db.query({
-        text: `
+        queryConfig: {
+          text: `
   INSERT INTO ${User.tableName}
   VALUES ($1, $2);`,
-        values: [users[0].username, users[0].password],
+          values: [users[0].username, users[0].password],
+        },
       })
     )
   );
@@ -63,8 +65,10 @@ describe(className, () => {
         // Assert
         const databaseEntries = (
           await db.query({
-            text: sqlTextSelectAll + `\n  ${whereClauseToGetAll};`,
-            values: [users[0].username],
+            queryConfig: {
+              text: sqlTextSelectAll + `\n  ${whereClauseToGetAll};`,
+              values: [users[0].username],
+            },
           })
         ).rows;
 
