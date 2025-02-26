@@ -3,6 +3,7 @@
 const db = require('../database/db');
 
 const {
+  AppError,
   AppServerError,
   BadRequestError,
   NotFoundError,
@@ -100,6 +101,112 @@ class Relationship {
 
     const data = result.rows[0];
     return new this(...Object.values(data));
+  }
+
+  /**
+   * Updates the positions of all relationships belonging to a particular
+   * container.  In other words, updates all of the positions of a type of
+   * content in a document, experience, etc..
+   *
+   * @param {Object} attachTo - Holds the data related to the container of the
+   *  content.
+   * @param {String} attachTo.jsName - The JavaScript variable name that
+   *  describes the ID.  This is used for logging.
+   * @param {String} attachTo.sqlName - The SQL name for the ID of the
+   *  container, which will be used in the SQL UPDATE WHERE clause.
+   * @param {Number} attachTo.id - The ID of the container.
+   * @param {Object} attachWiths - Holds the data related to the things being
+   *  repositioned.
+   * @param {String} attachWiths.jsName - The JavaScript variable name that
+   *  describes the ID.  This is used for logging.
+   * @param {String} attachWiths.sqlName - The SQL name for the ID of the
+   *  content, which will be used in the SQL UPDATE WHERE clause.
+   * @param {Number[]} attachWiths.id - The IDs of the content to be
+   *  repositioned, in their desired order.
+   * @returns {Array} A list of instances of the relationship data model.
+   */
+  static async updateAllPositions(attachTo, attachWiths) {
+    const logPrefix =
+      `${this.name}.updateAll(` +
+      `${attachTo.jsName} = ${attachTo.id}, ` +
+      `${attachWiths.jsName}s = [${attachWiths.ids}])`;
+    logger.verbose(logPrefix);
+
+    const dbClient = await db.getClient();
+
+    try {
+      // Verify number of IDs.
+      const countResult = await db.query({
+        queryConfig: {
+          text: `
+  SELECT COUNT(*)
+  FROM ${this.tableName}
+  WHERE ${attachTo.sqlName} = $1;`,
+          values: [attachTo.id],
+        },
+        logPrefix,
+        dbClient,
+      });
+      if (countResult.rows[0].count != attachWiths.ids.length) {
+        logger.error(
+          `${logPrefix}: Number of content to reposition is not equal to ` +
+            `number in container.  Container has ${countResult.rows[0].count}.`
+        );
+        throw new AppServerError(
+          'Number of things to reposition must be total number in container.'
+        );
+      }
+
+      // Start SQL transaction.
+      await db.query({
+        queryConfig: {
+          text: `
+  BEGIN;`,
+        },
+        logPrefix,
+        dbClient,
+      });
+
+      // Loop thru IDs and make UPDATEs.
+      const results = [];
+      for (let i = 0; i < attachWiths.ids.length; i++) {
+        const result = await db.query({
+          queryConfig: {
+            text: `
+  UPDATE ${this.tableName}
+  SET position = $1
+  WHERE ${attachTo.sqlName} = $2 AND ${attachWiths.sqlName} = $3
+  RETURNING ${this._allDbColsAsJs};`,
+            values: [i, attachTo.id, attachWiths.ids[i]],
+          },
+          logPrefix,
+          dbClient,
+        });
+
+        results.push(new this(...Object.values(result.rows[0])));
+      }
+
+      // End SQL transaction.
+      await db.query({
+        queryConfig: {
+          text: `
+  COMMIT;`,
+        },
+        logPrefix,
+        dbClient,
+      });
+
+      return results;
+    } catch (err) {
+      if (err instanceof AppError) {
+        throw err;
+      } else {
+        logger.error(`${logPrefix}: ${err.message}`);
+        throw new AppServerError('Error when updating positions in database.');
+      }
+    } finally {
+      dbClient.release();
+    }
   }
 
   /**
