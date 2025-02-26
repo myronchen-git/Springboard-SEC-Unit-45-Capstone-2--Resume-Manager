@@ -2,7 +2,7 @@
 
 'use strict';
 
-const { Pool } = require('pg');
+const pg = require('pg');
 
 const { DATABASE_URI } = require('../config');
 const logger = require('../util/logger');
@@ -22,11 +22,19 @@ class PostgresDb {
    * Creates a new database connection pool.
    */
   constructor() {
-    this.pool = new Pool(PostgresDb.config);
+    this.pool = new pg.Pool(PostgresDb.config);
     this.pool.on('error', (err, client) => {
       logger.error('Unexpected error on idle client: ' + err);
       process.exit(-1);
     });
+  }
+
+  /**
+   * Checks out a client that can be used to make database queries.
+   * @returns
+   */
+  async getClient() {
+    return await this.pool.connect();
   }
 
   /**
@@ -55,17 +63,19 @@ class PostgresDb {
    *  logs.
    * @param {PostgresDb~queryErrorCallback} [props.errorCallback] - Callback
    *  that runs if pg.Client.query throws an Error.
+   * @param {pg.Client} [props.dbClient] - The pg (node-postgres) client to call
+   *  query on.  If not supplied, then query is called on the pg Pool.
    * @returns The result from a database query.
    */
   async query({
     queryConfig,
     logPrefix = 'PostgresDb.query(...)',
     errorCallback,
+    dbClient = this.pool,
   }) {
     logger.verbose(
       `${logPrefix}: Executing query on database: ${queryConfig.text}`
     );
-    const dbClient = await this.pool.connect();
 
     try {
       return await dbClient.query(queryConfig);
@@ -75,8 +85,6 @@ class PostgresDb {
       if (errorCallback) errorCallback(err);
 
       throw err;
-    } finally {
-      dbClient.release();
     }
   }
 
