@@ -2,6 +2,8 @@
 
 const Relationship = require('./relationship');
 
+const { camelToSnakeCase } = require('../util/caseConversions');
+
 // ==================================================
 
 /**
@@ -109,6 +111,33 @@ class Document_X_Section extends Relationship {
       `document ID ${documentId} and section ID ${sectionId}.`;
 
     return await super.get(queryParams, queryConfig, notFoundMessage);
+  }
+
+  /**
+   * Updates the positions of all sections in a document.
+   *
+   * @param {Number} documentId - ID of the document that is having its sections
+   *  reordered.
+   * @param {Number[]} sectionIds - List of sections IDs with the desired
+   *  ordering.
+   * @returns {Document_X_Section[]} A list of Document_X_Section instances.
+   */
+  static async updateAllPositions(documentId, sectionIds) {
+    let name = 'documentId';
+    const attachTo = {
+      jsName: name,
+      sqlName: camelToSnakeCase(name),
+      id: documentId,
+    };
+
+    name = 'sectionId';
+    const attachWiths = {
+      jsName: name,
+      sqlName: camelToSnakeCase(name),
+      ids: sectionIds,
+    };
+
+    return await super.updateAllPositions(attachTo, attachWiths);
   }
 
   /**

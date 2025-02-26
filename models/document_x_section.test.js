@@ -12,6 +12,7 @@ const {
 const Document = require('./document');
 const Section = require('./section');
 const User = require('./user');
+const { shuffle } = require('../util/array');
 const {
   users,
   documents,
@@ -274,6 +275,94 @@ describe('Document_X_Section', () => {
       // Assert
       await expect(runFunc).rejects.toThrow(NotFoundError);
     });
+  });
+
+  // -------------------------------------------------- updateAllPositions
+
+  describe('updateAllPositions', () => {
+    beforeEach(async () => {
+      for (const document_x_section of documents_x_sections) {
+        await Document_X_Section.add(document_x_section);
+      }
+    });
+
+    test("Updates all of the sections' positions in a document.", async () => {
+      // Arrange
+      const shuffledDocuments_x_sections = shuffle(
+        structuredClone(documents_x_sections)
+      );
+      shuffledDocuments_x_sections.forEach(
+        (_, idx) => (shuffledDocuments_x_sections[idx].position = idx)
+      );
+
+      const updatedPositionedSectionIds = shuffledDocuments_x_sections.map(
+        (dxs) => dxs.sectionId
+      );
+
+      // Act
+      const repositionedDocuments_x_sections =
+        await Document_X_Section.updateAllPositions(
+          documentId,
+          updatedPositionedSectionIds
+        );
+
+      // Assert
+      repositionedDocuments_x_sections.forEach((dxs) =>
+        expect(dxs).toBeInstanceOf(Document_X_Section)
+      );
+
+      expect(repositionedDocuments_x_sections).toEqual(
+        shuffledDocuments_x_sections
+      );
+    });
+
+    test.each([
+      [
+        documents_x_sections.length - 1,
+        (() => {
+          const clonedData = structuredClone(documents_x_sections);
+          clonedData.pop();
+          return clonedData;
+        })(),
+        ,
+      ],
+      [
+        documents_x_sections.length + 1,
+        (() => {
+          const clonedData = structuredClone(documents_x_sections);
+          clonedData.push({ ...clonedData.at(-1) });
+          clonedData.at(-1).sectionId = clonedData.at(-1).sectionId + 1;
+          clonedData.at(-1).position = clonedData.at(-1).position + 1;
+          return clonedData;
+        })(),
+        ,
+      ],
+    ])(
+      'Throws an Error if the number of section IDs is not the exact ' +
+        'amount in a document.  # of section IDs = %d.',
+      async (amount, documents_x_sections) => {
+        // Arrange
+        const shuffledDocuments_x_sections = shuffle(documents_x_sections);
+        shuffledDocuments_x_sections.forEach(
+          (_, idx) => (shuffledDocuments_x_sections[idx].position = idx)
+        );
+
+        const updatedPositionedSectionIds = shuffledDocuments_x_sections.map(
+          (dxs) => dxs.sectionId
+        );
+
+        // Act
+        async function runFunc() {
+          await Document_X_Section.updateAllPositions(
+            documentId,
+            updatedPositionedSectionIds
+          );
+        }
+
+        // Assert
+        await expect(runFunc).rejects.toThrow(AppServerError);
+      }
+    );
   });
 
   // -------------------------------------------------- update
