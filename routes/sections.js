@@ -3,12 +3,14 @@
 const express = require('express');
 
 const document_x_sectionNewSchema = require('../schemas/document_x_sectionNew.json');
+const document_x_sectionPositionsSchema = require('../schemas/document_x_sectionPositions.json');
 const urlParamsSchema = require('../schemas/urlParams.json');
 
 const Section = require('../models/section');
 const {
   createDocument_x_section,
   getSections,
+  updateDocument_x_sectionPositions,
   deleteDocument_x_section,
 } = require('../services/sectionService');
 const { ensureLoggedIn } = require('../middleware/auth');
@@ -96,8 +98,8 @@ router.post(
  * Gets all sections in a document.  The sections' order is related to their
  * positions.
  *
- * @returns {Object} sections - A list of Objects containing section data and
- *  position.
+ * @returns {Object} sections - A list of Objects containing section data in
+ *  order of position.
  */
 router.get(
   '/users/:username/documents/:documentId/sections',
@@ -116,6 +118,52 @@ router.get(
       runJsonSchemaValidator(urlParamsSchema, { documentId }, logPrefix);
 
       const sections = await getSections(userPayload.username, documentId);
+
+      return res.json({ sections });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/**
+ * PUT /users/:username/documents/:documentId/sections
+ * [ sectionId, sectionId, ... ] => { sections }
+ *
+ * Authorization required: login
+ *
+ * Updates the positions of all sections in a document.  All sections need to be
+ * included.
+ *
+ * @returns {Object} sections - A list of Objects containing section data in
+ *  order of position.
+ */
+router.put(
+  '/users/:username/documents/:documentId/sections',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+
+    const { username, documentId } = req.params;
+
+    const logPrefix =
+      `PUT /users/${username}/documents/${documentId}/sections ` +
+      `(user: ${JSON.stringify(userPayload)})`;
+    logger.info(logPrefix + ' BEGIN');
+
+    try {
+      runJsonSchemaValidator(urlParamsSchema, { documentId }, logPrefix);
+      runJsonSchemaValidator(
+        document_x_sectionPositionsSchema,
+        req.body,
+        logPrefix
+      );
+
+      const sections = await updateDocument_x_sectionPositions(
+        userPayload.username,
+        documentId,
+        req.body
+      );
 
       return res.json({ sections });
     } catch (err) {

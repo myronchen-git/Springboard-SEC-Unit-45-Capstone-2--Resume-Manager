@@ -7,6 +7,7 @@ const db = require('../database/db');
 
 const Document = require('../models/document');
 const Document_X_Section = require('../models/document_x_section');
+const { shuffle } = require('../util/array');
 const { users, sections } = require('../_testData');
 const {
   commonBeforeAll,
@@ -25,6 +26,15 @@ const getGetAllDocumentsUrl = (username) =>
 
 const authTokens = [];
 
+const existingSections = Object.freeze(
+  sections.map((section, idx) =>
+    Object.freeze({
+      id: idx + 1,
+      sectionName: section.sectionName,
+    })
+  )
+);
+
 beforeAll(() =>
   commonBeforeAll(db)
     .then(() => {
@@ -34,6 +44,7 @@ beforeAll(() =>
       const sqlValuesText = sections.map(
         (section) => `\n    ('${section.sectionName}')`
       );
+
       const text =
         `
   INSERT INTO sections (section_name) VALUES` +
@@ -218,10 +229,6 @@ describe('GET /users/:username/documents/:documentId/sections', () => {
     `${urlPrefix}/users/${username}/documents/${documentId}/sections`;
 
   const user = users[0];
-  const existingSections = sections.map((section, idx) => ({
-    id: idx + 1,
-    sectionName: section.sectionName,
-  }));
 
   let authToken;
   let documentId;
@@ -328,6 +335,177 @@ describe('GET /users/:username/documents/:documentId/sections', () => {
 });
 
 // --------------------------------------------------
+// PUT /users/:username/documents/:documentId/sections
+
+describe('PUT /users/:username/documents/:documentId/sections', () => {
+  const getUrl = (username, documentId) =>
+    `${urlPrefix}/users/${username}/documents/${documentId}/sections`;
+
+  const user = users[0];
+
+  let authToken;
+  let documentId;
+
+  beforeAll(async () => {
+    authToken = authTokens[0];
+
+    // Getting document ID
+    const resp = await request(app)
+      .get(getGetAllDocumentsUrl(user.username))
+      .set('authorization', `Bearer ${authToken}`);
+
+    documentId = resp.body.documents[0].id;
+  });
+
+  beforeEach(async () => {
+    await commonBeforeEach(db, Document_X_Section.tableName);
+
+    // Adding document-section relationships.
+    for (const section of existingSections) {
+      await request(app)
+        .post(
+          getCreateDocumentSectionRelationshipUrl(
+            user.username,
+            documentId,
+            section.id
+          )
+        )
+        .set('authorization', `Bearer ${authToken}`);
+    }
+  });
+
+  test('Updates section positions in a document.', async () => {
+    // Arrange
+    const shuffledSections = shuffle([...existingSections]);
+    const updatedPositionedSections = shuffledSections.map(
+      (section) => section.id
+    );
+
+    // Act
+    const resp = await request(app)
+      .put(getUrl(user.username, documentId))
+      .send(updatedPositionedSections)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body).toEqual({ sections: shuffledSections });
+  });
+
+  test('Returns 400 status if URL parameters are invalid.', async () => {
+    // Arrange
+    const invalidDocumentId = 'abc';
+
+    const updatedPositionedSections = existingSections.map(
+      (section) => section.id
+    );
+
+    // Act
+    const resp = await request(app)
+      .put(getUrl(user.username, invalidDocumentId))
+      .send(updatedPositionedSections)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(400);
+    expect(resp.body).not.toHaveProperty('sections');
+  });
+
+  test('Returns 400 status if list of section IDs are invalid types.', async () => {
+    // Arrange
+    const updatedPositionedSections = existingSections.map(
+      (section) => section.id + 0.1
+    );
+
+    // Alternative test data for input.  Uses an Object instead of an Array of
+    // floats.
+    /*
+    const updatedPositionedSections = existingSections.reduce(
+      (obj, section, idx) => {
+        obj[idx] = section.id;
+        return obj;
+      },
+      {}
+    );
+    */
+
+    // Act
+    const resp = await request(app)
+      .put(getUrl(user.username, documentId))
+      .send(updatedPositionedSections)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(400);
+    expect(resp.body).not.toHaveProperty('sections');
+  });
+
+  test(
+    "Returns 400 status if not exactly all of the document's sections " +
+      'are updated.',
+    async () => {
+      // Arrange
+      const updatedPositionedSections = existingSections.map(
+        (section) => section.id
+      );
+      updatedPositionedSections.pop();
+
+      // Act
+      const resp = await request(app)
+        .put(getUrl(user.username, documentId))
+        .send(updatedPositionedSections)
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(400);
+      expect(resp.body).not.toHaveProperty('sections');
+    }
+  );
+
+  test('Returns 404 status if document is not found.', async () => {
+    // Arrange
+    const nonexistentDocumentId = 99;
+
+    const updatedPositionedSections = existingSections.map(
+      (section) => section.id
+    );
+
+    // Act
+    const resp = await request(app)
+      .put(getUrl(user.username, nonexistentDocumentId))
+      .send(updatedPositionedSections)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(404);
+    expect(resp.body).not.toHaveProperty('sections');
+  });
+
+  test(
+    "Attempting to access another user's document " +
+      'should return 403 status.',
+    async () => {
+      // Arrange
+      const otherAuthToken = authTokens[1];
+
+      const updatedPositionedSections = existingSections.map(
+        (section) => section.id
+      );
+
+      // Act
+      const resp = await request(app)
+        .put(getUrl(user.username, documentId))
+        .send(updatedPositionedSections)
+        .set('authorization', `Bearer ${otherAuthToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
+      expect(resp.body).not.toHaveProperty('sections');
+    }
+  );
+});
+
+// --------------------------------------------------
 // DELETE /users/:username/documents/:documentId/sections/:sectionId
 
 describe('DELETE /users/:username/documents/:documentId/sections/:sectionId', () => {
@@ -335,10 +513,6 @@ describe('DELETE /users/:username/documents/:documentId/sections/:sectionId', ()
     `${urlPrefix}/users/${username}/documents/${documentId}/sections/${sectionId}`;
 
   const user = users[0];
-  const existingSections = sections.map((section, idx) => ({
-    id: idx + 1,
-    sectionName: section.sectionName,
-  }));
   const section = existingSections[0];
 
   let authToken;
