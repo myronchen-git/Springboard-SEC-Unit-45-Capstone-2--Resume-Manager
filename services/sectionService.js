@@ -3,9 +3,12 @@
 const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
+const db = require('../database/db');
 const Section = require('../models/section');
 const Document_X_Section = require('../models/document_x_section');
 const { validateDocumentOwner } = require('../util/serviceHelpers');
+
+const { BadRequestError } = require('../errors/appErrors');
 
 const logger = require('../util/logger');
 
@@ -53,8 +56,7 @@ async function createDocument_x_section(username, documentId, sectionId) {
  * @param {String} username - Name of user that wants to interact with the
  *  document.  This should be the owner.
  * @param {Number} documentId - ID of the document to get sections from.
- * @returns {Section[]} A list of Section instances, which also include the
- *  position.
+ * @returns {Section[]} A list of Section instances, in order of position.
  */
 async function getSections(username, documentId) {
   const logPrefix =
@@ -69,11 +71,57 @@ async function getSections(username, documentId) {
 }
 
 /**
+ * Changes the order of the sections in a document.
+ *
+ * @param {String} username - Name of user that wants to interact with the
+ *  document.  This should be the owner.
+ * @param {Number} documentId - ID of the document that is having its sections
+ *  reordered.
+ * @param {Number[]} sectionIds - List of sections IDs with the desired
+ *  ordering.
+ * @returns {Section[]} A list of Section instances, in order of position.
+ */
+async function updateDocument_x_sectionPositions(
+  username,
+  documentId,
+  sectionIds
+) {
+  const logPrefix =
+    `${fileName}.updateDocument_x_sectionPositions(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId}, ` +
+    `sectionIds = [${sectionIds}])`;
+  logger.verbose(logPrefix);
+
+  await validateDocumentOwner(username, documentId, logPrefix);
+
+  // Verify that sectionIds contains all of the sections in the document.
+  const documents_x_sections = await Document_X_Section.getAll(documentId);
+  if (
+    documents_x_sections.length !== sectionIds.length ||
+    !documents_x_sections.every((dxs) => sectionIds.includes(dxs.sectionId))
+  ) {
+    logger.error(
+      `${logPrefix}: Provided section IDs do not exactly ` +
+        'match those in document.'
+    );
+    throw new BadRequestError(
+      'All sections, and only those, need to be included ' +
+        'when updating their positions in a document.'
+    );
+  }
+
+  await Document_X_Section.updateAllPositions(documentId, sectionIds);
+
+  return await Section.getAllInDocument(documentId);
+}
+
+/**
  * Deletes a document-section relationship.  Document ownership is first
  * verified.
  *
  * @param {String} username - Name of user that wants to delete the
- *  document-section relationship.
+ *  document-section relationship.  This should be the owner.
  * @param {Number} documentId - ID of the document to remove the section from.
  * @param {Number} sectionId - ID of the section to be removed.
  */
@@ -95,5 +143,6 @@ async function deleteDocument_x_section(username, documentId, sectionId) {
 module.exports = {
   createDocument_x_section,
   getSections,
+  updateDocument_x_sectionPositions,
   deleteDocument_x_section,
 };

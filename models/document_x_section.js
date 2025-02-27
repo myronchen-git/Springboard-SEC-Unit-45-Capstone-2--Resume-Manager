@@ -67,7 +67,8 @@ class Document_X_Section extends Relationship {
    *
    * @param {Number} documentId - ID of the document to get the
    *  documents_x_sections for.
-   * @returns {Document_X_Section[]} A list of Document_X_Section instances.
+   * @returns {Document_X_Section[]} A list of Document_X_Section instances,
+   *  ordered by position.
    */
   static async getAll(documentId) {
     const queryConfig = {
