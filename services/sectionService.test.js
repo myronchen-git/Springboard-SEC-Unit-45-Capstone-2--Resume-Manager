@@ -8,6 +8,7 @@ const {
 } = require('./sectionService');
 const {
   validateDocumentOwner: mockValidateDocumentOwner,
+  getLastPosition: mockGetLastPosition,
 } = require('../util/serviceHelpers');
 
 const { BadRequestError } = require('../errors/appErrors');
@@ -30,27 +31,30 @@ describe('createDocument_x_section', () => {
   beforeEach(() => {
     mockValidateDocumentOwner.mockReset();
     Document_X_Section.getAll.mockReset();
+    mockGetLastPosition.mockReset();
     Document_X_Section.add.mockReset();
   });
 
   test.each([
-    [[], 0],
+    [Object.freeze([]), -1, 0],
     [
-      [
-        { documentId, sectionId: 1, position: 0 },
-        { documentId, sectionId: 2, position: 1 },
-      ],
+      Object.freeze([
+        Object.freeze({ documentId, sectionId: 1, position: 0 }),
+        Object.freeze({ documentId, sectionId: 2, position: 1 }),
+      ]),
+      1,
       2,
     ],
   ])(
-    'Calls Document_X_Section.add if document is found and belongs to user.  ' +
-      'Existing documents_x_sections = %j.',
-    async (existingDocuments_x_sections, expectedNewPosition) => {
+    'Adds a Document_X_Section, if document is found and belongs to user, ' +
+      'and at the correct next position.  Existing documents_x_sections = %j.',
+    async (existingDocuments_x_sections, lastPosition, expectedNewPosition) => {
       // Arrange
       const sectionIdToAdd = 3;
 
       const mockObject = Object.freeze({});
       Document_X_Section.getAll.mockResolvedValue(existingDocuments_x_sections);
+      mockGetLastPosition.mockReturnValue(lastPosition);
       Document_X_Section.add.mockResolvedValue(mockObject);
 
       // Act
@@ -71,6 +75,10 @@ describe('createDocument_x_section', () => {
 
       expect(Document_X_Section.getAll).toHaveBeenCalledWith(documentId);
 
+      expect(mockGetLastPosition).toHaveBeenCalledWith(
+        existingDocuments_x_sections
+      );
+
       expect(Document_X_Section.add).toHaveBeenCalledWith({
         documentId,
         sectionId: sectionIdToAdd,
@@ -78,40 +86,6 @@ describe('createDocument_x_section', () => {
       });
     }
   );
-
-  test("The new document_x_section's position is correct.", async () => {
-    // Arrange
-    const sectionIdToAdd = 3;
-    const existingDocuments_x_sections = [
-      { documentId, sectionId: 1, position: 2 },
-      { documentId, sectionId: 2, position: 6 },
-    ];
-
-    const mockObject = Object.freeze({});
-    Document_X_Section.getAll.mockResolvedValue(existingDocuments_x_sections);
-    Document_X_Section.add.mockResolvedValue(mockObject);
-
-    // Act
-    const document_x_section = await createDocument_x_section(
-      username,
-      documentId,
-      sectionIdToAdd
-    );
-
-    // Assert
-    expect(document_x_section).toBe(mockObject);
-    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
-      username,
-      documentId,
-      expect.any(String)
-    );
-    expect(Document_X_Section.getAll).toHaveBeenCalledWith(documentId);
-    expect(Document_X_Section.add).toHaveBeenCalledWith({
-      documentId,
-      sectionId: sectionIdToAdd,
-      position: 7,
-    });
-  });
 });
 
 // --------------------------------------------------

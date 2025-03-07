@@ -3,10 +3,12 @@
 const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
-const db = require('../database/db');
 const Section = require('../models/section');
 const Document_X_Section = require('../models/document_x_section');
-const { validateDocumentOwner } = require('../util/serviceHelpers');
+const {
+  validateDocumentOwner,
+  getLastPosition,
+} = require('../util/serviceHelpers');
 
 const { BadRequestError } = require('../errors/appErrors');
 
@@ -37,10 +39,8 @@ async function createDocument_x_section(username, documentId, sectionId) {
 
   await validateDocumentOwner(username, documentId, logPrefix);
 
-  // Find Document_X_Section records for document and set position to be after
-  // last / highest.
   const documents_x_sections = await Document_X_Section.getAll(documentId);
-  const nextPosition = (documents_x_sections.at(-1)?.position ?? -1) + 1;
+  const nextPosition = getLastPosition(documents_x_sections) + 1;
 
   return await Document_X_Section.add({
     documentId,
