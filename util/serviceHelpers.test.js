@@ -1,7 +1,7 @@
 'use strict';
 
 const Document = require('../models/document');
-const { validateDocumentOwner } = require('./serviceHelpers');
+const { validateDocumentOwner, getLastPosition } = require('./serviceHelpers');
 
 const { ForbiddenError } = require('../errors/appErrors');
 
@@ -53,5 +53,54 @@ describe('validateDocumentOwner', () => {
     // Assert
     await expect(runFunc).rejects.toThrow(ForbiddenError);
     expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+  });
+});
+
+// --------------------------------------------------
+
+describe('getLastPosition', () => {
+  test.each([
+    [[{ position: 0 }], 0],
+    [[{ position: 3 }], 3],
+    [[{ position: 0 }, { position: 1 }, { position: 2 }], 2],
+  ])(
+    'Returns the last position in a list of relationships.',
+    (relationships, expectedLastPosition) => {
+      // Act
+      const lastPosition = getLastPosition(relationships);
+
+      // Assert
+      expect(lastPosition).toBe(expectedLastPosition);
+    }
+  );
+
+  test(
+    'Returns the last position in a list of relationships that does not ' +
+      'have a sequential position order.',
+    () => {
+      // Arrange
+      const relationships = [
+        { position: 3 },
+        { position: 8 },
+        { position: 11 },
+      ];
+
+      // Act
+      const lastPosition = getLastPosition(relationships);
+
+      // Assert
+      expect(lastPosition).toBe(11);
+    }
+  );
+
+  test('Returns -1 when the list is empty.', () => {
+    // Arrange
+    const relationships = [];
+
+    // Act
+    const lastPosition = getLastPosition(relationships);
+
+    // Assert
+    expect(lastPosition).toBe(-1);
   });
 });

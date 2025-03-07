@@ -37,6 +37,20 @@ async function validateDocumentOwner(username, documentId, logPrefix) {
   return document;
 }
 
+/**
+ * Gets the position of the last section, education, experience, etc. of a
+ * document, or return -1.  The last position is the one with the highest value.
+ * The list of relationships must be in ascending position order.
+ *
+ * @param {Array} relationships - A list of the document and content
+ *  relationships.
+ * @returns {Number} Highest value position or -1 if there are no sections,
+ *  educations, experiences, etc..
+ */
+function getLastPosition(relationships) {
+  return relationships.at(-1)?.position ?? -1;
+}
+
 // ==================================================
 
-module.exports = { validateDocumentOwner };
+module.exports = { validateDocumentOwner, getLastPosition };
