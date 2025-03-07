@@ -29,8 +29,8 @@ class Document_X_Education extends Relationship {
    *
    * @param {Object} props - Contains data for creating a new
    *  document_x_education.
-   * @param {String} props.documentId - ID of the document.
-   * @param {String} props.educationId - ID of the education.
+   * @param {Number} props.documentId - ID of the document.
+   * @param {Number} props.educationId - ID of the education.
    * @param {Number} props.position - Position of education among other
    *  educations in the document.
    * @returns {Document_X_Education} A new Document_X_Education instance that
