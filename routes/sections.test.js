@@ -168,6 +168,46 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
   );
 
   test(
+    'Adds a new document-section relationship at the correct position ' +
+      'when existing ones are non-sequential.',
+    async () => {
+      // Ensure that there are enough sections.
+      expect(sections.length).toBeGreaterThanOrEqual(3);
+
+      // Arrange
+      const docId = (await Document.getAll(user.username))[0].id;
+
+      // Manually inserting relationships to simplify set up.  Otherwise, there
+      // will be many calls to create, delete, and reposition document-section
+      // relationships.
+      db.query({
+        queryConfig: {
+          text: `
+  INSERT INTO documents_x_sections (document_id, section_id, position)
+    VALUES (${docId}, 1, 9),
+           (${docId}, 2, 3);`,
+        },
+      });
+
+      // Act
+      const resp = await request(app)
+        .post(getCreateDocumentSectionRelationshipUrl(user.username, docId, 3))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(201);
+
+      expect(resp.body).toEqual({
+        document_x_section: {
+          documentId: docId,
+          sectionId: 3,
+          position: 10,
+        },
+      });
+    }
+  );
+
+  test(
     'Adding a relationship with a nonexistent document ' +
       'should return 404 status.',
     async () => {
