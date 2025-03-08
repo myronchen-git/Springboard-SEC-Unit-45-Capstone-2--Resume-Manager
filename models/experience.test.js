@@ -15,8 +15,8 @@ const dataForUpdate = Object.freeze(
       title: 'New ' + data.title,
       organization: 'New ' + data.organization,
       location: 'New Location',
-      startDate: new Date(2050, 0, 10),
-      endDate: new Date(2055, 0, 10),
+      startDate: '2050-01-10',
+      endDate: '2055-01-10',
     })
   )
 );

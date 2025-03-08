@@ -11,6 +11,7 @@ const {
   commonBeforeEach,
   commonAfterAll,
 } = require('../_testCommon');
+const { convertDateToString } = require('../util/modelHelpers');
 
 // ==================================================
 
@@ -124,6 +125,7 @@ function runCommonTests(testConfig) {
           })
         ).rows[0];
 
+        convertDatabaseEntryDates(databaseEntry);
         expect(databaseEntry).toEqual(expectedInstanceData);
       });
 
@@ -156,7 +158,11 @@ function runCommonTests(testConfig) {
 
             // Ensure existing data has not been modified.
             expect(databaseEntries.length).toBe(1);
-            expect(databaseEntries[0]).toEqual(expectedInstanceData);
+
+            const databaseEntry = databaseEntries[0];
+
+            convertDatabaseEntryDates(databaseEntry);
+            expect(databaseEntry).toEqual(expectedInstanceData);
           }
         );
       }
@@ -325,6 +331,7 @@ function runCommonTests(testConfig) {
             })
           ).rows[0];
 
+          convertDatabaseEntryDates(databaseEntry);
           expect(databaseEntry).toEqual(expectedUpdatedInstance);
         }
       );
@@ -387,6 +394,23 @@ function runCommonTests(testConfig) {
       );
     });
   });
+}
+
+// ==================================================
+
+/**
+ * Converts the Date Objects into Strings for a retrieved row from the database.
+ * This looks for keys that contains the text "Date" for Objects to convert.
+ * The passed-in Object is mutated.
+ *
+ * @param {Object} databaseEntry - Data from a row from the database.
+ */
+function convertDatabaseEntryDates(databaseEntry) {
+  for (const [key, value] of Object.entries(databaseEntry)) {
+    if (key.includes('Date')) {
+      databaseEntry[key] = convertDateToString(value);
+    }
+  }
 }
 
 // ==================================================

@@ -14,8 +14,8 @@ const dataForUpdate = Object.freeze(
     Object.freeze({
       school: 'New ' + data.school,
       location: 'New ' + data.location,
-      startDate: new Date(2000, 5, 5),
-      endDate: new Date(2001, 5, 5),
+      startDate: '2000-05-05',
+      endDate: '2001-05-05',
       degree: 'New ' + data.degree,
       gpa: 'New GPA',
       awardsAndHonors: 'New Awards',

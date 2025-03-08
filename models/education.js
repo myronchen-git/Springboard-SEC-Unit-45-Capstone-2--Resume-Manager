@@ -2,6 +2,7 @@
 
 const db = require('../database/db');
 const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
+const { convertDateToString } = require('../util/modelHelpers');
 
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
@@ -60,8 +61,8 @@ class Education {
    * @param {String} props.owner - Username that the education belongs to.
    * @param {String} props.school - School or education center name.
    * @param {String} props.location - Location of school.
-   * @param {Date} props.startDate - The start date of joining the school.
-   * @param {Date} props.endDate - The end date of leaving the school.
+   * @param {String} props.startDate - The start date of joining the school.
+   * @param {String} props.endDate - The end date of leaving the school.
    * @param {String} props.degree - The degree name that was or will be given
    *  from the school.
    * @param {String} [props.gpa] - The grade point average throughout the
@@ -120,7 +121,12 @@ class Education {
 
     const result = await db.query({ queryConfig, logPrefix });
 
-    return new Education(...Object.values(result.rows[0]));
+    const education = new Education(...Object.values(result.rows[0]));
+
+    education.startDate = convertDateToString(education.startDate);
+    education.endDate = convertDateToString(education.endDate);
+
+    return education;
   }
 
   /**
@@ -143,7 +149,14 @@ class Education {
 
     const result = await db.query({ queryConfig, logPrefix });
 
-    return result.rows.map((data) => new Education(...Object.values(data)));
+    return result.rows.map((data) => {
+      const education = new Education(...Object.values(data));
+
+      education.startDate = convertDateToString(education.startDate);
+      education.endDate = convertDateToString(education.endDate);
+
+      return education;
+    });
   }
 
   /**
@@ -177,8 +190,12 @@ class Education {
       throw new NotFoundError(`Can not find education with ID ${id}.`);
     }
 
-    const data = result.rows[0];
-    return new Education(...Object.values(data));
+    const education = new Education(...Object.values(result.rows[0]));
+
+    education.startDate = convertDateToString(education.startDate);
+    education.endDate = convertDateToString(education.endDate);
+
+    return education;
   }
 
   /**
@@ -188,8 +205,8 @@ class Education {
    * @param {Object} props - Contains the updated properties.
    * @param {String} [props.school] - New school or education center name.
    * @param {String} [props.location] - New location of school.
-   * @param {Date} [props.startDate] - New start date of joining the school.
-   * @param {Date} [props.endDate] - New end date of leaving the school.
+   * @param {String} [props.startDate] - New start date of joining the school.
+   * @param {String} [props.endDate] - New end date of leaving the school.
    * @param {String} [props.degree] - New degree name that was or will be given
    *  from the school.
    * @param {String} [props.gpa] - New grade point average throughout the
@@ -241,7 +258,7 @@ class Education {
 
     // Update current instance's properties.
     Object.entries(result.rows[0]).forEach(([colName, val]) => {
-      this[colName] = val;
+      this[colName] = colName.includes('Date') ? convertDateToString(val) : val;
     });
 
     return this;

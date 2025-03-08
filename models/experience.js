@@ -2,6 +2,7 @@
 
 const db = require('../database/db');
 const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
+const { convertDateToString } = require('../util/modelHelpers');
 
 const { AppServerError, NotFoundError } = require('../errors/appErrors');
 
@@ -45,8 +46,8 @@ class Experience {
    * @param {String} props.organization - Name of the company or other type of
    *  organization.
    * @param {String} props.location - Location of the organization.
-   * @param {Date} props.startDate - The start date of joining the organization.
-   * @param {Date} [props.endDate] - The end date of leaving the organization.
+   * @param {String} props.startDate - The start date of joining the organization.
+   * @param {String} [props.endDate] - The end date of leaving the organization.
    * @returns {Experience} A new Experience instance that contains the
    *  experience's data.
    */
@@ -74,7 +75,12 @@ class Experience {
 
     const result = await db.query({ queryConfig, logPrefix });
 
-    return new Experience(...Object.values(result.rows[0]));
+    const experience = new Experience(...Object.values(result.rows[0]));
+
+    experience.startDate = convertDateToString(experience.startDate);
+    experience.endDate = convertDateToString(experience.endDate);
+
+    return experience;
   }
 
   /**
@@ -97,7 +103,14 @@ class Experience {
 
     const result = await db.query({ queryConfig, logPrefix });
 
-    return result.rows.map((data) => new Experience(...Object.values(data)));
+    return result.rows.map((data) => {
+      const experience = new Experience(...Object.values(data));
+
+      experience.startDate = convertDateToString(experience.startDate);
+      experience.endDate = convertDateToString(experience.endDate);
+
+      return experience;
+    });
   }
 
   /**
@@ -131,8 +144,12 @@ class Experience {
       throw new NotFoundError(`Can not find experience with ID ${id}.`);
     }
 
-    const data = result.rows[0];
-    return new Experience(...Object.values(data));
+    const experience = new Experience(...Object.values(result.rows[0]));
+
+    experience.startDate = convertDateToString(experience.startDate);
+    experience.endDate = convertDateToString(experience.endDate);
+
+    return experience;
   }
 
   /**
@@ -144,8 +161,8 @@ class Experience {
    * @param {String} [props.organization] - New name of the company or other type
    *  of organization.
    * @param {String} [props.location] - New location of the organization.
-   * @param {Date} [props.startDate] - New start date of joining the organization.
-   * @param {Date} [props.endDate] - New end date of leaving the organization.
+   * @param {String} [props.startDate] - New start date of joining the organization.
+   * @param {String} [props.endDate] - New end date of leaving the organization.
    * @returns {Experience} The same Experience instance that this method was
    *  called on, but with updated property values.
    */
@@ -190,7 +207,7 @@ class Experience {
 
     // Update current instance's properties.
     Object.entries(result.rows[0]).forEach(([colName, val]) => {
-      this[colName] = val;
+      this[colName] = colName.includes('Date') ? convertDateToString(val) : val;
     });
 
     return this;
