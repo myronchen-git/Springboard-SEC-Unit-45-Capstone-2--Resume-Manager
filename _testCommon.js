@@ -5,6 +5,19 @@ const User = require('./models/user');
 
 // ==================================================
 
+const urlPrefix = '/api/v1';
+
+const urlRegisterUser = `${urlPrefix}/auth/register`;
+
+const getDocumentsGeneralUrl = (username) =>
+  `${urlPrefix}/users/${username}/documents`;
+const getDocumentsSpecificUrl = (username, documentId) =>
+  `${urlPrefix}/users/${username}/documents/${documentId}`;
+const getEducationsGeneralUrl = (username, documentId) =>
+  `${urlPrefix}/users/${username}/documents/${documentId}/educations`;
+
+// --------------------------------------------------
+
 async function commonBeforeAll(db) {
   return await db.query({
     queryConfig: {
@@ -33,4 +46,12 @@ async function commonAfterAll(db) {
 
 // ==================================================
 
-module.exports = { commonBeforeAll, commonBeforeEach, commonAfterAll };
+module.exports = {
+  urlRegisterUser,
+  getDocumentsGeneralUrl,
+  getDocumentsSpecificUrl,
+  getEducationsGeneralUrl,
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterAll,
+};
