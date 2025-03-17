@@ -13,6 +13,8 @@ const {
 
 const { BadRequestError } = require('../errors/appErrors');
 
+const { documents_x_sections } = require('../_testData');
+
 // ==================================================
 
 jest.mock('../util/serviceHelpers');
@@ -36,26 +38,19 @@ describe('createDocument_x_section', () => {
   });
 
   test.each([
-    [Object.freeze([]), -1, 0],
-    [
-      Object.freeze([
-        Object.freeze({ documentId, sectionId: 1, position: 0 }),
-        Object.freeze({ documentId, sectionId: 2, position: 1 }),
-      ]),
-      1,
-      2,
-    ],
+    [Object.freeze([]), -1],
+    [documents_x_sections, 1],
   ])(
     'Adds a Document_X_Section, if document is found and belongs to user, ' +
       'and at the correct next position.  Existing documents_x_sections = %j.',
-    async (existingDocuments_x_sections, lastPosition, expectedNewPosition) => {
+    async (existingDocuments_x_sections, lastPosition) => {
       // Arrange
       const sectionIdToAdd = 3;
 
-      const mockObject = Object.freeze({});
+      const mockDocument_x_section = Object.freeze({});
       Document_X_Section.getAll.mockResolvedValue(existingDocuments_x_sections);
       mockGetLastPosition.mockReturnValue(lastPosition);
-      Document_X_Section.add.mockResolvedValue(mockObject);
+      Document_X_Section.add.mockResolvedValue(mockDocument_x_section);
 
       // Act
       const document_x_section = await createDocument_x_section(
@@ -65,7 +60,7 @@ describe('createDocument_x_section', () => {
       );
 
       // Assert
-      expect(document_x_section).toBe(mockObject);
+      expect(document_x_section).toBe(mockDocument_x_section);
 
       expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
         username,
@@ -82,7 +77,7 @@ describe('createDocument_x_section', () => {
       expect(Document_X_Section.add).toHaveBeenCalledWith({
         documentId,
         sectionId: sectionIdToAdd,
-        position: expectedNewPosition,
+        position: lastPosition + 1,
       });
     }
   );

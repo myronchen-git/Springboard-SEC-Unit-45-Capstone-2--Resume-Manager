@@ -13,6 +13,8 @@ const {
 
 const { ForbiddenError } = require('../errors/appErrors');
 
+const { documents_x_educations } = require('../_testData');
+
 // ==================================================
 
 jest.mock('../util/serviceHelpers');
@@ -162,32 +164,21 @@ describe('createDocument_x_education', () => {
   });
 
   test.each([
-    [Object.freeze([]), -1, 0],
-    [
-      Object.freeze([
-        Object.freeze({ documentId, educationId: 1, position: 0 }),
-        Object.freeze({ documentId, educationId: 2, position: 1 }),
-      ]),
-      1,
-      2,
-    ],
+    [Object.freeze([]), -1],
+    [documents_x_educations, 1],
   ])(
     'Adds a Document_X_Education, if document is found and belongs to user, ' +
       'and at the correct next position.  Existing documents_x_educations = %j.',
-    async (
-      existingDocuments_x_educations,
-      lastPosition,
-      expectedNewPosition
-    ) => {
+    async (existingDocuments_x_educations, lastPosition) => {
       // Arrange
       const educationIdToAdd = 3;
 
-      const mockObject = Object.freeze({});
+      const mockDocument_x_education = Object.freeze({});
       Document_X_Education.getAll.mockResolvedValue(
         existingDocuments_x_educations
       );
       mockGetLastPosition.mockReturnValue(lastPosition);
-      Document_X_Education.add.mockResolvedValue(mockObject);
+      Document_X_Education.add.mockResolvedValue(mockDocument_x_education);
 
       // Act
       const document_x_education = await createDocument_x_education(
@@ -197,7 +188,7 @@ describe('createDocument_x_education', () => {
       );
 
       // Assert
-      expect(document_x_education).toBe(mockObject);
+      expect(document_x_education).toBe(mockDocument_x_education);
 
       expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
         username,
@@ -214,7 +205,7 @@ describe('createDocument_x_education', () => {
       expect(Document_X_Education.add).toHaveBeenCalledWith({
         documentId,
         educationId: educationIdToAdd,
-        position: expectedNewPosition,
+        position: lastPosition + 1,
       });
     }
   );
