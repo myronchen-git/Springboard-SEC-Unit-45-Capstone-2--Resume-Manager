@@ -2,7 +2,10 @@
 
 const Education = require('../models/education');
 const Document_X_Education = require('../models/document_x_education');
-const { createEducation } = require('./educationService');
+const {
+  createEducation,
+  createDocument_x_education,
+} = require('./educationService');
 const {
   validateDocumentOwner: mockValidateDocumentOwner,
   getLastPosition: mockGetLastPosition,
@@ -145,4 +148,74 @@ describe('createEducation', () => {
     expect(mockGetLastPosition).not.toHaveBeenCalled();
     expect(Document_X_Education.add).not.toHaveBeenCalled();
   });
+});
+
+// --------------------------------------------------
+// createDocument_x_education
+
+describe('createDocument_x_education', () => {
+  beforeEach(() => {
+    mockValidateDocumentOwner.mockReset();
+    Document_X_Education.getAll.mockReset();
+    mockGetLastPosition.mockReset();
+    Document_X_Education.add.mockReset();
+  });
+
+  test.each([
+    [Object.freeze([]), -1, 0],
+    [
+      Object.freeze([
+        Object.freeze({ documentId, educationId: 1, position: 0 }),
+        Object.freeze({ documentId, educationId: 2, position: 1 }),
+      ]),
+      1,
+      2,
+    ],
+  ])(
+    'Adds a Document_X_Education, if document is found and belongs to user, ' +
+      'and at the correct next position.  Existing documents_x_educations = %j.',
+    async (
+      existingDocuments_x_educations,
+      lastPosition,
+      expectedNewPosition
+    ) => {
+      // Arrange
+      const educationIdToAdd = 3;
+
+      const mockObject = Object.freeze({});
+      Document_X_Education.getAll.mockResolvedValue(
+        existingDocuments_x_educations
+      );
+      mockGetLastPosition.mockReturnValue(lastPosition);
+      Document_X_Education.add.mockResolvedValue(mockObject);
+
+      // Act
+      const document_x_education = await createDocument_x_education(
+        username,
+        documentId,
+        educationIdToAdd
+      );
+
+      // Assert
+      expect(document_x_education).toBe(mockObject);
+
+      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+        username,
+        documentId,
+        expect.any(String)
+      );
+
+      expect(Document_X_Education.getAll).toHaveBeenCalledWith(documentId);
+
+      expect(mockGetLastPosition).toHaveBeenCalledWith(
+        existingDocuments_x_educations
+      );
+
+      expect(Document_X_Education.add).toHaveBeenCalledWith({
+        documentId,
+        educationId: educationIdToAdd,
+        position: expectedNewPosition,
+      });
+    }
+  );
 });

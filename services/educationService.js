@@ -72,6 +72,39 @@ async function createEducation(username, documentId, props) {
   return { education, document_x_education };
 }
 
+/**
+ * Creates a document_x_education record (document-education relationship) in
+ * the database.  The document owner is first verified, then the next position
+ * is found by getting all document_x_education records.
+ *
+ * @param {String} username - Name of user that wants to interact with the
+ *  document.  This should be the owner.
+ * @param {Number} documentId - ID of the document that is having an education
+ *  attach to it.
+ * @param {Number} educationId - ID of the education to attach to the document.
+ * @returns {Document_X_Education} A Document_X_Education instance that contains
+ *  the document-education relationship data.
+ */
+async function createDocument_x_education(username, documentId, educationId) {
+  const logPrefix =
+    `${fileName}.createDocument_x_education(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId}, ` +
+    `educationId = ${educationId})`;
+  logger.verbose(logPrefix);
+
+  await validateDocumentOwner(username, documentId, logPrefix);
+
+  const documents_x_educations = await Document_X_Education.getAll(documentId);
+  const nextPosition = getLastPosition(documents_x_educations) + 1;
+
+  return await Document_X_Education.add({
+    documentId,
+    educationId,
+    position: nextPosition,
+  });
+}
+
 // ==================================================
 
-module.exports = { createEducation };
+module.exports = { createEducation, createDocument_x_education };
