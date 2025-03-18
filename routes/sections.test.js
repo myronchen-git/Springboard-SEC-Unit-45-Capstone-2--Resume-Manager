@@ -19,8 +19,12 @@ const {
 
 const urlPrefix = '/api/v1';
 const urlRegisterUser = `${urlPrefix}/auth/register`;
-const getCreateDocumentSectionRelationshipUrl = (username, docId, sectionId) =>
-  `${urlPrefix}/users/${username}/documents/${docId}/sections/${sectionId}`;
+const getCreateDocumentSectionRelationshipUrl = (
+  username,
+  documentId,
+  sectionId
+) =>
+  `${urlPrefix}/users/${username}/documents/${documentId}/sections/${sectionId}`;
 const getGetAllDocumentsUrl = (username) =>
   `${urlPrefix}/users/${username}/documents`;
 
@@ -97,39 +101,42 @@ describe('GET /sections', () => {
 
 describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
   const user = users[0];
+  let authToken;
+  let documentId;
 
   // Need to set authToken in beforeAll, because all variable declarations
   // outside of these setup functions are run first.
-  let authToken;
-  beforeAll(() => {
+  beforeAll(async () => {
     authToken = authTokens[0];
+    documentId = (await Document.getAll(user.username))[0].id;
   });
 
   beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
 
   test('Adds a new document-section relationship.', async () => {
     // Arrange
-    const docId = (await Document.getAll(user.username))[0].id;
     const sectionId = 1;
 
     // Act
     const resp = await request(app)
       .post(
-        getCreateDocumentSectionRelationshipUrl(user.username, docId, sectionId)
+        getCreateDocumentSectionRelationshipUrl(
+          user.username,
+          documentId,
+          sectionId
+        )
       )
       .set('authorization', `Bearer ${authToken}`);
 
     // Assert
     expect(resp.statusCode).toBe(201);
 
-    const expectedDocument_x_section = {
-      documentId: docId,
-      sectionId: sectionId,
-      position: 0,
-    };
-
     expect(resp.body).toEqual({
-      document_x_section: expectedDocument_x_section,
+      document_x_section: {
+        documentId,
+        sectionId,
+        position: 0,
+      },
     });
   });
 
@@ -141,28 +148,28 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
       expect(sections.length).toBeGreaterThanOrEqual(2);
 
       // Arrange
-      const docId = (await Document.getAll(user.username))[0].id;
-
       await request(app)
-        .post(getCreateDocumentSectionRelationshipUrl(user.username, docId, 1))
+        .post(
+          getCreateDocumentSectionRelationshipUrl(user.username, documentId, 1)
+        )
         .set('authorization', `Bearer ${authToken}`);
 
       // Act
       const resp = await request(app)
-        .post(getCreateDocumentSectionRelationshipUrl(user.username, docId, 2))
+        .post(
+          getCreateDocumentSectionRelationshipUrl(user.username, documentId, 2)
+        )
         .set('authorization', `Bearer ${authToken}`);
 
       // Assert
       expect(resp.statusCode).toBe(201);
 
-      const expectedDocument_x_section = {
-        documentId: docId,
-        sectionId: 2,
-        position: 1,
-      };
-
       expect(resp.body).toEqual({
-        document_x_section: expectedDocument_x_section,
+        document_x_section: {
+          documentId,
+          sectionId: 2,
+          position: 1,
+        },
       });
     }
   );
@@ -175,8 +182,6 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
       expect(sections.length).toBeGreaterThanOrEqual(3);
 
       // Arrange
-      const docId = (await Document.getAll(user.username))[0].id;
-
       // Manually inserting relationships to simplify set up.  Otherwise, there
       // will be many calls to create, delete, and reposition document-section
       // relationships.
@@ -184,14 +189,16 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
         queryConfig: {
           text: `
   INSERT INTO documents_x_sections (document_id, section_id, position)
-    VALUES (${docId}, 1, 9),
-           (${docId}, 2, 3);`,
+    VALUES (${documentId}, 1, 9),
+           (${documentId}, 2, 3);`,
         },
       });
 
       // Act
       const resp = await request(app)
-        .post(getCreateDocumentSectionRelationshipUrl(user.username, docId, 3))
+        .post(
+          getCreateDocumentSectionRelationshipUrl(user.username, documentId, 3)
+        )
         .set('authorization', `Bearer ${authToken}`);
 
       // Assert
@@ -199,7 +206,7 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
 
       expect(resp.body).toEqual({
         document_x_section: {
-          documentId: docId,
+          documentId,
           sectionId: 3,
           position: 10,
         },
@@ -212,7 +219,7 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
       'should return 404 status.',
     async () => {
       // Arrange
-      const nonexistentDocId = 99;
+      const nonexistentDocumentId = 99;
       const sectionId = 1;
 
       // Act
@@ -220,7 +227,7 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
         .post(
           getCreateDocumentSectionRelationshipUrl(
             user.username,
-            nonexistentDocId,
+            nonexistentDocumentId,
             sectionId
           )
         )
@@ -240,7 +247,6 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
       expect(users.length).toBeGreaterThanOrEqual(2);
 
       // Arrange
-      const docId = (await Document.getAll(users[0].username))[0].id;
       const sectionId = 1;
 
       // Act
@@ -248,7 +254,7 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
         .post(
           getCreateDocumentSectionRelationshipUrl(
             users[0].username,
-            docId,
+            documentId,
             sectionId
           )
         )
