@@ -15,6 +15,8 @@ const getDocumentsSpecificUrl = (username, documentId) =>
   `${urlPrefix}/users/${username}/documents/${documentId}`;
 const getEducationsGeneralUrl = (username, documentId) =>
   `${urlPrefix}/users/${username}/documents/${documentId}/educations`;
+const getEducationsSpecificUrl = (username, documentId, educationId) =>
+  `${urlPrefix}/users/${username}/documents/${documentId}/educations/${educationId}`;
 
 // --------------------------------------------------
 
@@ -51,6 +53,7 @@ module.exports = {
   getDocumentsGeneralUrl,
   getDocumentsSpecificUrl,
   getEducationsGeneralUrl,
+  getEducationsSpecificUrl,
   commonBeforeAll,
   commonBeforeEach,
   commonAfterAll,

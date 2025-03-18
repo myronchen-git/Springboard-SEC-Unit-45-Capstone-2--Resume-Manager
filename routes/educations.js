@@ -5,7 +5,10 @@ const express = require('express');
 const educationNewSchema = require('../schemas/educationNew.json');
 const urlParamsSchema = require('../schemas/urlParams.json');
 
-const { createEducation } = require('../services/educationService');
+const {
+  createEducation,
+  createDocument_x_education,
+} = require('../services/educationService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
 
@@ -71,6 +74,50 @@ router.post(
       );
 
       return res.status(201).json({ education, document_x_education });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/**
+ * POST /users/:username/documents/:documentId/educations/:educationId
+ * {} => { document_x_education }
+ *
+ * Authorization required: login
+ *
+ * Creates document-education relationship.  The position of the education in
+ * the document will be after the last position of any existing educations.
+ *
+ * @returns {Object} document_x_education - The document ID, education ID, and
+ *  position of education within document.
+ */
+router.post(
+  '/:documentId/educations/:educationId',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+    const { username, documentId, educationId } = req.params;
+
+    const logPrefix =
+      `POST /users/${username}/documents/${documentId}/educations/${educationId} ` +
+      `(user: ${JSON.stringify(userPayload)})`;
+    logger.info(logPrefix + ' BEGIN');
+
+    try {
+      runJsonSchemaValidator(
+        urlParamsSchema,
+        { documentId, educationId },
+        logPrefix
+      );
+
+      const document_x_education = await createDocument_x_education(
+        userPayload.username,
+        documentId,
+        educationId
+      );
+
+      return res.status(201).json({ document_x_education });
     } catch (err) {
       return next(err);
     }

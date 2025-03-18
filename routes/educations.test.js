@@ -5,18 +5,29 @@ const request = require('supertest');
 const app = require('../app');
 const db = require('../database/db');
 
+const Document = require('../models/document');
+const Education = require('../models/education');
 const Document_X_Education = require('../models/document_x_education');
 const { users, educations } = require('../_testData');
 const {
   urlRegisterUser,
   getDocumentsGeneralUrl,
   getEducationsGeneralUrl,
+  getEducationsSpecificUrl,
   commonBeforeAll,
   commonBeforeEach,
   commonAfterAll,
 } = require('../_testCommon');
 
 // ==================================================
+
+const educationsForRawClientInputs = Object.freeze(
+  educations.map((education) => {
+    const educationCopy = { ...education };
+    delete educationCopy.owner;
+    return Object.freeze(educationCopy);
+  })
+);
 
 const authTokens = [];
 const masterDocumentIds = [];
@@ -61,13 +72,9 @@ afterAll(() => commonAfterAll(db));
 describe('POST /users/:username/documents/:documentId/educations', () => {
   const username = users[0].username;
 
-  const educationsForRawClientInputs = educations.map((education) => {
-    const educationCopy = { ...education };
-    delete educationCopy.owner;
-    return educationCopy;
-  });
-
   beforeEach(() => commonBeforeEach(db, Document_X_Education.tableName));
+
+  afterAll(() => commonBeforeEach(db, Education.tableName));
 
   test.each([
     [educationsForRawClientInputs[0]],
@@ -256,6 +263,202 @@ describe('POST /users/:username/documents/:documentId/educations', () => {
       // Assert
       expect(resp.statusCode).toBe(403);
       expect(resp.body).not.toHaveProperty('education');
+      expect(resp.body).not.toHaveProperty('document_x_education');
+    }
+  );
+});
+
+// --------------------------------------------------
+// POST /users/:username/documents/:documentId/educations/:educationId
+
+describe('POST /users/:username/documents/:documentId/educations/:educationId', () => {
+  const username = users[0].username;
+  let authToken;
+  let documentId;
+
+  beforeAll(async () => {
+    authToken = authTokens[0];
+    documentId = (await Document.getAll(username))[0].id;
+
+    // Adding educations into database.
+    for (const educationInputData of educationsForRawClientInputs) {
+      await request(app)
+        .post(getEducationsGeneralUrl(username, documentId))
+        .send(educationInputData)
+        .set('authorization', `Bearer ${authToken}`);
+    }
+  });
+
+  beforeEach(() => commonBeforeEach(db, Document_X_Education.tableName));
+
+  afterAll(() => commonBeforeEach(db, Education.tableName));
+
+  test('Adds a new document-education relationship.', async () => {
+    // Arrange
+    const educationId = 1;
+
+    // Act
+    const resp = await request(app)
+      .post(getEducationsSpecificUrl(username, documentId, educationId))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(201);
+
+    expect(resp.body).toEqual({
+      document_x_education: {
+        documentId,
+        educationId,
+        position: 0,
+      },
+    });
+  });
+
+  test(
+    'Adds a new document-education relationship at the correct position ' +
+      'if there already exists multiples.',
+    async () => {
+      // Ensure that there are enough educations.
+      expect(educationsForRawClientInputs.length).toBeGreaterThanOrEqual(2);
+
+      // Arrange
+      await request(app)
+        .post(getEducationsSpecificUrl(username, documentId, 1))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Act
+      const resp = await request(app)
+        .post(getEducationsSpecificUrl(username, documentId, 2))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(201);
+
+      expect(resp.body).toEqual({
+        document_x_education: {
+          documentId,
+          educationId: 2,
+          position: 1,
+        },
+      });
+    }
+  );
+
+  test(
+    'Adds a new document-education relationship at the correct position ' +
+      'when existing ones are non-sequential.',
+    async () => {
+      // Ensure that there are enough educations.
+      expect(educationsForRawClientInputs.length).toBeGreaterThanOrEqual(2);
+
+      // Arrange
+      // Manually inserting relationships to simplify set up.  Otherwise, there
+      // will be many calls to create, delete, and reposition relationships.
+      await db.query({
+        queryConfig: {
+          text: `
+  INSERT INTO documents_x_educations (document_id, education_id, position)
+    VALUES (${documentId}, 1, 9),
+           (${documentId}, 2, 3);`,
+        },
+      });
+
+      // Adding one more education so that there's at least 3.  At least 3 is
+      // needed to make this test valid.
+      await request(app)
+        .post(getEducationsGeneralUrl(username, documentId))
+        .send(educationsForRawClientInputs[0])
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Remove relationship, that was created automatically from above new
+      // education request, to generalize environment to any resume and not only
+      // the master resume.
+      await db.query({
+        queryConfig: {
+          text: `
+  DELETE FROM documents_x_educations
+  WHERE document_id=${documentId} AND education_id=3`,
+        },
+      });
+
+      // Act
+      const resp = await request(app)
+        .post(getEducationsSpecificUrl(username, documentId, 3))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(201);
+
+      expect(resp.body).toEqual({
+        document_x_education: {
+          documentId,
+          educationId: 3,
+          position: 10,
+        },
+      });
+    }
+  );
+
+  test(
+    'Adding a relationship with a nonexistent document ' +
+      'should return 404 status.',
+    async () => {
+      // Arrange
+      const nonexistentDocumentId = 99;
+      const educationId = 1;
+
+      // Act
+      const resp = await request(app)
+        .post(
+          getEducationsSpecificUrl(username, nonexistentDocumentId, educationId)
+        )
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(404);
+      expect(resp.body).not.toHaveProperty('document_x_education');
+    }
+  );
+
+  test(
+    'Adding a relationship with a nonexistent education ' +
+      'should return 404 status.',
+    async () => {
+      // Arrange
+      const nonexistentEducationId = 99;
+
+      // Act
+      const resp = await request(app)
+        .post(
+          getEducationsSpecificUrl(username, documentId, nonexistentEducationId)
+        )
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(404);
+      expect(resp.body).not.toHaveProperty('document_x_education');
+    }
+  );
+
+  test(
+    "Attempting to access another user's document " +
+      'should return 403 status.',
+    async () => {
+      // Ensure there are enough users.
+      expect(users.length).toBeGreaterThanOrEqual(2);
+
+      // Arrange
+      const educationId = 1;
+
+      // Act
+      const resp = await request(app)
+        .post(
+          getEducationsSpecificUrl(users[0].username, documentId, educationId)
+        )
+        .set('authorization', `Bearer ${authTokens[1]}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
       expect(resp.body).not.toHaveProperty('document_x_education');
     }
   );

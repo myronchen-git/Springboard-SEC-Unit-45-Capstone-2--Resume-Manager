@@ -5,7 +5,11 @@
   "title": "URL Parameter Inputs",
   "description": "Validates URL parameters.  Checks if inputs are the correct type, format, pattern, etc..",
   "additionalProperties": false,
-  "anyOf": [{ "required": ["documentId"] }, { "required": ["sectionId"] }],
+  "anyOf": [
+    { "title": "Document ID format", "required": ["documentId"] },
+    { "title": "Section ID format", "required": ["sectionId"] },
+    { "title": "Education ID format", "required": ["educationId"] }
+  ],
   "properties": {
     "documentId": {
       "type": "string",
@@ -13,6 +17,11 @@
       "examples": ["1"]
     },
     "sectionId": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "examples": ["1"]
+    },
+    "educationId": {
       "type": "string",
       "pattern": "^\\d+$",
       "examples": ["1"]
