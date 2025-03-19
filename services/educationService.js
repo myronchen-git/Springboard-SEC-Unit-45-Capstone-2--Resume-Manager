@@ -47,22 +47,26 @@ async function createEducation(username, documentId, props) {
     `props = ${JSON.stringify(props)})`;
   logger.verbose(logPrefix);
 
+  // Verify document ownership and if document is master.
   const document = await validateDocumentOwner(username, documentId, logPrefix);
 
   if (!document.isMaster) {
     logger.error(
-      'User attempted to add an education not to the master resume.'
+      `${logPrefix}: User attempted to add an education not to the master resume.`
     );
     throw new ForbiddenError(
       'Educations can only be added to the master resume.'
     );
   }
 
+  // Create education.
   const education = await Education.add({ ...props, owner: username });
 
+  // Find next position.
   const documents_x_educations = await Document_X_Education.getAll(documentId);
   const nextPosition = getLastPosition(documents_x_educations) + 1;
 
+  // Create document-education relationship.
   const document_x_education = await Document_X_Education.add({
     documentId,
     educationId: education.id,
