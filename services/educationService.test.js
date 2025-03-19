@@ -5,6 +5,7 @@ const Document_X_Education = require('../models/document_x_education');
 const {
   createEducation,
   createDocument_x_education,
+  updateEducation,
 } = require('./educationService');
 const {
   validateDocumentOwner: mockValidateDocumentOwner,
@@ -209,4 +210,95 @@ describe('createDocument_x_education', () => {
       });
     }
   );
+});
+
+// --------------------------------------------------
+// updateEducation
+
+describe('updateEducation', () => {
+  const educationId = 1;
+  const props = Object.freeze({ school: 'University 10' });
+
+  const mockUpdatedEducation = Object.freeze({});
+  const getMockOriginalEducation = (owner) =>
+    Object.freeze({
+      owner,
+      update: jest.fn(async () => mockUpdatedEducation),
+    });
+
+  beforeEach(() => {
+    mockValidateDocumentOwner.mockReset();
+    Education.get.mockReset();
+  });
+
+  test('Updates an education.', async () => {
+    // Arrange
+    const mockOriginalEducation = getMockOriginalEducation(username);
+    const document = { owner: username, isMaster: true };
+
+    Education.get.mockResolvedValue(mockOriginalEducation);
+    mockValidateDocumentOwner.mockResolvedValue(document);
+
+    // Act
+    const updatedEducation = await updateEducation(
+      username,
+      documentId,
+      educationId,
+      props
+    );
+
+    // Assert
+    expect(updatedEducation).toBe(mockUpdatedEducation);
+    expect(Education.get).toHaveBeenCalledWith({ id: educationId });
+    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      username,
+      documentId,
+      expect.any(String)
+    );
+    expect(mockOriginalEducation.update).toHaveBeenCalledWith(props);
+  });
+
+  test('Throws an Error if education does not belong to user.', async () => {
+    // Arrange
+    const mockOriginalEducation = getMockOriginalEducation('otherUser');
+    const document = { owner: username, isMaster: true };
+
+    Education.get.mockResolvedValue(mockOriginalEducation);
+    mockValidateDocumentOwner.mockResolvedValue(document);
+
+    // Act
+    async function runFunc() {
+      await updateEducation(username, documentId, educationId, props);
+    }
+
+    // Assert
+    await expect(runFunc).rejects.toThrow(ForbiddenError);
+    expect(Education.get).toHaveBeenCalledWith({ id: educationId });
+    expect(mockValidateDocumentOwner).not.toHaveBeenCalled();
+    expect(mockOriginalEducation.update).not.toHaveBeenCalled();
+  });
+
+  test('Throws an Error if document is not master.', async () => {
+    // Arrange
+    const mockOriginalEducation = getMockOriginalEducation(username);
+    const document = { owner: username, isMaster: false };
+
+    Education.get.mockResolvedValue(mockOriginalEducation);
+    mockValidateDocumentOwner.mockResolvedValue(document);
+
+    // Act
+    async function runFunc() {
+      await updateEducation(username, documentId, educationId, props);
+    }
+
+    // Assert
+    await expect(runFunc).rejects.toThrow(ForbiddenError);
+    expect(Education.get).toHaveBeenCalledWith({ id: educationId });
+    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      username,
+      documentId,
+      expect.any(String)
+    );
+    expect(mockOriginalEducation.update).not.toHaveBeenCalled();
+  });
 });

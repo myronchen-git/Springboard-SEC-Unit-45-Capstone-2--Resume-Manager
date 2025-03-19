@@ -25,7 +25,7 @@ const logger = require('../util/logger');
  * @param {Number} documentId - ID of the document to be updated.
  * @param {Object} props - Properties of the document to be updated.  See route
  *  for full list.
- * @returns {Document} An Document instance containing the updated info.
+ * @returns {Document} A Document instance containing the updated info.
  * @throws {ForbiddenError} If the document does not belong to the specified
  *  user.
  * @throws {ArgumentError} If the document is a master resume and document name

@@ -109,6 +109,57 @@ async function createDocument_x_education(username, documentId, educationId) {
   });
 }
 
+/**
+ * Verifies that an education belongs to the specified user.  Checks if the
+ * education is being updated in the master resume.  Then updates the education.
+ *
+ * @param {String} username - Name of user that wants to update the education.
+ * @param {Number} documentId - ID of the document that the education belongs
+ *  to.
+ * @param {Number} educationId - ID of the education to update.
+ * @param {Object} props - Properties of the education to be updated.  See route
+ *  for full list.
+ * @returns {Education} An Education instance containing the updated info.
+ * @throws {ForbiddenError} If the education does not belong to the user or if
+ *  the document is not the master resume.
+ */
+async function updateEducation(username, documentId, educationId, props) {
+  const logPrefix =
+    `${fileName}.updateEducation(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId}, ` +
+    `educationId = ${educationId}), ` +
+    `props = ${JSON.stringify(props)})`;
+  logger.verbose(logPrefix);
+
+  // Get education and verify ownership.
+  const education = await Education.get({ id: educationId });
+
+  if (education.owner !== username) {
+    logger.error(`${logPrefix}: Education does not belong to user.`);
+    throw new ForbiddenError("Can not update another user's education.");
+  }
+
+  // Verify document ownership and if document is master.
+  const document = await validateDocumentOwner(username, documentId, logPrefix);
+
+  if (!document.isMaster) {
+    logger.error(
+      `${logPrefix}: User attempted to update education not in master resume.`
+    );
+    throw new ForbiddenError(
+      'Educations can only be updated in the master resume.'
+    );
+  }
+
+  // Updating education.
+  return await education.update(props);
+}
+
 // ==================================================
 
-module.exports = { createEducation, createDocument_x_education };
+module.exports = {
+  createEducation,
+  createDocument_x_education,
+  updateEducation,
+};
