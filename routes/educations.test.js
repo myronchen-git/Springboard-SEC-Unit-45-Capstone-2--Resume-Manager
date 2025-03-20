@@ -29,6 +29,7 @@ const educationsForRawClientInputs = Object.freeze(
   })
 );
 
+const username = users[0].username;
 const authTokens = [];
 const masterDocumentIds = [];
 
@@ -70,8 +71,6 @@ afterAll(() => commonAfterAll(db));
 // POST /users/:username/documents/:documentId/educations
 
 describe('POST /users/:username/documents/:documentId/educations', () => {
-  const username = users[0].username;
-
   beforeEach(() => commonBeforeEach(db, Document_X_Education.tableName));
 
   afterAll(() => commonBeforeEach(db, Education.tableName));
@@ -176,9 +175,10 @@ describe('POST /users/:username/documents/:documentId/educations', () => {
     // Arrange
     const authToken = authTokens[0];
     const documentId = masterDocumentIds[0];
-    const educationInputData = { ...educationsForRawClientInputs[0] };
-
-    educationInputData.startDate = '03-03-2003';
+    const educationInputData = {
+      ...educationsForRawClientInputs[0],
+      startDate: '03-03-2003',
+    };
 
     // Act
     const resp = await request(app)
@@ -272,13 +272,12 @@ describe('POST /users/:username/documents/:documentId/educations', () => {
 // POST /users/:username/documents/:documentId/educations/:educationId
 
 describe('POST /users/:username/documents/:documentId/educations/:educationId', () => {
-  const username = users[0].username;
   let authToken;
   let documentId;
 
   beforeAll(async () => {
     authToken = authTokens[0];
-    documentId = (await Document.getAll(username))[0].id;
+    documentId = masterDocumentIds[0];
 
     // Adding educations into database.
     for (const educationInputData of educationsForRawClientInputs) {
@@ -462,4 +461,205 @@ describe('POST /users/:username/documents/:documentId/educations/:educationId', 
       expect(resp.body).not.toHaveProperty('document_x_education');
     }
   );
+});
+
+// --------------------------------------------------
+// PATCH /users/:username/documents/:documentId/educations/:educationId
+
+describe('PATCH /users/:username/documents/:documentId/educations/:educationId', () => {
+  let authToken;
+  let documentId;
+  let educationId;
+
+  const updatedProps = Object.freeze({
+    school: 'updated school name',
+    location: 'updated school location',
+  });
+
+  beforeAll(async () => {
+    authToken = authTokens[0];
+    documentId = masterDocumentIds[0];
+  });
+
+  beforeEach(async () => {
+    await commonBeforeEach(db, Education.tableName);
+
+    // Adding an education into database.
+    const resp = await request(app)
+      .post(getEducationsGeneralUrl(username, documentId))
+      .send(educationsForRawClientInputs[0])
+      .set('authorization', `Bearer ${authToken}`);
+
+    educationId = resp.body.education.id;
+  });
+
+  afterAll(() => commonBeforeEach(db, Education.tableName));
+
+  test('Updates an education.', async () => {
+    // Act
+    const resp = await request(app)
+      .patch(getEducationsSpecificUrl(username, documentId, educationId))
+      .send(updatedProps)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+
+    const expectedEducation = {
+      ...educations[0],
+      ...updatedProps,
+      id: educationId,
+    };
+    expectedEducation.gpa ||= null;
+    expectedEducation.awardsAndHonors ||= null;
+    expectedEducation.activities ||= null;
+
+    expect(resp.body).toEqual({ education: expectedEducation });
+  });
+
+  test(
+    'Giving an invalid document ID in the URL ' + 'should return 400 status.',
+    async () => {
+      // Arrange
+      const invalidDocumentId = 'invalid';
+
+      // Act
+      const resp = await request(app)
+        .patch(
+          getEducationsSpecificUrl(username, invalidDocumentId, educationId)
+        )
+        .send(updatedProps)
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(400);
+      expect(resp.body).not.toHaveProperty('education');
+    }
+  );
+
+  test(
+    'Giving an invalid education property ' + 'should return 400 status.',
+    async () => {
+      // Arrange
+      const invalidUpdatedProps = { ...updatedProps, startDate: '03-03-2003' };
+
+      // Act
+      const resp = await request(app)
+        .patch(getEducationsSpecificUrl(username, documentId, educationId))
+        .send(invalidUpdatedProps)
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(400);
+      expect(resp.body).not.toHaveProperty('education');
+    }
+  );
+
+  test(
+    'Updating an education not in the master resume ' +
+      'should return 403 status.',
+    async () => {
+      // Arrange
+      // Adding another resume.
+      const notMasterDocumentId = (
+        await request(app)
+          .post(getDocumentsGeneralUrl(username))
+          .send({ documentName: 'Resume 2', isTemplate: false })
+          .set('authorization', `Bearer ${authToken}`)
+      ).body.document.id;
+
+      // Act
+      const resp = await request(app)
+        .patch(
+          getEducationsSpecificUrl(username, notMasterDocumentId, educationId)
+        )
+        .send(updatedProps)
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
+      expect(resp.body).not.toHaveProperty('education');
+
+      // Clean up
+      await Document.delete(notMasterDocumentId);
+    }
+  );
+
+  test(
+    'Updating an education in a nonexistent document' +
+      'should return 404 status.',
+    async () => {
+      // Arrange
+      const nonexistentDocumentId = 99;
+
+      // Act
+      const resp = await request(app)
+        .patch(
+          getEducationsSpecificUrl(username, nonexistentDocumentId, educationId)
+        )
+        .send(updatedProps)
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(404);
+      expect(resp.body).not.toHaveProperty('education');
+    }
+  );
+
+  test('Updating a nonexistent education should return 404 status.', async () => {
+    // Arrange
+    const nonexistentEducationId = 99;
+
+    // Act
+    const resp = await request(app)
+      .patch(
+        getEducationsSpecificUrl(username, documentId, nonexistentEducationId)
+      )
+      .send(updatedProps)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(404);
+    expect(resp.body).not.toHaveProperty('education');
+  });
+
+  test(
+    "Attempting to access another user's document " +
+      'should return 403 status.',
+    async () => {
+      // Arrange
+      const otherAuthToken = authTokens[1];
+
+      // Act
+      const resp = await request(app)
+        .patch(getEducationsSpecificUrl(username, documentId, educationId))
+        .send(updatedProps)
+        .set('authorization', `Bearer ${otherAuthToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(403);
+      expect(resp.body).not.toHaveProperty('education');
+    }
+  );
+
+  test("Updating another user's education should return 403 status.", async () => {
+    // Arrange
+    // Adding another user's education into database.
+    let resp = await request(app)
+      .post(getEducationsGeneralUrl(users[1].username, masterDocumentIds[1]))
+      .send(educationsForRawClientInputs[0])
+      .set('authorization', `Bearer ${authTokens[1]}`);
+
+    const otherEducationId = resp.body.education.id;
+
+    // Act
+    resp = await request(app)
+      .patch(getEducationsSpecificUrl(username, documentId, otherEducationId))
+      .send(updatedProps)
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(403);
+    expect(resp.body).not.toHaveProperty('education');
+  });
 });

@@ -2,12 +2,14 @@
 
 const express = require('express');
 
-const educationNewSchema = require('../schemas/educationNew.json');
 const urlParamsSchema = require('../schemas/urlParams.json');
+const educationNewSchema = require('../schemas/educationNew.json');
+const educationUpdateSchema = require('../schemas/educationUpdate.json');
 
 const {
   createEducation,
   createDocument_x_education,
+  updateEducation,
 } = require('../services/educationService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
@@ -118,6 +120,70 @@ router.post(
       );
 
       return res.status(201).json({ document_x_education });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/**
+ * PATCH /users/:username/documents/:documentId/educations/:educationId
+ * {
+ *  school,
+ *  location,
+ *  startDate,
+ *  endDate,
+ *  degree,
+ *  gpa,
+ *  awardsAndHonors,
+ *  activities
+ * } => { education }
+ *
+ * Authorization required: login
+ *
+ * Updates an education.  All input data are optional, but at least one is
+ * needed, else an error is thrown.
+ *
+ * @param {String} [school] - School or education center name.
+ * @param {String} [location] - Location of school.
+ * @param {String} [startDate] - The start date of joining the school.
+ * @param {String} [endDate] - The end date of leaving the school.
+ * @param {String} [degree] - The degree name that was or will be given from the
+ *  school.
+ * @param {String} [gpa] - The grade point average throughout the attendance.
+ * @param {String} [awardsAndHonors] - Any awards or honors given by the school.
+ * @param {String} [activities] - Any activities done in relation to the school.
+ * @returns {{ education }} The education ID and info like school, location, and
+ *  dates.
+ */
+router.patch(
+  '/:documentId/educations/:educationId',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+    const { username, documentId, educationId } = req.params;
+
+    const logPrefix =
+      `PATCH /users/${username}/documents/${documentId}/educations/${educationId} ` +
+      `(user: ${JSON.stringify(userPayload)})`;
+    logger.info(logPrefix + ' BEGIN');
+
+    try {
+      runJsonSchemaValidator(
+        urlParamsSchema,
+        { documentId, educationId },
+        logPrefix
+      );
+      runJsonSchemaValidator(educationUpdateSchema, req.body, logPrefix);
+
+      const education = await updateEducation(
+        userPayload.username,
+        documentId,
+        educationId,
+        req.body
+      );
+
+      return res.json({ education });
     } catch (err) {
       return next(err);
     }
