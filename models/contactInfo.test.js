@@ -9,8 +9,8 @@ const User = require('./user');
 const { users, contactInfos: dataForNewInstances } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -51,7 +51,7 @@ describe('ContactInfo', () => {
     )
   );
 
-  beforeEach(() => commonBeforeEach(db, ContactInfo.tableName));
+  beforeEach(() => clearTable(db, ContactInfo.tableName));
 
   afterAll(() => commonAfterAll(db));
 

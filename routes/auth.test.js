@@ -8,7 +8,7 @@ const db = require('../database/db');
 const Document = require('../models/document');
 const User = require('../models/user');
 const { users } = require('../_testData');
-const { commonBeforeEach, commonAfterAll } = require('../_testCommon');
+const { commonAfterAll, clearTable } = require('../_testCommon');
 
 // ==================================================
 
@@ -24,7 +24,7 @@ describe('POST /auth/register', () => {
   const url = urlRegisterUser;
   const user = users[0];
 
-  beforeEach(() => commonBeforeEach(db, User.tableName));
+  beforeEach(() => clearTable(db, User.tableName));
 
   test('Registers a user and creates master resume.', async () => {
     // Act

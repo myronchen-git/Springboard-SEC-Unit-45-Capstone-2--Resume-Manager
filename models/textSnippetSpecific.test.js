@@ -12,8 +12,8 @@ const {
 } = require('./_textSnippetTestData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ================================================== Set Up Variables
@@ -42,7 +42,7 @@ describe(className, () => {
     )
   );
 
-  beforeEach(() => commonBeforeEach(db, TextSnippet.tableName));
+  beforeEach(() => clearTable(db, TextSnippet.tableName));
 
   afterAll(() => commonAfterAll(db));
 

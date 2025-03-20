@@ -15,8 +15,8 @@ const {
   getEducationsGeneralUrl,
   getEducationsSpecificUrl,
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -71,9 +71,9 @@ afterAll(() => commonAfterAll(db));
 // POST /users/:username/documents/:documentId/educations
 
 describe('POST /users/:username/documents/:documentId/educations', () => {
-  beforeEach(() => commonBeforeEach(db, Document_X_Education.tableName));
+  beforeEach(() => clearTable(db, Document_X_Education.tableName));
 
-  afterAll(() => commonBeforeEach(db, Education.tableName));
+  afterAll(() => clearTable(db, Education.tableName));
 
   test.each([
     [educationsForRawClientInputs[0]],
@@ -288,9 +288,9 @@ describe('POST /users/:username/documents/:documentId/educations/:educationId', 
     }
   });
 
-  beforeEach(() => commonBeforeEach(db, Document_X_Education.tableName));
+  beforeEach(() => clearTable(db, Document_X_Education.tableName));
 
-  afterAll(() => commonBeforeEach(db, Education.tableName));
+  afterAll(() => clearTable(db, Education.tableName));
 
   test('Adds a new document-education relationship.', async () => {
     // Arrange
@@ -482,7 +482,7 @@ describe('PATCH /users/:username/documents/:documentId/educations/:educationId',
   });
 
   beforeEach(async () => {
-    await commonBeforeEach(db, Education.tableName);
+    await clearTable(db, Education.tableName);
 
     // Adding an education into database.
     const resp = await request(app)
@@ -493,7 +493,7 @@ describe('PATCH /users/:username/documents/:documentId/educations/:educationId',
     educationId = resp.body.education.id;
   });
 
-  afterAll(() => commonBeforeEach(db, Education.tableName));
+  afterAll(() => clearTable(db, Education.tableName));
 
   test('Updates an education.', async () => {
     // Act

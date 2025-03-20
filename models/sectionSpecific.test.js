@@ -10,8 +10,8 @@ const User = require('./user');
 const { users, sections: sectionsInputData } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -46,7 +46,7 @@ describe('Section', () => {
     ];
 
     beforeAll(async () => {
-      await commonBeforeEach(db, Document.tableName);
+      await clearTable(db, Document.tableName);
 
       const document = await Document.add({
         documentName: 'Master',
@@ -62,9 +62,9 @@ describe('Section', () => {
       }
     });
 
-    beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
+    beforeEach(() => clearTable(db, Document_X_Section.tableName));
 
-    afterAll(() => commonBeforeEach(db, Document.tableName));
+    afterAll(() => clearTable(db, Document.tableName));
 
     // 0, many
     test.each([[[]], [sections]])(

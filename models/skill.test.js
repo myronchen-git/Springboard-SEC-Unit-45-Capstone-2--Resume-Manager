@@ -10,8 +10,8 @@ const User = require('./user');
 const { users, skills, textSnippets } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -96,7 +96,7 @@ describe('Skill', () => {
       })
   );
 
-  beforeEach(() => commonBeforeEach(db, Skill.tableName));
+  beforeEach(() => clearTable(db, Skill.tableName));
 
   afterAll(() => commonAfterAll(db));
 

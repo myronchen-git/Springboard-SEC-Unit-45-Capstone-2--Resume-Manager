@@ -9,8 +9,8 @@ const Document = require('../models/document');
 const { users, documents } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -39,7 +39,7 @@ beforeAll(() =>
     })
 );
 
-beforeEach(() => commonBeforeEach(db, Document.tableName));
+beforeEach(() => clearTable(db, Document.tableName));
 
 afterAll(() => commonAfterAll(db));
 

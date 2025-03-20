@@ -31,19 +31,19 @@ async function commonBeforeAll(db) {
   });
 }
 
-async function commonBeforeEach(db, tableName) {
+async function commonAfterAll(db) {
+  // Currently uses the same SQL statement as commonBeforeAll.  In the future,
+  // write out the db.query call if the SQL changes.
+  return await commonBeforeAll(db).then(() => db.shutdown());
+}
+
+async function clearTable(db, tableName) {
   return await db.query({
     queryConfig: {
       text: `
   TRUNCATE TABLE ${tableName} RESTART IDENTITY CASCADE;`,
     },
   });
-}
-
-async function commonAfterAll(db) {
-  // Currently uses the same SQL statement as commonBeforeAll.  In the future,
-  // write out the db.query call if the SQL changes.
-  return await commonBeforeAll(db).then(() => db.shutdown());
 }
 
 // ==================================================
@@ -55,6 +55,6 @@ module.exports = {
   getEducationsGeneralUrl,
   getEducationsSpecificUrl,
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 };

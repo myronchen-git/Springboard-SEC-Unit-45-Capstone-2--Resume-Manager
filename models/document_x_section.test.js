@@ -21,8 +21,8 @@ const {
 } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -86,7 +86,7 @@ describe('Document_X_Section', () => {
       })
   );
 
-  beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
+  beforeEach(() => clearTable(db, Document_X_Section.tableName));
 
   afterAll(() => commonAfterAll(db));
 

@@ -9,8 +9,8 @@ const ContactInfo = require('../models/contactInfo');
 const { users, contactInfos } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -167,7 +167,7 @@ describe('PATCH /users/:username', () => {
 describe('PUT /users/:username/contact-info', () => {
   const getUrl = (username) => `${urlPrefix}/users/${username}/contact-info`;
 
-  beforeEach(() => commonBeforeEach(db, ContactInfo.tableName));
+  beforeEach(() => clearTable(db, ContactInfo.tableName));
 
   test.each(contactInfos.map((info, idx) => [idx, { ...info }]))(
     'Adds a contact info entry into database if one does not exist.  ' +
@@ -274,7 +274,7 @@ describe('PUT /users/:username/contact-info', () => {
 describe('GET /users/:username/contact-info', () => {
   const getUrl = (username) => `${urlPrefix}/users/${username}/contact-info`;
 
-  beforeEach(() => commonBeforeEach(db, ContactInfo.tableName));
+  beforeEach(() => clearTable(db, ContactInfo.tableName));
 
   test.each(contactInfos.map((info, idx) => [idx, { ...info }]))(
     'Retrieves contact info for a user.  Field %i: %o.',

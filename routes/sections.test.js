@@ -11,8 +11,8 @@ const { shuffle } = require('../util/array');
 const { users, sections } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 
 // ==================================================
@@ -111,7 +111,7 @@ describe('POST /users/:username/documents/:docId/sections/:sectionId', () => {
     documentId = (await Document.getAll(user.username))[0].id;
   });
 
-  beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
+  beforeEach(() => clearTable(db, Document_X_Section.tableName));
 
   test('Adds a new document-section relationship.', async () => {
     // Arrange
@@ -290,7 +290,7 @@ describe('GET /users/:username/documents/:documentId/sections', () => {
     documentId = resp.body.documents[0].id;
   });
 
-  beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
+  beforeEach(() => clearTable(db, Document_X_Section.tableName));
 
   test.each([[[]], [existingSections]])(
     'Gets all sections of a document in the correct order.',
@@ -404,7 +404,7 @@ describe('PUT /users/:username/documents/:documentId/sections', () => {
   });
 
   beforeEach(async () => {
-    await commonBeforeEach(db, Document_X_Section.tableName);
+    await clearTable(db, Document_X_Section.tableName);
 
     // Adding document-section relationships.
     for (const section of existingSections) {
@@ -575,7 +575,7 @@ describe('DELETE /users/:username/documents/:documentId/sections/:sectionId', ()
     documentId = resp.body.documents[0].id;
   });
 
-  beforeEach(() => commonBeforeEach(db, Document_X_Section.tableName));
+  beforeEach(() => clearTable(db, Document_X_Section.tableName));
 
   test('Removes a section from a document.', async () => {
     // Arrange

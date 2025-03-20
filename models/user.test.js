@@ -7,7 +7,7 @@ const { AppServerError, NotFoundError } = require('../errors/appErrors');
 const { RegistrationError, SigninError } = require('../errors/userErrors');
 
 const { users } = require('../_testData');
-const { commonBeforeAll, commonBeforeEach } = require('../_testCommon');
+const { commonBeforeAll, clearTable } = require('../_testCommon');
 
 // ==================================================
 
@@ -31,7 +31,7 @@ describe('User', () => {
 
   beforeAll(() => commonBeforeAll(db));
 
-  beforeEach(() => commonBeforeEach(db, User.tableName));
+  beforeEach(() => clearTable(db, User.tableName));
 
   afterAll(() => db.shutdown());
 

@@ -8,8 +8,8 @@ const User = require('./user');
 const { users } = require('../_testData');
 const {
   commonBeforeAll,
-  commonBeforeEach,
   commonAfterAll,
+  clearTable,
 } = require('../_testCommon');
 const { convertDateToString } = require('../util/modelHelpers');
 
@@ -94,7 +94,7 @@ function runCommonTests(testConfig) {
       )
     );
 
-    beforeEach(() => commonBeforeEach(db, tableName));
+    beforeEach(() => clearTable(db, tableName));
 
     afterAll(() => commonAfterAll(db));
 
