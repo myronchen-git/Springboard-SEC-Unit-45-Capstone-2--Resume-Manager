@@ -97,11 +97,11 @@ router.post(
  *
  * Authorization required: login
  *
- * Creates document-education relationship.  The position of the education in
+ * Creates a document-education relationship.  The position of the education in
  * the document will be after the last position of any existing educations.
  *
- * @returns {{document_x_education}} document_x_education - The document ID,
- *  education ID, and position of education within document.
+ * @returns {{document_x_education}} The document ID, education ID, and position
+ * of education within the document.
  */
 router.post(
   '/:documentId/educations/:educationId',
