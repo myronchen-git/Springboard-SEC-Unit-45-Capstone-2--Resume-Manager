@@ -87,7 +87,7 @@ class Document_X_Education extends Relationship {
    *  specific document_x_education.
    * @param {Number} queryParams.documentId - Document ID of the
    *  document_x_education.
-   * @param {String} queryParams.educationId - Education ID of the
+   * @param {Number} queryParams.educationId - Education ID of the
    *  document_x_education.
    * @returns {Document_X_Education} A new Document_X_Education instance that
    *  contains the document_x_education's data.
