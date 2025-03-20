@@ -44,6 +44,15 @@ const router = new express.Router();
  * Note that, currently, educations can only be added to the master resume.
  * This can be changed in the future.
  *
+ * @param {String} school - School or education center name.
+ * @param {String} location - Location of school.
+ * @param {String} startDate - The start date of joining the school.
+ * @param {String} endDate - The end date of leaving the school.
+ * @param {String} degree - The degree name that was or will be given from the
+ *  school.
+ * @param {String} [gpa] - The grade point average throughout the attendance.
+ * @param {String} [awardsAndHonors] - Any awards or honors given by the school.
+ * @param {String} [activities] - Any activities done in relation to the school.
  * @returns {{
  *    education: Education,
  *    document_x_education: Document_X_Education
@@ -91,8 +100,8 @@ router.post(
  * Creates document-education relationship.  The position of the education in
  * the document will be after the last position of any existing educations.
  *
- * @returns {Object} document_x_education - The document ID, education ID, and
- *  position of education within document.
+ * @returns {{document_x_education}} document_x_education - The document ID,
+ *  education ID, and position of education within document.
  */
 router.post(
   '/:documentId/educations/:educationId',
