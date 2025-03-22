@@ -17,7 +17,8 @@ const getEducationsGeneralUrl = (username, documentId) =>
   `${urlPrefix}/users/${username}/documents/${documentId}/educations`;
 const getEducationsSpecificUrl = (username, documentId, educationId) =>
   `${urlPrefix}/users/${username}/documents/${documentId}/educations/${educationId}`;
-
+const getAllEducationsUrl = (username) =>
+  `${urlPrefix}/users/${username}/educations`;
 // --------------------------------------------------
 
 async function commonBeforeAll(db) {
@@ -54,6 +55,7 @@ module.exports = {
   getDocumentsSpecificUrl,
   getEducationsGeneralUrl,
   getEducationsSpecificUrl,
+  getAllEducationsUrl,
   commonBeforeAll,
   commonAfterAll,
   clearTable,

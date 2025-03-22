@@ -6,6 +6,7 @@ const urlParamsSchema = require('../schemas/urlParams.json');
 const educationNewSchema = require('../schemas/educationNew.json');
 const educationUpdateSchema = require('../schemas/educationUpdate.json');
 
+const Education = require('../models/education');
 const {
   createEducation,
   createDocument_x_education,
@@ -134,6 +135,34 @@ router.post(
     }
   }
 );
+
+/**
+ * GET /users/:username/educations
+ * {} => { educations }
+ *
+ * Authorization required: login
+ *
+ * Gets all educations for a user.
+ *
+ * @returns {{ educations }} A list of educations that a user has.
+ */
+router.get('/:username/educations', ensureLoggedIn, async (req, res, next) => {
+  const userPayload = res.locals.user;
+  const { username } = req.params;
+
+  const logPrefix =
+    `GET /users/${username}/educations ` +
+    `(user: ${JSON.stringify(userPayload)})`;
+  logger.info(logPrefix + ' BEGIN');
+
+  try {
+    const educations = await Education.getAll(userPayload.username);
+
+    return res.json({ educations });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 /**
  * PATCH /users/:username/documents/:documentId/educations/:educationId

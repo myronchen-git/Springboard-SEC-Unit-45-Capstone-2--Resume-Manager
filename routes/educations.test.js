@@ -14,6 +14,7 @@ const {
   getDocumentsGeneralUrl,
   getEducationsGeneralUrl,
   getEducationsSpecificUrl,
+  getAllEducationsUrl,
   commonBeforeAll,
   commonAfterAll,
   clearTable,
@@ -461,6 +462,61 @@ describe('POST /users/:username/documents/:documentId/educations/:educationId', 
       expect(resp.body).not.toHaveProperty('document_x_education');
     }
   );
+});
+
+// --------------------------------------------------
+// GET /users/:username/educations
+
+describe('GET /users/:username/educations', () => {
+  let authToken;
+  let documentId;
+
+  beforeAll(async () => {
+    authToken = authTokens[0];
+    documentId = masterDocumentIds[0];
+  });
+
+  beforeEach(() => clearTable(db, Education.tableName));
+
+  afterAll(() => clearTable(db, Education.tableName));
+
+  test.each([
+    [educationsForRawClientInputs, users[0].username], // many
+    [[], users[1].username], // zero
+  ])('Get all educations from a user.', async (educationInputs, username) => {
+    // Arrange
+    // Adding educations into database.
+    for (const educationInputData of educationInputs) {
+      await request(app)
+        .post(getEducationsGeneralUrl(username, documentId))
+        .send(educationInputData)
+        .set('authorization', `Bearer ${authToken}`);
+    }
+
+    // Act
+    const resp = await request(app)
+      .get(getAllEducationsUrl(username))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+
+    const expectedEducations = educationInputs.map((education, idx) => {
+      const expectedEducation = {
+        ...education,
+        id: idx + 1,
+        owner: username,
+      };
+
+      expectedEducation.gpa ||= null;
+      expectedEducation.awardsAndHonors ||= null;
+      expectedEducation.activities ||= null;
+
+      return expectedEducation;
+    });
+
+    expect(resp.body).toEqual({ educations: expectedEducations });
+  });
 });
 
 // --------------------------------------------------
