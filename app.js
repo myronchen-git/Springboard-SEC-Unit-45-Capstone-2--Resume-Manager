@@ -35,7 +35,7 @@ app.use(`${urlPrefix}/auth`, authRoutes);
 app.use(`${urlPrefix}/users`, usersRoutes);
 app.use(`${urlPrefix}/users/:username/documents`, documentsRoutes);
 app.use(`${urlPrefix}/`, sectionsRoutes);
-app.use(`${urlPrefix}/users/:username/documents`, educationsRoutes);
+app.use(`${urlPrefix}/users`, educationsRoutes);
 
 /** Catch-all for handling 404 errors. */
 app.use(function (req, res, next) {

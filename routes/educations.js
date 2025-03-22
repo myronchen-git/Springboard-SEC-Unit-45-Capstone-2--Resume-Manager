@@ -63,7 +63,7 @@ const router = new express.Router();
  *  the document.
  */
 router.post(
-  '/:documentId/educations',
+  '/:username/documents/:documentId/educations',
   ensureLoggedIn,
   async (req, res, next) => {
     const userPayload = res.locals.user;
@@ -104,7 +104,7 @@ router.post(
  * of education within the document.
  */
 router.post(
-  '/:documentId/educations/:educationId',
+  '/:username/documents/:documentId/educations/:educationId',
   ensureLoggedIn,
   async (req, res, next) => {
     const userPayload = res.locals.user;
@@ -166,7 +166,7 @@ router.post(
  *  dates.
  */
 router.patch(
-  '/:documentId/educations/:educationId',
+  '/:username/documents/:documentId/educations/:educationId',
   ensureLoggedIn,
   async (req, res, next) => {
     const userPayload = res.locals.user;
