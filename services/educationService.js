@@ -79,8 +79,8 @@ async function createEducation(username, documentId, props) {
 
 /**
  * Creates a document_x_education record (document-education relationship) in
- * the database.  The document owner is first verified, then the next position
- * is found by getting all document_x_education records.
+ * the database.  Education and document ownership are verified, then the next
+ * position is found by getting all document_x_education records.
  *
  * @param {String} username - Name of user that wants to interact with the
  *  document.  This should be the owner.
@@ -98,8 +98,18 @@ async function createDocument_x_education(username, documentId, educationId) {
     `educationId = ${educationId})`;
   logger.verbose(logPrefix);
 
+  // Get education and verify ownership.
+  const education = await Education.get({ id: educationId });
+
+  if (education.owner !== username) {
+    logger.error(`${logPrefix}: Education does not belong to user.`);
+    throw new ForbiddenError("Can not add another user's education.");
+  }
+
+  // Verify document ownership.
   await validateDocumentOwner(username, documentId, logPrefix);
 
+  // Find next proper position to place education in.
   const documents_x_educations = await Document_X_Education.getAll(documentId);
   const nextPosition = getLastPosition(documents_x_educations) + 1;
 

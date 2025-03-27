@@ -158,6 +158,7 @@ describe('createEducation', () => {
 
 describe('createDocument_x_education', () => {
   beforeEach(() => {
+    Education.get.mockReset();
     mockValidateDocumentOwner.mockReset();
     Document_X_Education.getAll.mockReset();
     mockGetLastPosition.mockReset();
@@ -175,6 +176,7 @@ describe('createDocument_x_education', () => {
       const educationIdToAdd = 3;
 
       const mockDocument_x_education = Object.freeze({});
+      Education.get.mockResolvedValue({ owner: username });
       Document_X_Education.getAll.mockResolvedValue(
         existingDocuments_x_educations
       );
@@ -190,6 +192,8 @@ describe('createDocument_x_education', () => {
 
       // Assert
       expect(document_x_education).toBe(mockDocument_x_education);
+
+      expect(Education.get).toHaveBeenCalledWith({ id: educationIdToAdd });
 
       expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
         username,
@@ -210,6 +214,32 @@ describe('createDocument_x_education', () => {
       });
     }
   );
+
+  test('Throws an Error if education does not belong to user.', async () => {
+    // Arrange
+    const educationIdToAdd = 3;
+
+    const mockDocument_x_education = Object.freeze({});
+    Education.get.mockResolvedValue({ owner: 'other user' });
+    Document_X_Education.getAll.mockResolvedValue(documents_x_educations);
+    mockGetLastPosition.mockReturnValue(1);
+    Document_X_Education.add.mockResolvedValue(mockDocument_x_education);
+
+    // Act
+    async function runFunc() {
+      await createDocument_x_education(username, documentId, educationIdToAdd);
+    }
+
+    // Assert
+    await expect(runFunc).rejects.toThrow(ForbiddenError);
+
+    expect(Education.get).toHaveBeenCalledWith({ id: educationIdToAdd });
+
+    expect(mockValidateDocumentOwner).not.toHaveBeenCalled();
+    expect(Document_X_Education.getAll).not.toHaveBeenCalled();
+    expect(mockGetLastPosition).not.toHaveBeenCalled();
+    expect(Document_X_Education.add).not.toHaveBeenCalled();
+  });
 });
 
 // --------------------------------------------------
