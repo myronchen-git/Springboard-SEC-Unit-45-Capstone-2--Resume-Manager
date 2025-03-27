@@ -13,6 +13,7 @@ const {
   createDocument_x_education,
   updateEducation,
   updateDocument_x_educationPositions,
+  deleteDocument_x_education,
 } = require('../services/educationService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
@@ -268,6 +269,47 @@ router.put(
       );
 
       return res.json({ educations });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/**
+ * DELETE /users/:username/documents/:documentId/educations/:educationId
+ * {} => {}
+ *
+ * Authorization required: login
+ *
+ * Deletes a document-education relationship.
+ */
+router.delete(
+  '/:username/documents/:documentId/educations/:educationId',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+
+    const { username, documentId, educationId } = req.params;
+
+    const logPrefix =
+      `DELETE /users/${username}/documents/${documentId}/educations/${educationId} ` +
+      `(user: ${JSON.stringify(userPayload)})`;
+    logger.info(logPrefix + ' BEGIN');
+
+    try {
+      runJsonSchemaValidator(
+        urlParamsSchema,
+        { documentId, educationId },
+        logPrefix
+      );
+
+      await deleteDocument_x_education(
+        userPayload.username,
+        documentId,
+        educationId
+      );
+
+      return res.sendStatus(200);
     } catch (err) {
       return next(err);
     }

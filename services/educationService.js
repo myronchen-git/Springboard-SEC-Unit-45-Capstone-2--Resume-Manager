@@ -205,6 +205,28 @@ async function updateDocument_x_educationPositions(
   return await Education.getAllInDocument(documentId);
 }
 
+/**
+ * Deletes a document-education relationship.  Document ownership is first
+ * verified.
+ *
+ * @param {String} username - Name of user that wants to delete the
+ *  document-education relationship.  This should be the owner.
+ * @param {Number} documentId - ID of the document to remove the education from.
+ * @param {Number} educationId - ID of the education to be removed.
+ */
+async function deleteDocument_x_education(username, documentId, educationId) {
+  const logPrefix =
+    `${fileName}.deleteDocument_x_education(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId}, ` +
+    `educationId = ${educationId})`;
+  logger.verbose(logPrefix);
+
+  await validateDocumentOwner(username, documentId, logPrefix);
+
+  await Document_X_Education.delete(documentId, educationId);
+}
+
 // ==================================================
 
 module.exports = {
@@ -212,4 +234,5 @@ module.exports = {
   createDocument_x_education,
   updateEducation,
   updateDocument_x_educationPositions,
+  deleteDocument_x_education,
 };
