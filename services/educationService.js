@@ -249,6 +249,31 @@ async function deleteDocument_x_education(username, documentId, educationId) {
   await Document_X_Education.delete(documentId, educationId);
 }
 
+/**
+ * Deletes an education.
+ *
+ * @param {String} username - Name of user that wants to delete the education.
+ *  This should be the owner.
+ * @param {Number} educationId - ID of the education to be deleted.
+ */
+async function deleteEducation(username, educationId) {
+  const logPrefix =
+    `${fileName}.deleteEducation(` +
+    `username = "${username}", ` +
+    `educationId = ${educationId})`;
+  logger.verbose(logPrefix);
+
+  // Get education and verify ownership.
+  const education = await Education.get({ id: educationId });
+
+  if (education.owner !== username) {
+    logger.error(`${logPrefix}: Education does not belong to user.`);
+    throw new ForbiddenError("Can not delete another user's education.");
+  }
+
+  await education.delete();
+}
+
 // ==================================================
 
 module.exports = {
@@ -257,4 +282,5 @@ module.exports = {
   updateEducation,
   updateDocument_x_educationPositions,
   deleteDocument_x_education,
+  deleteEducation,
 };
