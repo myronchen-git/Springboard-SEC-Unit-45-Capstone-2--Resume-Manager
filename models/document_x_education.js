@@ -2,6 +2,8 @@
 
 const Relationship = require('./relationship');
 
+const { camelToSnakeCase } = require('../util/caseConversions');
+
 // ==================================================
 
 /**
@@ -148,6 +150,33 @@ class Document_X_Education extends Relationship {
       notFoundLog,
       serverErrorMessage
     );
+  }
+
+  /**
+   * Updates the positions of all educations in a document.
+   *
+   * @param {Number} documentId - ID of the document that is having its
+   *  educations reordered.
+   * @param {Number[]} educationIds - List of educations IDs with the desired
+   *  ordering.
+   * @returns {Document_X_Education[]} A list of Document_X_Education instances.
+   */
+  static async updateAllPositions(documentId, educationIds) {
+    let name = 'documentId';
+    const attachTo = {
+      jsName: name,
+      sqlName: camelToSnakeCase(name),
+      id: documentId,
+    };
+
+    name = 'educationId';
+    const attachWiths = {
+      jsName: name,
+      sqlName: camelToSnakeCase(name),
+      ids: educationIds,
+    };
+
+    return await super.updateAllPositions(attachTo, attachWiths);
   }
 
   /**

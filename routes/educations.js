@@ -5,12 +5,14 @@ const express = require('express');
 const urlParamsSchema = require('../schemas/urlParams.json');
 const educationNewSchema = require('../schemas/educationNew.json');
 const educationUpdateSchema = require('../schemas/educationUpdate.json');
+const documentRelationshipPositionsSchema = require('../schemas/documentRelationshipPositions.json');
 
 const Education = require('../models/education');
 const {
   createEducation,
   createDocument_x_education,
   updateEducation,
+  updateDocument_x_educationPositions,
 } = require('../services/educationService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
@@ -222,6 +224,50 @@ router.patch(
       );
 
       return res.json({ education });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/**
+ * PUT /users/:username/documents/:documentId/educations
+ * [ educationId, educationId, ... ] => { educations }
+ *
+ * Authorization required: login
+ *
+ * Updates the positions of all educations in a document.  All educations need
+ * to be included.
+ *
+ * @returns {{educations}} A list of Educations in order of position.
+ */
+router.put(
+  '/:username/documents/:documentId/educations',
+  ensureLoggedIn,
+  async (req, res, next) => {
+    const userPayload = res.locals.user;
+    const { username, documentId } = req.params;
+
+    const logPrefix =
+      `PUT /users/${username}/documents/${documentId}/educations ` +
+      `(user: ${JSON.stringify(userPayload)})`;
+    logger.info(logPrefix + ' BEGIN');
+
+    try {
+      runJsonSchemaValidator(urlParamsSchema, { documentId }, logPrefix);
+      runJsonSchemaValidator(
+        documentRelationshipPositionsSchema,
+        req.body,
+        logPrefix
+      );
+
+      const educations = await updateDocument_x_educationPositions(
+        userPayload.username,
+        documentId,
+        req.body
+      );
+
+      return res.json({ educations });
     } catch (err) {
       return next(err);
     }

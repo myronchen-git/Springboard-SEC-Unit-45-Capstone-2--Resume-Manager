@@ -10,6 +10,7 @@ const {
   getLastPosition,
 } = require('../util/serviceHelpers');
 
+const { BadRequestError } = require('../errors/appErrors');
 const { ForbiddenError } = require('../errors/appErrors');
 
 const logger = require('../util/logger');
@@ -156,10 +157,59 @@ async function updateEducation(username, documentId, educationId, props) {
   return await education.update(props);
 }
 
+/**
+ * Changes the order of the educations in a document.
+ *
+ * @param {String} username - Name of user that wants to interact with the
+ *  document.  This should be the owner.
+ * @param {Number} documentId - ID of the document that is having its educations
+ *  reordered.
+ * @param {Number[]} educationIds - List of educations IDs with the desired
+ *  ordering.
+ * @returns {Education[]} A list of Education instances, in order of position.
+ */
+async function updateDocument_x_educationPositions(
+  username,
+  documentId,
+  educationIds
+) {
+  const logPrefix =
+    `${fileName}.updateDocument_x_educationPositions(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId}, ` +
+    `educationIds = ${educationIds})`;
+  logger.verbose(logPrefix);
+
+  await validateDocumentOwner(username, documentId, logPrefix);
+
+  // Verify that educationIds contains all of the educations in the document.
+  const documents_x_educations = await Document_X_Education.getAll(documentId);
+  if (
+    documents_x_educations.length !== educationIds.length ||
+    !documents_x_educations.every((dxe) =>
+      educationIds.includes(dxe.educationId)
+    )
+  ) {
+    logger.error(
+      `${logPrefix}: Provided education IDs do not exactly ` +
+        'match those in document.'
+    );
+    throw new BadRequestError(
+      'All educations, and only those, need to be included ' +
+        'when updating their positions in a document.'
+    );
+  }
+
+  await Document_X_Education.updateAllPositions(documentId, educationIds);
+
+  return await Education.getAllInDocument(documentId);
+}
+
 // ==================================================
 
 module.exports = {
   createEducation,
   createDocument_x_education,
   updateEducation,
+  updateDocument_x_educationPositions,
 };

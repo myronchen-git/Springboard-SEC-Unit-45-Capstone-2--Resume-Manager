@@ -1,6 +1,7 @@
 'use strict';
 
 const db = require('../database/db');
+const Document_X_Education = require('./document_x_education');
 const { convertPropsForSqlUpdate } = require('../util/sqlHelpers');
 const { convertDateToString } = require('../util/modelHelpers');
 
@@ -157,6 +158,33 @@ class Education {
 
       return education;
     });
+  }
+
+  /**
+   * Gets all educations belonging to a document.  The returned Educations'
+   * order is related to their positions.
+   *
+   * @param {Number} documentId - ID of the document to get educations from.
+   * @returns {Education[]} A list of Education instances.
+   */
+  static async getAllInDocument(documentId) {
+    const logPrefix = `Education.getAllInDocument(documentId = ${documentId})`;
+    logger.verbose(logPrefix);
+
+    const queryConfig = {
+      text: `
+  SELECT ${Education._allDbColsAsJs}
+  FROM ${Document_X_Education.tableName} AS dxe
+  JOIN ${Education.tableName} AS e
+  ON dxe.education_id = e.id
+  WHERE dxe.document_id = $1
+  ORDER BY dxe.position;`,
+      values: [documentId],
+    };
+
+    const result = await db.query({ queryConfig, logPrefix });
+
+    return result.rows.map((data) => new Education(...Object.values(data)));
   }
 
   /**
