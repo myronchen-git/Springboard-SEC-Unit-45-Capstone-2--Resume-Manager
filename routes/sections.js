@@ -3,7 +3,7 @@
 const express = require('express');
 
 const document_x_sectionNewSchema = require('../schemas/document_x_sectionNew.json');
-const document_x_sectionPositionsSchema = require('../schemas/document_x_sectionPositions.json');
+const documentRelationshipPositionsSchema = require('../schemas/documentRelationshipPositions.json');
 const urlParamsSchema = require('../schemas/urlParams.json');
 
 const Section = require('../models/section');
@@ -154,7 +154,7 @@ router.put(
     try {
       runJsonSchemaValidator(urlParamsSchema, { documentId }, logPrefix);
       runJsonSchemaValidator(
-        document_x_sectionPositionsSchema,
+        documentRelationshipPositionsSchema,
         req.body,
         logPrefix
       );
