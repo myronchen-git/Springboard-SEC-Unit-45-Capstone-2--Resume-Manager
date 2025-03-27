@@ -81,6 +81,49 @@ describe('createDocument_x_section', () => {
       });
     }
   );
+
+  test(
+    'Throws a BadRequestError if adding a Document_X_Section results in ' +
+      'a duplicate primary key database error.',
+    async () => {
+      // Arrange
+      const sectionIdToAdd = 3;
+      const existingDocuments_x_sections = Object.freeze([]);
+      const lastPosition = -1;
+
+      const mockDatabaseError = { code: '23505' };
+
+      Document_X_Section.getAll.mockResolvedValue(existingDocuments_x_sections);
+      mockGetLastPosition.mockReturnValue(lastPosition);
+      Document_X_Section.add.mockRejectedValue(mockDatabaseError);
+
+      // Act
+      async function runFunc() {
+        await createDocument_x_section(username, documentId, sectionIdToAdd);
+      }
+
+      // Assert
+      await expect(runFunc).rejects.toThrow(BadRequestError);
+
+      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+        username,
+        documentId,
+        expect.any(String)
+      );
+
+      expect(Document_X_Section.getAll).toHaveBeenCalledWith(documentId);
+
+      expect(mockGetLastPosition).toHaveBeenCalledWith(
+        existingDocuments_x_sections
+      );
+
+      expect(Document_X_Section.add).toHaveBeenCalledWith({
+        documentId,
+        sectionId: sectionIdToAdd,
+        position: lastPosition + 1,
+      });
+    }
+  );
 });
 
 // --------------------------------------------------

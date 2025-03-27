@@ -12,6 +12,7 @@ const {
   getLastPosition: mockGetLastPosition,
 } = require('../util/serviceHelpers');
 
+const { BadRequestError } = require('../errors/appErrors');
 const { ForbiddenError } = require('../errors/appErrors');
 
 const { documents_x_educations } = require('../_testData');
@@ -240,6 +241,58 @@ describe('createDocument_x_education', () => {
     expect(mockGetLastPosition).not.toHaveBeenCalled();
     expect(Document_X_Education.add).not.toHaveBeenCalled();
   });
+
+  test(
+    'Throws a BadRequestError if adding a Document_X_Education results in ' +
+      'a duplicate primary key database error.',
+    async () => {
+      // Arrange
+      const educationIdToAdd = 3;
+      const existingDocuments_x_educations = Object.freeze([]);
+      const lastPosition = -1;
+
+      const mockDatabaseError = { code: '23505' };
+
+      Education.get.mockResolvedValue({ owner: username });
+      Document_X_Education.getAll.mockResolvedValue(
+        existingDocuments_x_educations
+      );
+      mockGetLastPosition.mockReturnValue(lastPosition);
+      Document_X_Education.add.mockRejectedValue(mockDatabaseError);
+
+      // Act
+      async function runFunc() {
+        await createDocument_x_education(
+          username,
+          documentId,
+          educationIdToAdd
+        );
+      }
+
+      // Assert
+      await expect(runFunc).rejects.toThrow(BadRequestError);
+
+      expect(Education.get).toHaveBeenCalledWith({ id: educationIdToAdd });
+
+      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+        username,
+        documentId,
+        expect.any(String)
+      );
+
+      expect(Document_X_Education.getAll).toHaveBeenCalledWith(documentId);
+
+      expect(mockGetLastPosition).toHaveBeenCalledWith(
+        existingDocuments_x_educations
+      );
+
+      expect(Document_X_Education.add).toHaveBeenCalledWith({
+        documentId,
+        educationId: educationIdToAdd,
+        position: lastPosition + 1,
+      });
+    }
+  );
 });
 
 // --------------------------------------------------

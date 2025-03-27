@@ -113,11 +113,23 @@ async function createDocument_x_education(username, documentId, educationId) {
   const documents_x_educations = await Document_X_Education.getAll(documentId);
   const nextPosition = getLastPosition(documents_x_educations) + 1;
 
-  return await Document_X_Education.add({
-    documentId,
-    educationId,
-    position: nextPosition,
-  });
+  try {
+    return await Document_X_Education.add({
+      documentId,
+      educationId,
+      position: nextPosition,
+    });
+  } catch (err) {
+    // PostgreSQL error code 23505 is for unique constraint violation.
+    if (err.code === '23505') {
+      logger.error(`${logPrefix}: Relationship already exists.`);
+      throw new BadRequestError(
+        'Can not add education to document, as it already exists.'
+      );
+    } else {
+      throw err;
+    }
+  }
 }
 
 /**

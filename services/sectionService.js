@@ -42,11 +42,23 @@ async function createDocument_x_section(username, documentId, sectionId) {
   const documents_x_sections = await Document_X_Section.getAll(documentId);
   const nextPosition = getLastPosition(documents_x_sections) + 1;
 
-  return await Document_X_Section.add({
-    documentId,
-    sectionId,
-    position: nextPosition,
-  });
+  try {
+    return await Document_X_Section.add({
+      documentId,
+      sectionId,
+      position: nextPosition,
+    });
+  } catch (err) {
+    // PostgreSQL error code 23505 is for unique constraint violation.
+    if (err.code === '23505') {
+      logger.error(`${logPrefix}: Relationship already exists.`);
+      throw new BadRequestError(
+        'Can not add section to document, as it already exists.'
+      );
+    } else {
+      throw err;
+    }
+  }
 }
 
 /**
