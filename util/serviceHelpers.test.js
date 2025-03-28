@@ -1,7 +1,11 @@
 'use strict';
 
 const Document = require('../models/document');
-const { validateDocumentOwner, getLastPosition } = require('./serviceHelpers');
+const {
+  validateDocumentOwner,
+  validateOwnership,
+  getLastPosition,
+} = require('./serviceHelpers');
 
 const { ForbiddenError } = require('../errors/appErrors');
 
@@ -53,6 +57,54 @@ describe('validateDocumentOwner', () => {
     // Assert
     await expect(runFunc).rejects.toThrow(ForbiddenError);
     expect(Document.get).toHaveBeenCalledWith({ id: documentId });
+  });
+});
+
+// --------------------------------------------------
+
+describe('validateOwnership', () => {
+  const username = 'user1';
+  const itemId = '1';
+
+  const mockClass = Object.freeze({ get: jest.fn(), name: 'mockClass' });
+
+  beforeEach(() => {
+    mockClass.get.mockReset();
+  });
+
+  test('Returns retrieved object if it belongs to the specified user.', async () => {
+    // Arrange
+    const mockRetrievedObject = Object.freeze({ owner: username });
+
+    mockClass.get.mockResolvedValue(mockRetrievedObject);
+
+    // Act
+    const returnedObject = await validateOwnership(
+      mockClass,
+      username,
+      itemId,
+      ''
+    );
+
+    // Assert
+    expect(returnedObject).toEqual(mockRetrievedObject);
+    expect(mockClass.get).toHaveBeenCalledWith({ id: itemId });
+  });
+
+  test('Throws an Error if retrieved object does not belong to user.', async () => {
+    // Arrange
+    const mockRetrievedObject = { owner: 'otherUser' };
+
+    mockClass.get.mockResolvedValue(mockRetrievedObject);
+
+    // Act
+    async function runFunc() {
+      await validateOwnership(mockClass, username, itemId, '');
+    }
+
+    // Assert
+    await expect(runFunc).rejects.toThrow(ForbiddenError);
+    expect(mockClass.get).toHaveBeenCalledWith({ id: itemId });
   });
 });
 

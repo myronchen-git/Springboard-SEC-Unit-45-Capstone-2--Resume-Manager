@@ -4,6 +4,7 @@ const Document = require('../models/document');
 
 const { ForbiddenError } = require('../errors/appErrors');
 
+const { pascalToSpaceSeparated } = require('./caseConversions');
 const logger = require('../util/logger');
 
 // ==================================================
@@ -38,6 +39,36 @@ async function validateDocumentOwner(username, documentId, logPrefix) {
 }
 
 /**
+ * Checks that an item (document, education, etc.) belongs to a specified user.
+ * Retrieves an item from the database and verifies the owner.  The item in the
+ * database must have an "owner" property.
+ *
+ * @param {Class} modelClass - The JS class of the item.
+ * @param {String} username - Name of the user that wants access.
+ * @param {Number} id - ID of the relevant item that is being accessed.
+ * @param {String} logPrefix - Log text to put in front of any logs.
+ * @returns {Object} The relevant model Object, containing the retrieved data.
+ * @throws {ForbiddenError} If the item does not belong to the user.
+ */
+async function validateOwnership(modelClass, username, id, logPrefix) {
+  const object = await modelClass.get({ id });
+
+  if (object.owner !== username) {
+    logger.error(
+      `${logPrefix}: ${modelClass.name} does not belong to user "${username}"; ` +
+        `it belongs to "${object.owner}".`
+    );
+    throw new ForbiddenError(
+      `Can not access or interact with another user's ${pascalToSpaceSeparated(
+        modelClass.name
+      )}.`
+    );
+  }
+
+  return object;
+}
+
+/**
  * Gets the position of the last section, education, experience, etc. of a
  * document, or return -1.  The last position is the one with the highest value.
  * The list of relationships must be in ascending position order.
@@ -53,4 +84,8 @@ function getLastPosition(relationships) {
 
 // ==================================================
 
-module.exports = { validateDocumentOwner, getLastPosition };
+module.exports = {
+  validateDocumentOwner,
+  validateOwnership,
+  getLastPosition,
+};
