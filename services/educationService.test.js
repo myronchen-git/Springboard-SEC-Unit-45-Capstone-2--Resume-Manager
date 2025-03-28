@@ -1,5 +1,6 @@
 'use strict';
 
+const Document = require('../models/document');
 const Education = require('../models/education');
 const Document_X_Education = require('../models/document_x_education');
 const {
@@ -8,7 +9,7 @@ const {
   updateEducation,
 } = require('./educationService');
 const {
-  validateDocumentOwner: mockValidateDocumentOwner,
+  validateOwnership: mockValidateOwnership,
   getLastPosition: mockGetLastPosition,
 } = require('../util/serviceHelpers');
 
@@ -40,7 +41,7 @@ describe('createEducation', () => {
   const mockDocument_x_education = Object.freeze({});
 
   beforeEach(() => {
-    mockValidateDocumentOwner.mockReset();
+    mockValidateOwnership.mockReset();
     Education.add.mockReset();
     Document_X_Education.getAll.mockReset();
     mockGetLastPosition.mockReset();
@@ -52,7 +53,7 @@ describe('createEducation', () => {
       'if document belongs to user.',
     async () => {
       // Arrange
-      mockValidateDocumentOwner.mockResolvedValue(mockDocument);
+      mockValidateOwnership.mockResolvedValue(mockDocument);
       Education.add.mockResolvedValue(mockEducation);
       Document_X_Education.getAll.mockResolvedValue(mockDocuments_x_educations);
       mockGetLastPosition.mockReturnValue(lastPosition);
@@ -69,7 +70,8 @@ describe('createEducation', () => {
       expect(education).toEqual(mockEducation);
       expect(document_x_education).toEqual(mockDocument_x_education);
 
-      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      expect(mockValidateOwnership).toHaveBeenCalledWith(
+        Document,
         username,
         documentId,
         expect.any(String)
@@ -96,7 +98,7 @@ describe('createEducation', () => {
 
   test('The position of the new education is after the last (highest) one.', async () => {
     // Arrange
-    mockValidateDocumentOwner.mockResolvedValue(mockDocument);
+    mockValidateOwnership.mockResolvedValue(mockDocument);
     Education.add.mockResolvedValue(mockEducation);
     Document_X_Education.getAll.mockResolvedValue(mockDocuments_x_educations);
     mockGetLastPosition.mockReturnValue(lastPosition);
@@ -118,7 +120,7 @@ describe('createEducation', () => {
       // Arrange
       const lastPosition = -1;
 
-      mockValidateDocumentOwner.mockResolvedValue(mockDocument);
+      mockValidateOwnership.mockResolvedValue(mockDocument);
       Education.add.mockResolvedValue(mockEducation);
       Document_X_Education.getAll.mockResolvedValue(mockDocuments_x_educations);
       mockGetLastPosition.mockReturnValue(lastPosition);
@@ -138,7 +140,7 @@ describe('createEducation', () => {
     // Arrange
     const mockDocument = { isMaster: false };
 
-    mockValidateDocumentOwner.mockResolvedValue(mockDocument);
+    mockValidateOwnership.mockResolvedValue(mockDocument);
 
     // Act
     async function runFunc() {
@@ -159,8 +161,7 @@ describe('createEducation', () => {
 
 describe('createDocument_x_education', () => {
   beforeEach(() => {
-    Education.get.mockReset();
-    mockValidateDocumentOwner.mockReset();
+    mockValidateOwnership.mockReset();
     Document_X_Education.getAll.mockReset();
     mockGetLastPosition.mockReset();
     Document_X_Education.add.mockReset();
@@ -177,7 +178,6 @@ describe('createDocument_x_education', () => {
       const educationIdToAdd = 3;
 
       const mockDocument_x_education = Object.freeze({});
-      Education.get.mockResolvedValue({ owner: username });
       Document_X_Education.getAll.mockResolvedValue(
         existingDocuments_x_educations
       );
@@ -194,9 +194,17 @@ describe('createDocument_x_education', () => {
       // Assert
       expect(document_x_education).toBe(mockDocument_x_education);
 
-      expect(Education.get).toHaveBeenCalledWith({ id: educationIdToAdd });
+      expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+        1,
+        Education,
+        username,
+        educationIdToAdd,
+        expect.any(String)
+      );
 
-      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+        2,
+        Document,
         username,
         documentId,
         expect.any(String)
@@ -216,32 +224,6 @@ describe('createDocument_x_education', () => {
     }
   );
 
-  test('Throws an Error if education does not belong to user.', async () => {
-    // Arrange
-    const educationIdToAdd = 3;
-
-    const mockDocument_x_education = Object.freeze({});
-    Education.get.mockResolvedValue({ owner: 'other user' });
-    Document_X_Education.getAll.mockResolvedValue(documents_x_educations);
-    mockGetLastPosition.mockReturnValue(1);
-    Document_X_Education.add.mockResolvedValue(mockDocument_x_education);
-
-    // Act
-    async function runFunc() {
-      await createDocument_x_education(username, documentId, educationIdToAdd);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow(ForbiddenError);
-
-    expect(Education.get).toHaveBeenCalledWith({ id: educationIdToAdd });
-
-    expect(mockValidateDocumentOwner).not.toHaveBeenCalled();
-    expect(Document_X_Education.getAll).not.toHaveBeenCalled();
-    expect(mockGetLastPosition).not.toHaveBeenCalled();
-    expect(Document_X_Education.add).not.toHaveBeenCalled();
-  });
-
   test(
     'Throws a BadRequestError if adding a Document_X_Education results in ' +
       'a duplicate primary key database error.',
@@ -253,7 +235,6 @@ describe('createDocument_x_education', () => {
 
       const mockDatabaseError = { code: '23505' };
 
-      Education.get.mockResolvedValue({ owner: username });
       Document_X_Education.getAll.mockResolvedValue(
         existingDocuments_x_educations
       );
@@ -272,9 +253,17 @@ describe('createDocument_x_education', () => {
       // Assert
       await expect(runFunc).rejects.toThrow(BadRequestError);
 
-      expect(Education.get).toHaveBeenCalledWith({ id: educationIdToAdd });
+      expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+        1,
+        Education,
+        username,
+        educationIdToAdd,
+        expect.any(String)
+      );
 
-      expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+      expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+        2,
+        Document,
         username,
         documentId,
         expect.any(String)
@@ -310,8 +299,7 @@ describe('updateEducation', () => {
     });
 
   beforeEach(() => {
-    mockValidateDocumentOwner.mockReset();
-    Education.get.mockReset();
+    mockValidateOwnership.mockReset();
   });
 
   test('Updates an education.', async () => {
@@ -319,8 +307,14 @@ describe('updateEducation', () => {
     const mockOriginalEducation = getMockOriginalEducation(username);
     const document = { owner: username, isMaster: true };
 
-    Education.get.mockResolvedValue(mockOriginalEducation);
-    mockValidateDocumentOwner.mockResolvedValue(document);
+    mockValidateOwnership.mockImplementation((modelClass) => {
+      switch (modelClass) {
+        case Education:
+          return mockOriginalEducation;
+        case Document:
+          return document;
+      }
+    });
 
     // Act
     const updatedEducation = await updateEducation(
@@ -332,33 +326,24 @@ describe('updateEducation', () => {
 
     // Assert
     expect(updatedEducation).toBe(mockUpdatedEducation);
-    expect(Education.get).toHaveBeenCalledWith({ id: educationId });
-    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+
+    expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+      1,
+      Education,
+      username,
+      educationId,
+      expect.any(String)
+    );
+
+    expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+      2,
+      Document,
       username,
       documentId,
       expect.any(String)
     );
+
     expect(mockOriginalEducation.update).toHaveBeenCalledWith(props);
-  });
-
-  test('Throws an Error if education does not belong to user.', async () => {
-    // Arrange
-    const mockOriginalEducation = getMockOriginalEducation('otherUser');
-    const document = { owner: username, isMaster: true };
-
-    Education.get.mockResolvedValue(mockOriginalEducation);
-    mockValidateDocumentOwner.mockResolvedValue(document);
-
-    // Act
-    async function runFunc() {
-      await updateEducation(username, documentId, educationId, props);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow(ForbiddenError);
-    expect(Education.get).toHaveBeenCalledWith({ id: educationId });
-    expect(mockValidateDocumentOwner).not.toHaveBeenCalled();
-    expect(mockOriginalEducation.update).not.toHaveBeenCalled();
   });
 
   test('Throws an Error if document is not master.', async () => {
@@ -366,8 +351,14 @@ describe('updateEducation', () => {
     const mockOriginalEducation = getMockOriginalEducation(username);
     const document = { owner: username, isMaster: false };
 
-    Education.get.mockResolvedValue(mockOriginalEducation);
-    mockValidateDocumentOwner.mockResolvedValue(document);
+    mockValidateOwnership.mockImplementation((modelClass) => {
+      switch (modelClass) {
+        case Education:
+          return mockOriginalEducation;
+        case Document:
+          return document;
+      }
+    });
 
     // Act
     async function runFunc() {
@@ -376,12 +367,23 @@ describe('updateEducation', () => {
 
     // Assert
     await expect(runFunc).rejects.toThrow(ForbiddenError);
-    expect(Education.get).toHaveBeenCalledWith({ id: educationId });
-    expect(mockValidateDocumentOwner).toHaveBeenCalledWith(
+
+    expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+      1,
+      Education,
+      username,
+      educationId,
+      expect.any(String)
+    );
+
+    expect(mockValidateOwnership).toHaveBeenNthCalledWith(
+      2,
+      Document,
       username,
       documentId,
       expect.any(String)
     );
+
     expect(mockOriginalEducation.update).not.toHaveBeenCalled();
   });
 });

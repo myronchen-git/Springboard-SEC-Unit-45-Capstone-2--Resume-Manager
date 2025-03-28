@@ -3,10 +3,11 @@
 const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
+const Document = require('../models/document');
 const Education = require('../models/education');
 const Document_X_Education = require('../models/document_x_education');
 const {
-  validateDocumentOwner,
+  validateOwnership,
   getLastPosition,
 } = require('../util/serviceHelpers');
 
@@ -49,7 +50,12 @@ async function createEducation(username, documentId, props) {
   logger.verbose(logPrefix);
 
   // Verify document ownership and if document is master.
-  const document = await validateDocumentOwner(username, documentId, logPrefix);
+  const document = await validateOwnership(
+    Document,
+    username,
+    documentId,
+    logPrefix
+  );
 
   if (!document.isMaster) {
     logger.error(
@@ -98,21 +104,15 @@ async function createDocument_x_education(username, documentId, educationId) {
     `educationId = ${educationId})`;
   logger.verbose(logPrefix);
 
-  // Get education and verify ownership.
-  const education = await Education.get({ id: educationId });
-
-  if (education.owner !== username) {
-    logger.error(`${logPrefix}: Education does not belong to user.`);
-    throw new ForbiddenError("Can not add another user's education.");
-  }
-
-  // Verify document ownership.
-  await validateDocumentOwner(username, documentId, logPrefix);
+  // Verify ownership.
+  await validateOwnership(Education, username, educationId, logPrefix);
+  await validateOwnership(Document, username, documentId, logPrefix);
 
   // Find next proper position to place education in.
   const documents_x_educations = await Document_X_Education.getAll(documentId);
   const nextPosition = getLastPosition(documents_x_educations) + 1;
 
+  // Add relationship.
   try {
     return await Document_X_Education.add({
       documentId,
@@ -155,17 +155,21 @@ async function updateEducation(username, documentId, educationId, props) {
     `props = ${JSON.stringify(props)})`;
   logger.verbose(logPrefix);
 
-  // Get education and verify ownership.
-  const education = await Education.get({ id: educationId });
+  // Verify ownership.
+  const education = await validateOwnership(
+    Education,
+    username,
+    educationId,
+    logPrefix
+  );
+  const document = await validateOwnership(
+    Document,
+    username,
+    documentId,
+    logPrefix
+  );
 
-  if (education.owner !== username) {
-    logger.error(`${logPrefix}: Education does not belong to user.`);
-    throw new ForbiddenError("Can not update another user's education.");
-  }
-
-  // Verify document ownership and if document is master.
-  const document = await validateDocumentOwner(username, documentId, logPrefix);
-
+  // Verify that document is master.
   if (!document.isMaster) {
     logger.error(
       `${logPrefix}: User attempted to update education not in master resume.`
@@ -175,7 +179,7 @@ async function updateEducation(username, documentId, educationId, props) {
     );
   }
 
-  // Updating education.
+  // Update education.
   return await education.update(props);
 }
 
@@ -202,7 +206,7 @@ async function updateDocument_x_educationPositions(
     `educationIds = ${educationIds})`;
   logger.verbose(logPrefix);
 
-  await validateDocumentOwner(username, documentId, logPrefix);
+  await validateOwnership(Document, username, documentId, logPrefix);
 
   // Verify that educationIds contains all of the educations in the document.
   const documents_x_educations = await Document_X_Education.getAll(documentId);
@@ -244,7 +248,7 @@ async function deleteDocument_x_education(username, documentId, educationId) {
     `educationId = ${educationId})`;
   logger.verbose(logPrefix);
 
-  await validateDocumentOwner(username, documentId, logPrefix);
+  await validateOwnership(Document, username, documentId, logPrefix);
 
   await Document_X_Education.delete(documentId, educationId);
 }
@@ -263,13 +267,12 @@ async function deleteEducation(username, educationId) {
     `educationId = ${educationId})`;
   logger.verbose(logPrefix);
 
-  // Get education and verify ownership.
-  const education = await Education.get({ id: educationId });
-
-  if (education.owner !== username) {
-    logger.error(`${logPrefix}: Education does not belong to user.`);
-    throw new ForbiddenError("Can not delete another user's education.");
-  }
+  const education = await validateOwnership(
+    Education,
+    username,
+    educationId,
+    logPrefix
+  );
 
   await education.delete();
 }
