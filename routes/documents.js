@@ -2,11 +2,16 @@
 
 const express = require('express');
 
+const urlParamsSchema = require('../schemas/urlParams.json');
 const documentNewSchema = require('../schemas/documentNew.json');
 const documentUpdateSchema = require('../schemas/documentUpdate.json');
 
 const Document = require('../models/document');
-const documentService = require('../services/documentService');
+const {
+  getDocument,
+  updateDocument,
+  deleteDocument,
+} = require('../services/documentService');
 const { ensureLoggedIn } = require('../middleware/auth');
 const { runJsonSchemaValidator } = require('../util/validators');
 
@@ -79,6 +84,38 @@ router.get('/', ensureLoggedIn, async (req, res, next) => {
 });
 
 /**
+ * GET /users/:username/documents/:documentId
+ * {} => { document }
+ *
+ * Authorization required: login
+ *
+ * Gets a document and all section content in it.
+ *
+ * @returns {{document}} Document properties, user contact info, sections, and
+ *  content in sections.
+ */
+router.get('/:documentId', ensureLoggedIn, async (req, res, next) => {
+  const userPayload = res.locals.user;
+
+  const { username, documentId } = req.params;
+
+  const logPrefix =
+    `GET /users/${username}/documents/${documentId} ` +
+    `(user: ${JSON.stringify(userPayload)})`;
+  logger.info(logPrefix + ' BEGIN');
+
+  try {
+    runJsonSchemaValidator(urlParamsSchema, { documentId }, logPrefix);
+
+    const document = await getDocument(userPayload.username, documentId);
+
+    return res.json({ document });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
  * PATCH /users/:username/documents/:docId
  * { documentName, isTemplate, isLocked } => { document }
  *
@@ -103,7 +140,7 @@ router.patch('/:docId', ensureLoggedIn, async (req, res, next) => {
   try {
     runJsonSchemaValidator(documentUpdateSchema, req.body, logPrefix);
 
-    const document = await documentService.updateDocument(
+    const document = await updateDocument(
       userPayload.username,
       req.params.docId,
       req.body
@@ -130,10 +167,7 @@ router.delete('/:docId', ensureLoggedIn, async (req, res, next) => {
   logger.info(logPrefix + ' BEGIN');
 
   try {
-    await documentService.deleteDocument(
-      userPayload.username,
-      req.params.docId
-    );
+    await deleteDocument(userPayload.username, req.params.docId);
 
     return res.sendStatus(200);
   } catch (err) {

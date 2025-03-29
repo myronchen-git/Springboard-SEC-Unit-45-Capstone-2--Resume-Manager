@@ -150,6 +150,115 @@ class Document {
   }
 
   /**
+   * Retrieves a full document and its contents.  This includes contact info,
+   * sections, educations, experiences, etc..  Assumes that the document exists.
+   *
+   * @param {Number} documentId - ID of the document to get all the data from.
+   * @returns {Object} All needed data to display a resume or template.
+   */
+  static async getDocumentAndSectionContent(documentId) {
+    const logPrefix =
+      'Document.getDocumentAndSectionContent(' + `documentId = ${documentId})`;
+    logger.verbose(logPrefix);
+
+    const queryConfig = {
+      text: `
+  SELECT d.id,
+    d.document_name,
+    d.created_on,
+    d.last_updated,
+    d.is_master,
+    d.is_template,
+    d.is_locked,
+    (
+      SELECT json_build_object(
+          'full_name', ci.full_name,
+          'location', ci.location,
+          'email', ci.email,
+          'phone', ci.phone,
+          'linkedin', ci.linkedin,
+          'github', ci.github
+        ) AS contact_info
+      FROM contact_info AS ci
+      WHERE ci.username = d.owner
+    ),
+    (
+      SELECT json_agg(
+        json_build_object(
+          'id', s.id,
+          'section_name', s.section_name
+        )
+        ORDER BY dxs.position
+      ) AS sections
+      FROM documents_x_sections AS dxs
+      JOIN sections AS s
+      ON dxs.section_id = s.id
+      WHERE dxs.document_id = $1
+    ),
+    (
+      SELECT json_agg(
+        json_build_object(
+          'id', ed.id,
+          'school', ed.school,
+          'location', ed.location,
+          'start_date', ed.start_date,
+          'end_date', ed.end_date,
+          'degree', ed.degree,
+          'gpa', ed.gpa,
+          'awards_and_honors', ed.awards_and_honors,
+          'activities', ed.activities
+        )
+        ORDER BY dxed.position
+      ) AS educations
+      FROM documents_x_educations AS dxed
+      JOIN educations AS ed
+      ON dxed.education_id = ed.id
+      WHERE dxed.document_id = $1
+    ),
+    (
+      SELECT json_agg(
+        json_build_object(
+          'id', ex.id,
+          'title', ex.title,
+          'organization', ex.organization,
+          'location', ex.location,
+          'start_date', ex.start_date,
+          'end_date', ex.end_date,
+          'bullets', (
+            SELECT json_agg(
+              json_build_object(
+                'id', t.id,
+                'version', t.version,
+                'parent', t.parent,
+                'type', t.type,
+                'content', t.content
+              )
+              ORDER BY ext.position
+            )
+            FROM experiences_x_text_snippets AS ext
+            JOIN text_snippets AS t
+            ON ext.text_snippet_id = t.id
+            AND ext.text_snippet_version = t.version
+            WHERE dxex.id = ext.document_x_experience_id)
+        )
+        ORDER BY dxex.position
+      ) AS experiences
+      FROM documents_x_experiences AS dxex
+      JOIN experiences AS ex
+      ON dxex.experience_id = ex.id
+      WHERE dxex.document_id = $1
+    )
+  FROM documents AS d
+  WHERE d.id = $1;`,
+      values: [documentId],
+    };
+
+    const result = await db.query({ queryConfig, logPrefix });
+
+    return result.rows[0];
+  }
+
+  /**
    * Updates a document entry with new properties.
    *
    * @param {Number} id - Document ID given by the database.

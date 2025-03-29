@@ -4,7 +4,10 @@ const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
 const Document = require('../models/document');
-const { validateDocumentOwner } = require('../util/serviceHelpers');
+const {
+  validateDocumentOwner,
+  validateOwnership,
+} = require('../util/serviceHelpers');
 
 const {
   ForbiddenError,
@@ -15,6 +18,25 @@ const {
 const logger = require('../util/logger');
 
 // ==================================================
+
+/**
+ * Helps validate the owner of a document, then retrieves it.
+ *
+ * @param {String} username - Name of user that wants to get the document.
+ * @param {Number} documentId - ID of the document to get.
+ * @returns {Object} All needed data to display a resume or template.
+ */
+async function getDocument(username, documentId) {
+  const logPrefix =
+    `${fileName}.getDocument(` +
+    `username = "${username}", ` +
+    `documentId = ${documentId})`;
+  logger.verbose(logPrefix);
+
+  await validateOwnership(Document, username, documentId, logPrefix);
+
+  return await Document.getDocumentAndSectionContent(documentId);
+}
 
 /**
  * Updates a document by first verifying that it belongs to the specified user.
@@ -98,4 +120,4 @@ async function deleteDocument(username, documentId) {
 
 // ==================================================
 
-module.exports = { updateDocument, deleteDocument };
+module.exports = { getDocument, updateDocument, deleteDocument };
