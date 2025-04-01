@@ -25,9 +25,21 @@ function App() {
     setAuthToken(authToken);
   }
 
+  /**
+   * Signs in a user.
+   *
+   * @param {Object} formData - Holds the data for signing in a user.
+   * @param {String} formData.username - Name of the user.
+   * @param {String} formData.password - Password of the user.
+   */
+  async function signinUser(formData) {
+    const authToken = await ResumeManagerApi.signinUser(formData);
+    setAuthToken(authToken);
+  }
+
   return (
     <div className="App">
-      <RoutesList registerUser={registerUser} />
+      <RoutesList registerUser={registerUser} signinUser={signinUser} />
     </div>
   );
 }

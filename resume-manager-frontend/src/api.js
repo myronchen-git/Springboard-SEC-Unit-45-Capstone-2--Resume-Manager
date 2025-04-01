@@ -89,6 +89,18 @@ class ResumeManagerApi {
     const res = await this.request('auth/register', user, 'post');
     return res.authToken;
   }
+
+  /**
+   * Signs in a user.
+   *
+   * @param {Object} user - { username, password }
+   * @returns {String} A new authentication token used to allow making further
+   *  requests.
+   */
+  static async signinUser(user) {
+    const res = await this.request('auth/signin', user, 'post');
+    return res.authToken;
+  }
 }
 
 // ==================================================
