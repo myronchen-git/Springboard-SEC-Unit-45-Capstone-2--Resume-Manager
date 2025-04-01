@@ -74,6 +74,21 @@ class ResumeManagerApi {
       }
     }
   }
+
+  // --------------------------------------------------
+  // Individual API routes
+
+  /**
+   * Registers a new user.
+   *
+   * @param {Object} user - { username, password }
+   * @returns {String} A new authentication token used to allow making further
+   *  requests.
+   */
+  static async registerUser(user) {
+    const res = await this.request('auth/register', user, 'post');
+    return res.authToken;
+  }
 }
 
 // ==================================================
