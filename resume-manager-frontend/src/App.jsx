@@ -41,6 +41,13 @@ function App() {
   }
 
   /**
+   * Signs out a user.
+   */
+  async function signoutUser() {
+    ResumeManagerApi.authToken = null;
+  }
+
+  /**
    * Updates a user's account information, such as password.
    *
    * @param {Object} formData - Holds the data for updating account info.
@@ -59,6 +66,7 @@ function App() {
       <RoutesList
         registerUser={registerUser}
         signinUser={signinUser}
+        signoutUser={signoutUser}
         updateAccount={updateAccount}
       />
     </div>
