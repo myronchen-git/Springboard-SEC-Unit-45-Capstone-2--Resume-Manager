@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import Account from './routes/Account.jsx';
+import HomePage from './routes/HomePage.jsx';
 import Register from './routes/Register.jsx';
 import Signin from './routes/Signin.jsx';
 
@@ -9,6 +10,7 @@ import Signin from './routes/Signin.jsx';
 function RoutesList({ registerUser, signinUser, updateAccount }) {
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
       <Route
         path="/register"
         element={<Register registerUser={registerUser} />}
