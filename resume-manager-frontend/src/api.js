@@ -87,6 +87,7 @@ class ResumeManagerApi {
    */
   static async registerUser(user) {
     const res = await this.request('auth/register', user, 'post');
+    this.authToken = res.authToken;
     return res.authToken;
   }
 
@@ -99,6 +100,7 @@ class ResumeManagerApi {
    */
   static async signinUser(user) {
     const res = await this.request('auth/signin', user, 'post');
+    this.authToken = res.authToken;
     return res.authToken;
   }
 }

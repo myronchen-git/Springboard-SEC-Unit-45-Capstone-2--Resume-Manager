@@ -1,3 +1,4 @@
+import { jwtDecode } from 'jwt-decode';
 import { useState } from 'react';
 
 import ResumeManagerApi from './api.js';
@@ -11,7 +12,7 @@ import './App.css';
  * The core app component.  This contains shared data and functions.
  */
 function App() {
-  const [authToken, setAuthToken] = useState(null);
+  const [user, setUser] = useState({});
 
   /**
    * Registers a new user.
@@ -22,7 +23,8 @@ function App() {
    */
   async function registerUser(formData) {
     const authToken = await ResumeManagerApi.registerUser(formData);
-    setAuthToken(authToken);
+    const userData = jwtDecode(authToken);
+    setUser({ ...userData, authToken });
   }
 
   /**
@@ -34,7 +36,8 @@ function App() {
    */
   async function signinUser(formData) {
     const authToken = await ResumeManagerApi.signinUser(formData);
-    setAuthToken(authToken);
+    const userData = jwtDecode(authToken);
+    setUser({ ...userData, authToken });
   }
 
   return (
