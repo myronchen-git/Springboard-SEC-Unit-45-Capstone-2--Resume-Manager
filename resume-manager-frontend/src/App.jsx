@@ -40,9 +40,27 @@ function App() {
     setUser({ ...userData, authToken });
   }
 
+  /**
+   * Updates a user's account information, such as password.
+   *
+   * @param {Object} formData - Holds the data for updating account info.
+   * @see ResumeManagerApi.updateAccount for formData properties.
+   */
+  async function updateAccount(formData) {
+    const userData = await ResumeManagerApi.updateAccount(
+      user.username,
+      formData
+    );
+    setUser({ ...user, ...userData });
+  }
+
   return (
     <div className="App">
-      <RoutesList registerUser={registerUser} signinUser={signinUser} />
+      <RoutesList
+        registerUser={registerUser}
+        signinUser={signinUser}
+        updateAccount={updateAccount}
+      />
     </div>
   );
 }

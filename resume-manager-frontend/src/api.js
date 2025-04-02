@@ -103,6 +103,20 @@ class ResumeManagerApi {
     this.authToken = res.authToken;
     return res.authToken;
   }
+
+  /**
+   * Updates account-related info, like password.
+   *
+   * @param {String} username - Name of the user.
+   * @param {Object} user - Contains the data for updating account.
+   * @param {String} user.oldPassword - Old password of the user.
+   * @param {String} user.newPassword - New password of the user.
+   * @returns {Object} Account info of the user, such as username.
+   */
+  static async updateAccount(username, user) {
+    const res = await this.request(`users/${username}`, user, 'patch');
+    return res.user;
+  }
 }
 
 // ==================================================
