@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from 'reactstrap';
 
 import ResumeManagerApi from '../api';
@@ -19,23 +18,19 @@ function Document() {
   const [isDocumentSelectOpen, setIsDocumentSelectOpen] = useState(true);
   const [isNewDocumentFormOpen, setIsNewDocumentFormOpen] = useState(false);
   const { user } = useContext(UserContext);
-  const navigate = useNavigate();
 
   // --------------------------------------------------
 
   useEffect(() => {
     async function runEffect() {
-      // Redirects anyone not logged in.  This functionality might be moved to a
-      // parent route, in a route protector.
-      if (!user.username) navigate('/');
-
-      if (user.username && document === null) {
+      // User info should have already been retrieved.
+      if (document === null) {
         setDocuments(await ResumeManagerApi.getDocuments(user.username));
       }
     }
 
     runEffect();
-  }, [user, navigate, document]);
+  }, [user, document]);
 
   // --------------------------------------------------
 
