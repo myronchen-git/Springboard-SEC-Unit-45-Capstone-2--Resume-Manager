@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Alert,
@@ -13,22 +12,24 @@ import {
   Label,
 } from 'reactstrap';
 
+import { UserContext } from '../contexts.jsx';
+
 // ==================================================
 
 /**
  * Displays and handles the user registration form.
- *
- * @param {Object} props - React component properties.
- * @param {Function} props.registerUser - Registers a new user.
  */
-function Register({ registerUser }) {
+function Register() {
   const initialFormData = {
     username: '',
     password: '',
   };
   const [formData, setFormData] = useState(initialFormData);
   const [errorMessages, setErrorMessages] = useState(null);
+  const { registerUser } = useContext(UserContext);
   const navigate = useNavigate();
+
+  // --------------------------------------------------
 
   function handleChange(evt) {
     const { name, value } = evt.target;
@@ -47,6 +48,8 @@ function Register({ registerUser }) {
 
     navigate('/document');
   }
+
+  // --------------------------------------------------
 
   return (
     <main className="Register">
@@ -92,9 +95,5 @@ function Register({ registerUser }) {
 }
 
 // ==================================================
-
-Register.propTypes = {
-  registerUser: PropTypes.func.isRequired,
-};
 
 export default Register;

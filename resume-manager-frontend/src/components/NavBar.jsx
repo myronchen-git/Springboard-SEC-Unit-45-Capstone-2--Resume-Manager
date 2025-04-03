@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Collapse, Nav, Navbar, NavbarToggler, NavItem } from 'reactstrap';
 
+import { UserContext } from '../contexts.jsx';
+
 // ==================================================
 
-function NavBar({ signoutUser }) {
+function NavBar() {
   const [collapsed, setCollapsed] = useState(true);
+  const { signoutUser } = useContext(UserContext);
+
+  // --------------------------------------------------
 
   const toggleNavbar = () => setCollapsed(!collapsed);
+
+  // --------------------------------------------------
 
   return (
     <>

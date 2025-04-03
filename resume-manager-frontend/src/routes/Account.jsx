@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Alert,
@@ -13,22 +12,24 @@ import {
   Label,
 } from 'reactstrap';
 
+import { UserContext } from '../contexts.jsx';
+
 // ==================================================
 
 /**
  * Displays and handles the form to update account info.
- *
- * @param {Object} props - React component properties.
- * @param {Function} props.updateAccount - Updates a user's account.
  */
-function Account({ updateAccount }) {
+function Account() {
   const initialFormData = {
     oldPassword: '',
     newPassword: '',
   };
   const [formData, setFormData] = useState(initialFormData);
   const [errorMessages, setErrorMessages] = useState(null);
+  const { updateAccount } = useContext(UserContext);
   const navigate = useNavigate();
+
+  // --------------------------------------------------
 
   function handleChange(evt) {
     const { name, value } = evt.target;
@@ -47,6 +48,8 @@ function Account({ updateAccount }) {
 
     navigate('/document');
   }
+
+  // --------------------------------------------------
 
   return (
     <main className="Account">
@@ -92,9 +95,5 @@ function Account({ updateAccount }) {
 }
 
 // ==================================================
-
-Account.propTypes = {
-  updateAccount: PropTypes.func.isRequired,
-};
 
 export default Account;

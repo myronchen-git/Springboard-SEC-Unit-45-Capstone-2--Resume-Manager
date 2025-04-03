@@ -1,25 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'reactstrap';
 
 import ResumeManagerApi from '../api';
 import DocumentSelect from '../components/DocumentSelect';
 import NewDocumentForm from '../components/NewDocumentForm';
+import { UserContext } from '../contexts.jsx';
 
 // ==================================================
 
 /**
  * This is the core webpage / component of the app.  Displays the document and
  * allows interacting with it, as well as gives document selection.
- *
- * @param {Object} props - React component properties.
- * @param {String} props.username - Name of the user accessing the website.
  */
-function Document({ username }) {
+function Document() {
   const [document, setDocument] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [isDocumentSelectOpen, setIsDocumentSelectOpen] = useState(true);
   const [isNewDocumentFormOpen, setIsNewDocumentFormOpen] = useState(false);
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
   // --------------------------------------------------
@@ -28,15 +27,15 @@ function Document({ username }) {
     async function runEffect() {
       // Redirects anyone not logged in.  This functionality might be moved to a
       // parent route, in a route protector.
-      if (!username) navigate('/');
+      if (!user.username) navigate('/');
 
-      if (username && document === null) {
-        setDocuments(await ResumeManagerApi.getDocuments(username));
+      if (user.username && document === null) {
+        setDocuments(await ResumeManagerApi.getDocuments(user.username));
       }
     }
 
     runEffect();
-  }, [username, navigate, document]);
+  }, [user, navigate, document]);
 
   // --------------------------------------------------
 
@@ -59,7 +58,7 @@ function Document({ username }) {
   }
 
   async function createDocument(formData) {
-    setDocument(await ResumeManagerApi.createDocument(username, formData));
+    setDocument(await ResumeManagerApi.createDocument(user.username, formData));
     setIsNewDocumentFormOpen(false);
   }
 

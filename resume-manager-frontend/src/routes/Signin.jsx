@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Alert,
@@ -13,22 +12,24 @@ import {
   Label,
 } from 'reactstrap';
 
+import { UserContext } from '../contexts.jsx';
+
 // ==================================================
 
 /**
  * Displays and handles the user sign-in form.
- *
- * @param {Object} props - React component properties.
- * @param {Function} props.signinUser - Signs in the user.
  */
-function Signin({ signinUser }) {
+function Signin() {
   const initialFormData = {
     username: '',
     password: '',
   };
   const [formData, setFormData] = useState(initialFormData);
   const [errorMessages, setErrorMessages] = useState(null);
+  const { signinUser } = useContext(UserContext);
   const navigate = useNavigate();
+
+  // --------------------------------------------------
 
   function handleChange(evt) {
     const { name, value } = evt.target;
@@ -47,6 +48,8 @@ function Signin({ signinUser }) {
 
     navigate('/document');
   }
+
+  // --------------------------------------------------
 
   return (
     <main className="Signin">
@@ -92,9 +95,5 @@ function Signin({ signinUser }) {
 }
 
 // ==================================================
-
-Signin.propTypes = {
-  signinUser: PropTypes.func.isRequired,
-};
 
 export default Signin;
