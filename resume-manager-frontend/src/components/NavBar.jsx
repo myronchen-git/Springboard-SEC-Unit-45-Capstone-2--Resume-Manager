@@ -16,6 +16,9 @@ function NavBar({ signoutUser }) {
         <Collapse isOpen={!collapsed} navbar>
           <Nav navbar>
             <NavItem>
+              <NavLink to="/document">Document</NavLink>
+            </NavItem>
+            <NavItem>
               <NavLink to="/account">Account</NavLink>
             </NavItem>
             <NavItem>

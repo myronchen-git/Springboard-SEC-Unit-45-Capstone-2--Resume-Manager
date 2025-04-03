@@ -2,13 +2,20 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import NavBar from './components/NavBar.jsx';
 import Account from './routes/Account.jsx';
+import Document from './routes/Document.jsx';
 import HomePage from './routes/HomePage.jsx';
 import Register from './routes/Register.jsx';
 import Signin from './routes/Signin.jsx';
 
 // ==================================================
 
-function RoutesList({ registerUser, signinUser, signoutUser, updateAccount }) {
+function RoutesList({
+  registerUser,
+  signinUser,
+  signoutUser,
+  updateAccount,
+  username,
+}) {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -22,6 +29,7 @@ function RoutesList({ registerUser, signinUser, signoutUser, updateAccount }) {
           path="/account"
           element={<Account updateAccount={updateAccount} />}
         />
+        <Route path="/document" element={<Document username={username} />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

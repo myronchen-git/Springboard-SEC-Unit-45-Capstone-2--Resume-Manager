@@ -45,7 +45,7 @@ function Signin({ signinUser }) {
       return;
     }
 
-    navigate('/');
+    navigate('/document');
   }
 
   return (

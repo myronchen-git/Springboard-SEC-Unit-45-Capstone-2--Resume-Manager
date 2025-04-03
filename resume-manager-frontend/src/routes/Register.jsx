@@ -45,7 +45,7 @@ function Register({ registerUser }) {
       return;
     }
 
-    navigate('/');
+    navigate('/document');
   }
 
   return (

@@ -45,7 +45,7 @@ function Account({ updateAccount }) {
       return;
     }
 
-    navigate('/');
+    navigate('/document');
   }
 
   return (

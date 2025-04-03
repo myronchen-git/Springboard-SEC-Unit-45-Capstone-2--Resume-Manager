@@ -117,6 +117,34 @@ class ResumeManagerApi {
     const res = await this.request(`users/${username}`, user, 'patch');
     return res.user;
   }
+
+  /**
+   * Creates a new resume or template.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @param {Object} data - Holds the info for creating a new document.
+   * @param {String} data.documentName - Name of the new document.
+   * @param {Boolean} data.isTemplate - Whether this new document should be a
+   *  template.
+   * @returns {Object} Returns the properties of the document.
+   */
+  static async createDocument(username, data) {
+    const res = await this.request(`users/${username}/documents`, data, 'post');
+    return res.document;
+  }
+
+  /**
+   * Gets all documents and their properties.  This does not get the contents,
+   * such as education and experience.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @returns {Object} Returns a list of documents containing all info of each
+   *  document.
+   */
+  static async getDocuments(username) {
+    const res = await this.request(`users/${username}/documents`);
+    return res.documents;
+  }
 }
 
 // ==================================================

@@ -68,6 +68,7 @@ function App() {
         signinUser={signinUser}
         signoutUser={signoutUser}
         updateAccount={updateAccount}
+        username={user.username}
       />
     </div>
   );
