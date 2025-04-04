@@ -4,6 +4,7 @@ import { Button } from 'reactstrap';
 import ResumeManagerApi from '../api';
 import DocumentSelect from '../components/DocumentSelect';
 import NewDocumentForm from '../components/NewDocumentForm';
+import SectionsList from '../components/SectionsList.jsx';
 import { UserContext } from '../contexts.jsx';
 
 // ==================================================
@@ -109,14 +110,7 @@ function Document() {
           close={closeNewDocumentForm}
         />
       )}
-      {/* placeholder */}
-      {document && (
-        <p>
-          Document Name: {document?.documentName}
-          <br />
-          Full Name: {document?.contactInfo?.fullName}
-        </p>
-      )}
+      {document && <SectionsList document={document} />}
     </main>
   );
 }
