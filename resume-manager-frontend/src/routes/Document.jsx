@@ -46,14 +46,32 @@ function Document() {
     if (documentId === '0') {
       setIsNewDocumentFormOpen(true);
     } else {
-      // Retrieve document and contents.
+      setDocument(
+        await ResumeManagerApi.getDocument(user.username, documentId)
+      );
     }
 
     setIsDocumentSelectOpen(false);
   }
 
   async function createDocument(formData) {
-    setDocument(await ResumeManagerApi.createDocument(user.username, formData));
+    const newDocument = await ResumeManagerApi.createDocument(
+      user.username,
+      formData
+    );
+
+    // Adds the new document to list of already retrieved ones to reduce an
+    // extra, unnecessary network call.
+    setDocuments([...documents, { ...newDocument }]);
+
+    // Gets and adds contact info to the new document.  This is done instead of
+    // calling the URL to retrieve a document and its contents, because this
+    // requires less processing by the database.
+    newDocument.contactInfo = await ResumeManagerApi.getContactInfo(
+      user.username
+    );
+
+    setDocument(newDocument);
     setIsNewDocumentFormOpen(false);
   }
 
@@ -76,6 +94,14 @@ function Document() {
           createDocument={createDocument}
           close={closeNewDocumentForm}
         />
+      )}
+      {/* placeholder */}
+      {document && (
+        <p>
+          Document Name: {document?.documentName}
+          <br />
+          Full Name: {document?.contactInfo?.fullName}
+        </p>
       )}
     </main>
   );

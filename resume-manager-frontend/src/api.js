@@ -134,6 +134,17 @@ class ResumeManagerApi {
   }
 
   /**
+   * Gets a user's contact information, such as full name, location, and email.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @returns {Object} Contact information data.s
+   */
+  static async getContactInfo(username) {
+    const res = await this.request(`users/${username}/contact-info`);
+    return res.contactInfo;
+  }
+
+  /**
    * Gets all documents and their properties.  This does not get the contents,
    * such as education and experience.
    *
@@ -144,6 +155,19 @@ class ResumeManagerApi {
   static async getDocuments(username) {
     const res = await this.request(`users/${username}/documents`);
     return res.documents;
+  }
+
+  /**
+   * Gets a document with all its contents.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @param {String} documentId - ID of the document to retrieve.
+   * @returns {Object} Document properties, contact info, education, experience,
+   *  etc.
+   */
+  static async getDocument(username, documentId) {
+    const res = await this.request(`users/${username}/documents/${documentId}`);
+    return res.document;
   }
 }
 
