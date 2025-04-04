@@ -42,6 +42,12 @@ function Document() {
     setIsNewDocumentFormOpen(false);
   }
 
+  /**
+   * Gets a document and its contents for displaying.  A document ID of 0
+   * signifies to create a new document.
+   *
+   * @param {String} documentId - ID of the document to retrieve and display.
+   */
   async function loadDocument(documentId) {
     if (documentId === '0') {
       setIsNewDocumentFormOpen(true);
@@ -54,6 +60,14 @@ function Document() {
     setIsDocumentSelectOpen(false);
   }
 
+  /**
+   * Sends a network call to create a new document, updates the list of
+   * documents that the user has with the new document, and updates the document
+   * state with the new document.
+   *
+   * @param {Object} formData - Required data to create a new document.
+   * @see ResumeManagerApi.createDocument for formData properties.
+   */
   async function createDocument(formData) {
     const newDocument = await ResumeManagerApi.createDocument(
       user.username,
