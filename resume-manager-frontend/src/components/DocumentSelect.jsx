@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useState } from 'react';
 import {
   Alert,
@@ -123,11 +122,5 @@ function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
 }
 
 // ==================================================
-
-DocumentSelect.propTypes = {
-  documents: PropTypes.array.isRequired,
-  loadDocument: PropTypes.func.isRequired,
-  closeDocumentSelect: PropTypes.func.isRequired,
-};
 
 export default DocumentSelect;

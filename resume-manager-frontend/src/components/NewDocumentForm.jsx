@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useState } from 'react';
 import {
   Alert,
@@ -98,10 +97,5 @@ function NewDocumentForm({ createDocument, close }) {
 }
 
 // ==================================================
-
-NewDocumentForm.propTypes = {
-  createDocument: PropTypes.func.isRequired,
-  close: PropTypes.func.isRequired,
-};
 
 export default NewDocumentForm;
