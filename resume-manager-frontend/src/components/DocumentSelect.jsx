@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -33,6 +34,7 @@ import {
  */
 function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
   const [documentId, setDocumentId] = useState(null);
+  const [errorMessages, setErrorMessages] = useState(null);
 
   function handleChange(evt) {
     const { value } = evt.target;
@@ -41,7 +43,13 @@ function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
 
   async function handleSubmit(evt) {
     evt.preventDefault();
-    await loadDocument(documentId);
+
+    try {
+      await loadDocument(documentId);
+    } catch (err) {
+      setErrorMessages(err);
+      return;
+    }
   }
 
   return (
@@ -103,6 +111,7 @@ function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
               </Card>
             </Label>
           </FormGroup>
+          {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
         </ModalBody>
         <ModalFooter>
           <Button type="submit">Open</Button>
