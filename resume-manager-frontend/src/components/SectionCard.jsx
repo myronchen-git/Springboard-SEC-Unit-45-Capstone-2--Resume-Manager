@@ -1,9 +1,12 @@
 import { Card, CardBody, CardTitle } from 'reactstrap';
 
+import EducationCard from './EducationCard';
+
 // ==================================================
 
-// Section IDs are the index positions.
-const sectionIdToSectionComponent = [null];
+// Holds the components that can be used to display a section item.  Section IDs
+// are the index positions.
+const sectionIdToSectionComponent = [null, EducationCard];
 
 // --------------------------------------------------
 
