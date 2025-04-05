@@ -110,7 +110,9 @@ function Document() {
           close={closeNewDocumentForm}
         />
       )}
-      {document && <SectionsList document={document} />}
+      {document && (
+        <SectionsList document={document} setDocument={setDocument} />
+      )}
     </main>
   );
 }

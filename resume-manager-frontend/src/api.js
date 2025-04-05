@@ -169,6 +169,36 @@ class ResumeManagerApi {
     const res = await this.request(`users/${username}/documents/${documentId}`);
     return res.document;
   }
+
+  /**
+   * Gets all allowed sections that a resume can contain.
+   *
+   * @returns {Object[]} A list of sections, in the form of Objects, that can be
+   *  used in documents.
+   */
+  static async getSections() {
+    const res = await this.request('sections');
+    return res.sections;
+  }
+
+  /**
+   * Attaches a section to a document.  In other words, creates a
+   * document-section relationship.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @param {String} documentId - ID of the document to add a section to.
+   * @param {String} sectionId - ID of the section to add.
+   * @returns {Object} The document_x_section Object, which contains document
+   *  ID, section ID, and position of section within document.
+   */
+  static async addSection(username, documentId, sectionId) {
+    const res = await this.request(
+      `users/${username}/documents/${documentId}/sections/${sectionId}`,
+      {},
+      'post'
+    );
+    return res.document_x_section;
+  }
 }
 
 // ==================================================
