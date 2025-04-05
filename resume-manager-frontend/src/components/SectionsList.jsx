@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import ResumeManagerApi from '../api.js';
-import { UserContext } from '../contexts.jsx';
+import { DocumentContext, UserContext } from '../contexts.jsx';
 import AddSectionCard from './AddSectionCard.jsx';
 import SectionCard from './SectionCard.jsx';
 
@@ -21,16 +21,11 @@ const sectionIdToDatabaseName = [
 
 /**
  * Renders a list of sections for a resume.
- *
- * @param {Object} props - React component properties.
- * @param {Object} props.document - Contains section info and contents.  Must
- *  not be null.
- * @param {Function} props.setDocument - Updates the document state in the
- *  parent component.
  */
-function SectionsList({ document, setDocument }) {
+function SectionsList() {
   const [availableSections, setAvailableSections] = useState([]);
   const { user } = useContext(UserContext);
+  const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 

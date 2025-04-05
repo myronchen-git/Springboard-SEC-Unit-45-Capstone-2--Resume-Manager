@@ -5,7 +5,7 @@ import ResumeManagerApi from '../api';
 import DocumentSelect from '../components/DocumentSelect';
 import NewDocumentForm from '../components/NewDocumentForm';
 import SectionsList from '../components/SectionsList.jsx';
-import { UserContext } from '../contexts.jsx';
+import { DocumentContext, UserContext } from '../contexts.jsx';
 
 // ==================================================
 
@@ -93,27 +93,27 @@ function Document() {
   // --------------------------------------------------
 
   return (
-    <main className="Document">
-      <Button onClick={() => setIsDocumentSelectOpen(true)}>
-        Select Document
-      </Button>
-      {isDocumentSelectOpen && (
-        <DocumentSelect
-          documents={documents}
-          loadDocument={loadDocument}
-          closeDocumentSelect={closeDocumentSelect}
-        />
-      )}
-      {isNewDocumentFormOpen && (
-        <NewDocumentForm
-          createDocument={createDocument}
-          close={closeNewDocumentForm}
-        />
-      )}
-      {document && (
-        <SectionsList document={document} setDocument={setDocument} />
-      )}
-    </main>
+    <DocumentContext.Provider value={[document, setDocument]}>
+      <main className="Document">
+        <Button onClick={() => setIsDocumentSelectOpen(true)}>
+          Select Document
+        </Button>
+        {isDocumentSelectOpen && (
+          <DocumentSelect
+            documents={documents}
+            loadDocument={loadDocument}
+            closeDocumentSelect={closeDocumentSelect}
+          />
+        )}
+        {isNewDocumentFormOpen && (
+          <NewDocumentForm
+            createDocument={createDocument}
+            close={closeNewDocumentForm}
+          />
+        )}
+        {document && <SectionsList />}
+      </main>
+    </DocumentContext.Provider>
   );
 }
 

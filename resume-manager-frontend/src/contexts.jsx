@@ -7,6 +7,11 @@ import { createContext } from 'react';
  */
 const UserContext = createContext({});
 
+/**
+ * Holds access to the document state.
+ */
+const DocumentContext = createContext(null);
+
 // ==================================================
 
-export { UserContext };
+export { DocumentContext, UserContext };
