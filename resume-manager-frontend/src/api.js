@@ -269,6 +269,37 @@ class ResumeManagerApi {
       'post'
     );
   }
+
+  /**
+   * Deletes an education entry from the database.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @param {String} educationId - ID of the education to delete.
+   */
+  static async deleteEducation(username, educationId) {
+    await this.request(
+      `users/${username}/educations/${educationId}`,
+      {},
+      'delete'
+    );
+  }
+
+  /**
+   * Removes an education from a document, but does not delete the entry itself.
+   * This is used for non-master resumes.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @param {String} documentId - ID of the document to remove the education
+   *  from.
+   * @param {String} educationId - ID of the education to remove.
+   */
+  static async removeEducationFromDocument(username, documentId, educationId) {
+    await this.request(
+      `users/${username}/documents/${documentId}/educations/${educationId}`,
+      {},
+      'delete'
+    );
+  }
 }
 
 // ==================================================
