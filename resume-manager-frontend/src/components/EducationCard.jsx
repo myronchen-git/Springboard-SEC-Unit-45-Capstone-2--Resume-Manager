@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../api.js';
-import { DocumentContext, UserContext } from '../contexts.jsx';
+import { DocumentContext } from '../contexts.jsx';
 
 import trashIcon from '../assets/trash.svg';
 
@@ -16,7 +16,6 @@ import trashIcon from '../assets/trash.svg';
  *  like school name and location, to display.
  */
 function EducationCard({ item: education }) {
-  const { user } = useContext(UserContext);
   const [document, setDocument] = useContext(DocumentContext);
   const [errorMessages, setErrorMessages] = useState(null);
 
@@ -40,10 +39,9 @@ function EducationCard({ item: education }) {
 
     try {
       if (document.isMaster) {
-        await ResumeManagerApi.deleteEducation(user.username, educationId);
+        await ResumeManagerApi.deleteEducation(educationId);
       } else {
         await ResumeManagerApi.removeEducationFromDocument(
-          user.username,
           document.id,
           educationId
         );

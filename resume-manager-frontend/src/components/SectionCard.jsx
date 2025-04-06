@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader, CardTitle } from 'reactstrap';
 
 import ResumeManagerApi from '../api.js';
-import { DocumentContext, UserContext } from '../contexts.jsx';
+import { DocumentContext } from '../contexts.jsx';
 import AddEducationCard from './AddEducationCard';
 import EducationCard from './EducationCard';
 
@@ -22,7 +22,6 @@ import trashIcon from '../assets/trash.svg';
  *  educations or experiences.
  */
 function SectionCard({ section, items }) {
-  const { user } = useContext(UserContext);
   const [document, setDocument] = useContext(DocumentContext);
   const [errorMessages, setErrorMessages] = useState(null);
 
@@ -40,11 +39,7 @@ function SectionCard({ section, items }) {
     const sectionId = evt.target.parentElement.parentElement.dataset.id;
 
     try {
-      await ResumeManagerApi.deleteSection(
-        user.username,
-        document.id,
-        sectionId
-      );
+      await ResumeManagerApi.deleteSection(document.id, sectionId);
     } catch (err) {
       setErrorMessages(err);
       setTimeout(() => setErrorMessages(null), 5000);
@@ -73,7 +68,6 @@ function SectionCard({ section, items }) {
    */
   async function addEducation(formData) {
     const { education: newEducation } = await ResumeManagerApi.addEducation(
-      user.username,
       document.id,
       formData
     );

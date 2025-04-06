@@ -13,9 +13,13 @@ const BASE_URL =
  */
 class ResumeManagerApi {
   static #authToken;
+  static #username;
 
   static {
     this.#authToken = localStorage.getItem('authToken');
+    this.#username = this.#authToken
+      ? jwtDecode(this.#authToken).username
+      : null;
   }
 
   static get authToken() {
@@ -26,9 +30,11 @@ class ResumeManagerApi {
     if (token == null) {
       localStorage.removeItem('authToken');
       this.#authToken = null;
+      this.#username = null;
     } else {
       localStorage.setItem('authToken', token);
       this.#authToken = token;
+      this.#username = jwtDecode(token).username;
     }
   }
 
@@ -126,40 +132,41 @@ class ResumeManagerApi {
   /**
    * Updates account-related info, like password.
    *
-   * @param {String} username - Name of the user.
    * @param {Object} user - Contains the data for updating account.
    * @param {String} user.oldPassword - Old password of the user.
    * @param {String} user.newPassword - New password of the user.
    * @returns {Object} Account info of the user, such as username.
    */
-  static async updateAccount(username, user) {
-    const res = await this.request(`users/${username}`, user, 'patch');
+  static async updateAccount(user) {
+    const res = await this.request(`users/${this.#username}`, user, 'patch');
     return res.user;
   }
 
   /**
    * Creates a new resume or template.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @param {Object} data - Holds the info for creating a new document.
    * @param {String} data.documentName - Name of the new document.
    * @param {Boolean} data.isTemplate - Whether this new document should be a
    *  template.
    * @returns {Object} Returns the properties of the document.
    */
-  static async createDocument(username, data) {
-    const res = await this.request(`users/${username}/documents`, data, 'post');
+  static async createDocument(data) {
+    const res = await this.request(
+      `users/${this.#username}/documents`,
+      data,
+      'post'
+    );
     return res.document;
   }
 
   /**
    * Gets a user's contact information, such as full name, location, and email.
    *
-   * @param {String} username - Name of the user accessing the website.
-   * @returns {Object} Contact information data.s
+   * @returns {Object} Contact information data.
    */
-  static async getContactInfo(username) {
-    const res = await this.request(`users/${username}/contact-info`);
+  static async getContactInfo() {
+    const res = await this.request(`users/${this.#username}/contact-info`);
     return res.contactInfo;
   }
 
@@ -167,25 +174,25 @@ class ResumeManagerApi {
    * Gets all documents and their properties.  This does not get the contents,
    * such as education and experience.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @returns {Object} Returns a list of documents containing all info of each
    *  document.
    */
-  static async getDocuments(username) {
-    const res = await this.request(`users/${username}/documents`);
+  static async getDocuments() {
+    const res = await this.request(`users/${this.#username}/documents`);
     return res.documents;
   }
 
   /**
    * Gets a document with all its contents.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @param {String} documentId - ID of the document to retrieve.
    * @returns {Object} Document properties, contact info, education, experience,
    *  etc.
    */
-  static async getDocument(username, documentId) {
-    const res = await this.request(`users/${username}/documents/${documentId}`);
+  static async getDocument(documentId) {
+    const res = await this.request(
+      `users/${this.#username}/documents/${documentId}`
+    );
     return res.document;
   }
 
@@ -204,15 +211,14 @@ class ResumeManagerApi {
    * Attaches a section to a document.  In other words, creates a
    * document-section relationship.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @param {String} documentId - ID of the document to add a section to.
    * @param {String} sectionId - ID of the section to add.
    * @returns {Object} The document_x_section Object, which contains document
    *  ID, section ID, and position of section within document.
    */
-  static async addSection(username, documentId, sectionId) {
+  static async addSection(documentId, sectionId) {
     const res = await this.request(
-      `users/${username}/documents/${documentId}/sections/${sectionId}`,
+      `users/${this.#username}/documents/${documentId}/sections/${sectionId}`,
       {},
       'post'
     );
@@ -223,13 +229,12 @@ class ResumeManagerApi {
    * Deletes a section from a document.  Since sections are currently not
    * user-created, this will delete the document-section relationships.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @param {String} documentId - ID of the document to remove a section from.
    * @param {String} sectionId - ID of the section to remove.
    */
-  static async deleteSection(username, documentId, sectionId) {
+  static async deleteSection(documentId, sectionId) {
     await this.request(
-      `users/${username}/documents/${documentId}/sections/${sectionId}`,
+      `users/${this.#username}/documents/${documentId}/sections/${sectionId}`,
       {},
       'delete'
     );
@@ -238,7 +243,6 @@ class ResumeManagerApi {
   /**
    * Creates a new education entry and adds it to a document.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @param {String} documentId - ID of the document to add an education to.
    * @param {Object} data - Holds the info for creating a new education.
    * @param {String} data.school - School or education center name.
@@ -262,9 +266,9 @@ class ResumeManagerApi {
    *  education ID, and the position of the education among other educations in
    *  the document.
    */
-  static async addEducation(username, documentId, data) {
+  static async addEducation(documentId, data) {
     return await this.request(
-      `users/${username}/documents/${documentId}/educations`,
+      `users/${this.#username}/documents/${documentId}/educations`,
       data,
       'post'
     );
@@ -273,12 +277,11 @@ class ResumeManagerApi {
   /**
    * Deletes an education entry from the database.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @param {String} educationId - ID of the education to delete.
    */
-  static async deleteEducation(username, educationId) {
+  static async deleteEducation(educationId) {
     await this.request(
-      `users/${username}/educations/${educationId}`,
+      `users/${this.#username}/educations/${educationId}`,
       {},
       'delete'
     );
@@ -288,14 +291,15 @@ class ResumeManagerApi {
    * Removes an education from a document, but does not delete the entry itself.
    * This is used for non-master resumes.
    *
-   * @param {String} username - Name of the user accessing the website.
    * @param {String} documentId - ID of the document to remove the education
    *  from.
    * @param {String} educationId - ID of the education to remove.
    */
-  static async removeEducationFromDocument(username, documentId, educationId) {
+  static async removeEducationFromDocument(documentId, educationId) {
     await this.request(
-      `users/${username}/documents/${documentId}/educations/${educationId}`,
+      `users/${
+        this.#username
+      }/documents/${documentId}/educations/${educationId}`,
       {},
       'delete'
     );

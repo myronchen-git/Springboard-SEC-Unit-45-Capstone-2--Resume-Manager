@@ -26,7 +26,7 @@ function Document() {
     async function runEffect() {
       // User info should have already been retrieved.
       if (document === null) {
-        setDocuments(await ResumeManagerApi.getDocuments(user.username));
+        setDocuments(await ResumeManagerApi.getDocuments());
       }
     }
 
@@ -53,9 +53,7 @@ function Document() {
     if (documentId === '0') {
       setIsNewDocumentFormOpen(true);
     } else {
-      setDocument(
-        await ResumeManagerApi.getDocument(user.username, documentId)
-      );
+      setDocument(await ResumeManagerApi.getDocument(documentId));
     }
 
     setIsDocumentSelectOpen(false);
@@ -70,10 +68,7 @@ function Document() {
    * @see ResumeManagerApi.createDocument for formData properties.
    */
   async function createDocument(formData) {
-    const newDocument = await ResumeManagerApi.createDocument(
-      user.username,
-      formData
-    );
+    const newDocument = await ResumeManagerApi.createDocument(formData);
 
     // Adds the new document to list of already retrieved ones to reduce an
     // extra, unnecessary network call.
@@ -82,9 +77,7 @@ function Document() {
     // Gets and adds contact info to the new document.  This is done instead of
     // calling the URL to retrieve a document and its contents, because this
     // requires less processing by the database.
-    newDocument.contactInfo = await ResumeManagerApi.getContactInfo(
-      user.username
-    );
+    newDocument.contactInfo = await ResumeManagerApi.getContactInfo();
 
     setDocument(newDocument);
     setIsNewDocumentFormOpen(false);

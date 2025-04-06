@@ -57,10 +57,7 @@ function App() {
    */
   const updateAccount = useCallback(
     async (formData) => {
-      const userData = await ResumeManagerApi.updateAccount(
-        user.username,
-        formData
-      );
+      const userData = await ResumeManagerApi.updateAccount(formData);
       setUser({ ...user, ...userData });
     },
     [user]

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import ResumeManagerApi from '../api.js';
-import { DocumentContext, UserContext } from '../contexts.jsx';
+import { DocumentContext } from '../contexts.jsx';
 import AddSectionCard from './AddSectionCard.jsx';
 import SectionCard from './SectionCard.jsx';
 
@@ -24,7 +24,6 @@ const sectionIdToDatabaseName = [
  */
 function SectionsList() {
   const [availableSections, setAvailableSections] = useState([]);
-  const { user } = useContext(UserContext);
   const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
@@ -47,7 +46,7 @@ function SectionsList() {
    * @param {String} sectionId - ID of the section to add.
    */
   async function addSection(sectionId) {
-    await ResumeManagerApi.addSection(user.username, document.id, sectionId);
+    await ResumeManagerApi.addSection(document.id, sectionId);
 
     // Clone document so that React sees the document state has been modified.
     const documentClone = structuredClone(document);
