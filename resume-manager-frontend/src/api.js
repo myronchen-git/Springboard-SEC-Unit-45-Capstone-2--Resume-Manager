@@ -1,3 +1,4 @@
+import { jwtDecode } from 'jwt-decode';
 import axios from '../node_modules/axios';
 
 // ==================================================
@@ -11,7 +12,27 @@ const BASE_URL =
  * A class to hold the API functions that call the back-end.
  */
 class ResumeManagerApi {
-  static authToken = null;
+  static #authToken;
+
+  static {
+    this.#authToken = localStorage.getItem('authToken');
+  }
+
+  static get authToken() {
+    return this.#authToken;
+  }
+
+  static set authToken(token) {
+    if (token == null) {
+      localStorage.removeItem('authToken');
+      this.#authToken = null;
+    } else {
+      localStorage.setItem('authToken', token);
+      this.#authToken = token;
+    }
+  }
+
+  // --------------------------------------------------
 
   /**
    * Makes an HTTP request and handles any errors from that.
@@ -26,7 +47,7 @@ class ResumeManagerApi {
     console.debug('API Call: ', endpoint, data, method);
 
     const url = `${BASE_URL}/${endpoint}`;
-    const headers = { Authorization: `Bearer ${ResumeManagerApi.authToken}` };
+    const headers = { Authorization: `Bearer ${this.authToken}` };
     const params = method === 'get' ? data : {};
 
     try {
@@ -82,26 +103,24 @@ class ResumeManagerApi {
    * Registers a new user.
    *
    * @param {Object} user - { username, password }
-   * @returns {String} A new authentication token used to allow making further
-   *  requests.
+   * @returns {Object} Decoded authentication token, which should be user data.
    */
   static async registerUser(user) {
     const res = await this.request('auth/register', user, 'post');
     this.authToken = res.authToken;
-    return res.authToken;
+    return jwtDecode(res.authToken);
   }
 
   /**
    * Signs in a user.
    *
    * @param {Object} user - { username, password }
-   * @returns {String} A new authentication token used to allow making further
-   *  requests.
+   * @returns {Object} Decoded authentication token, which should be user data.
    */
   static async signinUser(user) {
     const res = await this.request('auth/signin', user, 'post');
     this.authToken = res.authToken;
-    return res.authToken;
+    return jwtDecode(res.authToken);
   }
 
   /**

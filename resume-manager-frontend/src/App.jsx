@@ -13,7 +13,9 @@ import './App.css';
  * The core app component.  This contains shared data and functions.
  */
 function App() {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(
+    ResumeManagerApi.authToken ? jwtDecode(ResumeManagerApi.authToken) : {}
+  );
 
   // --------------------------------------------------
 
@@ -25,9 +27,7 @@ function App() {
    * @param {String} formData.password - Password for the user.
    */
   const registerUser = useCallback(async (formData) => {
-    const authToken = await ResumeManagerApi.registerUser(formData);
-    const userData = jwtDecode(authToken);
-    setUser({ ...userData, authToken });
+    setUser(await ResumeManagerApi.registerUser(formData));
   }, []);
 
   /**
@@ -38,9 +38,7 @@ function App() {
    * @param {String} formData.password - Password of the user.
    */
   const signinUser = useCallback(async (formData) => {
-    const authToken = await ResumeManagerApi.signinUser(formData);
-    const userData = jwtDecode(authToken);
-    setUser({ ...userData, authToken });
+    setUser(await ResumeManagerApi.signinUser(formData));
   }, []);
 
   /**
@@ -48,6 +46,7 @@ function App() {
    */
   const signoutUser = useCallback(async () => {
     ResumeManagerApi.authToken = null;
+    setUser({});
   }, []);
 
   /**
