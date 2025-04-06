@@ -11,6 +11,8 @@ import {
   Label,
 } from 'reactstrap';
 
+import trashIcon from '../assets/trash.svg';
+
 // ==================================================
 
 /**
@@ -101,7 +103,7 @@ function AddEducationCard({ addItem }) {
       {isRevealed ? (
         <>
           <CardHeader className="text-end" onClick={toggleOpen}>
-            trash icon
+            {<img src={trashIcon} alt="trash icon" />}
           </CardHeader>
           <CardBody>
             <Form className="AddEducationCard__form" onSubmit={handleSubmit}>

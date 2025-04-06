@@ -6,6 +6,8 @@ import { DocumentContext, UserContext } from '../contexts.jsx';
 import AddEducationCard from './AddEducationCard';
 import EducationCard from './EducationCard';
 
+import trashIcon from '../assets/trash.svg';
+
 // ==================================================
 
 /**
@@ -30,11 +32,12 @@ function SectionCard({ section, items }) {
    * Removes a section from a document.  In other words, this deletes a
    * document-section relationship.
    *
-   * @param {Event} evt - The click event of the HTML element that has a direct
-   *  parent containing the "id" data attribute for the section ID.
+   * @param {Event} evt - The click event of the HTML element with a parent two
+   *  levels up, where the parent contains the "id" data attribute for the
+   *  section ID.
    */
   async function deleteSection(evt) {
-    const sectionId = evt.target.parentElement.dataset.id;
+    const sectionId = evt.target.parentElement.parentElement.dataset.id;
 
     try {
       await ResumeManagerApi.deleteSection(
@@ -122,7 +125,7 @@ function SectionCard({ section, items }) {
     <Card className="SectionCard text-center" data-id={section.id}>
       <CardHeader className="text-end" onClick={deleteSection}>
         {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
-        trash icon
+        {<img src={trashIcon} alt="trash icon" />}
       </CardHeader>
       <CardBody>
         <CardTitle>{section.sectionName}</CardTitle>

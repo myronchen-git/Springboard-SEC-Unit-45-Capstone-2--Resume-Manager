@@ -9,6 +9,8 @@ import {
   Input,
 } from 'reactstrap';
 
+import trashIcon from '../assets/trash.svg';
+
 // ==================================================
 
 /**
@@ -64,7 +66,7 @@ function AddSectionCard({ availableSections, addSection }) {
       {isRevealed ? (
         <>
           <CardHeader className="text-end" onClick={toggleOpen}>
-            trash icon
+            {<img src={trashIcon} alt="trash icon" />}
           </CardHeader>
           <CardBody>
             <Form onSubmit={handleSubmit}>
