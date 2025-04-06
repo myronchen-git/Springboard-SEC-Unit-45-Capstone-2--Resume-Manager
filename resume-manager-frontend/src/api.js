@@ -199,6 +199,41 @@ class ResumeManagerApi {
     );
     return res.document_x_section;
   }
+
+  /**
+   * Creates a new education entry and adds it to a document.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @param {String} documentId - ID of the document to add an education to.
+   * @param {Object} data - Holds the info for creating a new education.
+   * @param {String} data.school - School or education center name.
+   * @param {String} data.location - Location of school.
+   * @param {String} data.startDate - The start date of joining the school.
+   * @param {String} data.endDate - The end date of leaving the school.
+   * @param {String} data.degree - The degree name that was or will be given
+   *  from the school.
+   * @param {String} [data.gpa] - The grade point average throughout the
+   *  attendance.
+   * @param {String} [data.awardsAndHonors] - Any awards or honors given by the
+   *  school.
+   * @param {String} [data.activities] - Any activities done in relation to the
+   *  school.
+   * @returns {{
+   *    education: Object,
+   *    document_x_education: Object
+   *  }}
+   *  education - The education ID and all of the given info.
+   *  document_x_education - The document ID that owns the education, the
+   *  education ID, and the position of the education among other educations in
+   *  the document.
+   */
+  static async addEducation(username, documentId, data) {
+    return await this.request(
+      `users/${username}/documents/${documentId}/educations`,
+      data,
+      'post'
+    );
+  }
 }
 
 // ==================================================
