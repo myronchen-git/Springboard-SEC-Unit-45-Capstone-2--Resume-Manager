@@ -13,16 +13,16 @@ import RouteProtector from './routes/middleware/routeProtector.jsx';
 function RoutesList() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/signin" element={<Signin />} />
       <Route element={<RouteProtector />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/signin" element={<Signin />} />
         <Route element={<NavBar />}>
           <Route path="/account" element={<Account />} />
           <Route path="/document" element={<Document />} />
         </Route>
+        <Route path="*" element={<Navigate to="/" />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
