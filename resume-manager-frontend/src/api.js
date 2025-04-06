@@ -201,6 +201,22 @@ class ResumeManagerApi {
   }
 
   /**
+   * Deletes a section from a document.  Since sections are currently not
+   * user-created, this will delete the document-section relationships.
+   *
+   * @param {String} username - Name of the user accessing the website.
+   * @param {String} documentId - ID of the document to remove a section from.
+   * @param {String} sectionId - ID of the section to remove.
+   */
+  static async deleteSection(username, documentId, sectionId) {
+    await this.request(
+      `users/${username}/documents/${documentId}/sections/${sectionId}`,
+      {},
+      'delete'
+    );
+  }
+
+  /**
    * Creates a new education entry and adds it to a document.
    *
    * @param {String} username - Name of the user accessing the website.

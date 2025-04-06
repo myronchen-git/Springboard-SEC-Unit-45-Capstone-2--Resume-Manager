@@ -1,5 +1,5 @@
-import { useContext } from 'react';
-import { Card, CardBody, CardTitle } from 'reactstrap';
+import { useContext, useState } from 'react';
+import { Alert, Card, CardBody, CardHeader, CardTitle } from 'reactstrap';
 
 import ResumeManagerApi from '../api.js';
 import { DocumentContext, UserContext } from '../contexts.jsx';
@@ -22,8 +22,43 @@ import EducationCard from './EducationCard';
 function SectionCard({ section, items }) {
   const { user } = useContext(UserContext);
   const [document, setDocument] = useContext(DocumentContext);
+  const [errorMessages, setErrorMessages] = useState(null);
 
   // --------------------------------------------------
+
+  /**
+   * Removes a section from a document.  In other words, this deletes a
+   * document-section relationship.
+   *
+   * @param {Event} evt - The click event of the HTML element that has a direct
+   *  parent containing the "id" data attribute for the section ID.
+   */
+  async function deleteSection(evt) {
+    const sectionId = evt.target.parentElement.dataset.id;
+
+    try {
+      await ResumeManagerApi.deleteSection(
+        user.username,
+        document.id,
+        sectionId
+      );
+    } catch (err) {
+      setErrorMessages(err);
+      setTimeout(() => setErrorMessages(null), 5000);
+      return;
+    }
+
+    // Clone document so that React sees the document state has been modified.
+    const documentClone = structuredClone(document);
+
+    // Find the section in the document Object and remove it.
+    const sectionIdx = documentClone.sections.findIndex(
+      (section) => section.id == sectionId
+    );
+    documentClone.sections.splice(sectionIdx, 1);
+
+    setDocument(documentClone);
+  }
 
   /**
    * Sends a request to the back-end to save a new education.  Then locally
@@ -85,8 +120,12 @@ function SectionCard({ section, items }) {
 
   return (
     <Card className="SectionCard text-center" data-id={section.id}>
-      <CardTitle>{section.sectionName}</CardTitle>
+      <CardHeader className="text-end" onClick={deleteSection}>
+        {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+        trash icon
+      </CardHeader>
       <CardBody>
+        <CardTitle>{section.sectionName}</CardTitle>
         {renderedItems}
         {document.isMaster && renderAddItemForm(section.id)}
       </CardBody>
