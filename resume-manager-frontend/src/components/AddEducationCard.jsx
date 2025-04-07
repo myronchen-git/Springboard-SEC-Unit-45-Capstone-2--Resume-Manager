@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Alert,
   Button,
@@ -11,19 +11,17 @@ import {
   Label,
 } from 'reactstrap';
 
+import { DocumentContext } from '../contexts.jsx';
+import { addNewSectionItem } from '../util/specificSectionsFuncs.js';
+
 import trashIcon from '../assets/trash.svg';
 
 // ==================================================
 
 /**
  * Component for showing and controlling the form to add a new education entry.
- *
- * @param {Object} props - React component properties.
- * @param {Function} props.addItem - Takes in form data, sends a request to the
- *  back-end to save the new education, and locally updates the document Object
- *  with the new education.
  */
-function AddEducationCard({ addItem }) {
+function AddEducationCard() {
   const [isRevealed, setIsRevealed] = useState(false);
   const initialFormData = {
     school: '',
@@ -37,6 +35,7 @@ function AddEducationCard({ addItem }) {
   };
   const [formData, setFormData] = useState(initialFormData);
   const [errorMessages, setErrorMessages] = useState(null);
+  const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 
@@ -62,7 +61,12 @@ function AddEducationCard({ addItem }) {
     }
 
     try {
-      await addItem(formDataCopy);
+      const updatedDocument = await addNewSectionItem(
+        document,
+        1,
+        formDataCopy
+      );
+      setDocument(updatedDocument);
     } catch (err) {
       setErrorMessages(err);
       return;

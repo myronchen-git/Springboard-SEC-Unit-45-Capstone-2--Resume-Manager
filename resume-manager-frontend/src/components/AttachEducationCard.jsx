@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,17 +9,30 @@ import {
   Input,
 } from 'reactstrap';
 
+import ResumeManagerApi from '../api.js';
+import { DocumentContext } from '../contexts.jsx';
+import { attachSectionItem } from '../util/specificSectionsFuncs.js';
+
 import trashIcon from '../assets/trash.svg';
 
 // ==================================================
 
-function AttachEducationCard({
-  availableItems: availableEducations,
-  attachItem: attachEducation,
-}) {
+function AttachEducationCard() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [educationId, setEducationId] = useState(null);
   const [errorMessages, setErrorMessages] = useState(null);
+  const [availableEducations, setAvailableEducations] = useState([]);
+  const [document, setDocument] = useContext(DocumentContext);
+
+  // --------------------------------------------------
+
+  useEffect(() => {
+    async function runEffect() {
+      setAvailableEducations(await ResumeManagerApi.getEducations());
+    }
+
+    runEffect();
+  }, []);
 
   // --------------------------------------------------
 
@@ -39,7 +52,18 @@ function AttachEducationCard({
 
     if (educationId) {
       try {
-        await attachEducation(educationId);
+        const educationToAttach = availableEducations.find(
+          (education) => education.id == educationId
+        );
+
+        const updatedDocument = await attachSectionItem(
+          document,
+          1,
+          educationId,
+          educationToAttach
+        );
+
+        setDocument(updatedDocument);
       } catch (err) {
         setErrorMessages(err);
         return;

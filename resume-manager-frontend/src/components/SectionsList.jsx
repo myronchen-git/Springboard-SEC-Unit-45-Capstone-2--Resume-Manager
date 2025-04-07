@@ -7,18 +7,6 @@ import SectionCard from './SectionCard.jsx';
 
 // ==================================================
 
-// Section IDs are the index positions.
-const sectionIdToDatabaseName = [
-  null,
-  'educations',
-  'experiences',
-  'skills',
-  'certifications',
-  'projects',
-];
-
-// --------------------------------------------------
-
 /**
  * Renders a list of sections for a resume.
  */
@@ -73,16 +61,7 @@ function SectionsList() {
 
   const existingSections = document?.sections
     ? document.sections.map((section) => {
-        // Note that section.id must be an integer > 0.
-        const databaseName = sectionIdToDatabaseName[section.id];
-
-        return (
-          <SectionCard
-            key={section.id}
-            section={section}
-            items={document[databaseName] || []}
-          />
-        );
+        return <SectionCard key={section.id} section={section} />;
       })
     : [];
 
