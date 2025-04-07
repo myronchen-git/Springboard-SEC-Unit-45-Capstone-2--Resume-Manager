@@ -199,8 +199,8 @@ class ResumeManagerApi {
   /**
    * Gets all allowed sections that a resume can contain.
    *
-   * @returns {Object[]} A list of sections, in the form of Objects, that can be
-   *  used in documents.
+   * @returns {Object[]} A list of section Objects that can be used in
+   *  documents.
    */
   static async getSections() {
     const res = await this.request('sections');
@@ -241,6 +241,17 @@ class ResumeManagerApi {
   }
 
   /**
+   * Gets all educations from a user.
+   *
+   * @returns {Object[]} A list of education Objects, each containing info like
+   *  school name and location.
+   */
+  static async getEducations() {
+    const res = await this.request(`users/${this.#username}/educations`);
+    return res.educations;
+  }
+
+  /**
    * Creates a new education entry and adds it to a document.
    *
    * @param {String} documentId - ID of the document to add an education to.
@@ -272,6 +283,28 @@ class ResumeManagerApi {
       data,
       'post'
     );
+  }
+
+  /**
+   * Attaches an already created education to a document.  In other words, this
+   * creates a document-education relationship.  This is used for documents that
+   * are not the master resume.
+   *
+   * @param {Number | String} documentId - ID of the document to attach an
+   *  education to.
+   * @param {Number | String} educationId - ID of the education to attach.
+   * @returns {Object} The document_x_education Object, which contains document
+   *  ID, education ID, and position of education within document.
+   */
+  static async attachEducationToDocument(documentId, educationId) {
+    const res = this.request(
+      `users/${
+        this.#username
+      }/documents/${documentId}/educations/${educationId}`,
+      {},
+      'post'
+    );
+    return res.document_x_education;
   }
 
   /**

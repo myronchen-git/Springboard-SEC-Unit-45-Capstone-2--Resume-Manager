@@ -1,9 +1,10 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader, CardTitle } from 'reactstrap';
 
 import ResumeManagerApi from '../api.js';
 import { DocumentContext } from '../contexts.jsx';
 import AddEducationCard from './AddEducationCard';
+import AttachEducationCard from './AttachEducationCard.jsx';
 import EducationCard from './EducationCard';
 
 import trashIcon from '../assets/trash.svg';
@@ -22,8 +23,19 @@ import trashIcon from '../assets/trash.svg';
  *  educations or experiences.
  */
 function SectionCard({ section, items }) {
+  const [availableEducations, setAvailableEducations] = useState([]);
   const [document, setDocument] = useContext(DocumentContext);
   const [errorMessages, setErrorMessages] = useState(null);
+
+  // --------------------------------------------------
+
+  useEffect(() => {
+    async function runEffect() {
+      setAvailableEducations(await ResumeManagerApi.getEducations());
+    }
+
+    runEffect();
+  }, []);
 
   // --------------------------------------------------
 
@@ -86,16 +98,42 @@ function SectionCard({ section, items }) {
     setDocument(documentClone);
   }
 
+  async function attachEducation(educationId) {
+    await ResumeManagerApi.attachEducationToDocument(document.id, educationId);
+
+    // Clone document so that React sees the document state has been modified.
+    const documentClone = structuredClone(document);
+
+    // Find the chosen eduction Object.
+    const educationToAttach = availableEducations.find(
+      (education) => education.id == educationId
+    );
+
+    // Add the education Object to document.educations if it exists, otherwise
+    // create a new educations property.
+    if (documentClone.educations) {
+      documentClone.educations.push(educationToAttach);
+    } else {
+      documentClone.educations = [educationToAttach];
+    }
+
+    setDocument(documentClone);
+  }
+
   // --------------------------------------------------
 
   // Holds the components that can be used to display a section item.
   // Section IDs are the index positions.
   const sectionComponents = [null, EducationCard];
   const addSectionComponents = [null, AddEducationCard];
+  const attachSectionComponents = [null, AttachEducationCard];
 
-  // Holds the functions for adding a new section item.
+  // Holds the functions for section items.
   // Section IDs are the index positions.
-  const addSectionItemFunc = [null, addEducation];
+  const addSectionItemFuncs = [null, addEducation];
+  const attachSectionItemFuncs = [null, attachEducation];
+
+  const availableItemsList = [null, availableEducations];
 
   // Code for creating components stored here.
   // Note that section.id must be an integer > 0.
@@ -109,7 +147,18 @@ function SectionCard({ section, items }) {
     // Note that sectionId must be an integer > 0.
     const AddSectionComponent = addSectionComponents[sectionId];
     return AddSectionComponent == undefined ? null : (
-      <AddSectionComponent addItem={addSectionItemFunc[sectionId]} />
+      <AddSectionComponent addItem={addSectionItemFuncs[sectionId]} />
+    );
+  }
+
+  function renderAttachItemForm(sectionId) {
+    // Note that sectionId must be an integer > 0.
+    const AttachSectionComponent = attachSectionComponents[sectionId];
+    return AttachSectionComponent == undefined ? null : (
+      <AttachSectionComponent
+        availableItems={availableItemsList[sectionId]}
+        attachItem={attachSectionItemFuncs[sectionId]}
+      />
     );
   }
 
@@ -124,7 +173,9 @@ function SectionCard({ section, items }) {
       <CardBody>
         <CardTitle>{section.sectionName}</CardTitle>
         {renderedItems}
-        {document.isMaster && renderAddItemForm(section.id)}
+        {document.isMaster
+          ? renderAddItemForm(section.id)
+          : renderAttachItemForm(section.id)}
       </CardBody>
     </Card>
   );
