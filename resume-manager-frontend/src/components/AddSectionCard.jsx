@@ -66,7 +66,7 @@ function AddSectionCard({ availableSections, addSection }) {
       {isRevealed ? (
         <>
           <CardHeader className="text-end" onClick={toggleOpen}>
-            {<img src={trashIcon} alt="trash icon" />}
+            <img src={trashIcon} alt="trash icon" />
           </CardHeader>
           <CardBody>
             <Form onSubmit={handleSubmit}>

@@ -71,7 +71,7 @@ function EducationCard({ item: education }) {
     <Card className="EducationCard" data-id={education.id}>
       <CardHeader className="text-end" onClick={deleteEducation}>
         {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
-        {<img src={trashIcon} alt="trash icon" />}
+        <img src={trashIcon} alt="trash icon" />
       </CardHeader>
       <CardBody>
         {education.school}

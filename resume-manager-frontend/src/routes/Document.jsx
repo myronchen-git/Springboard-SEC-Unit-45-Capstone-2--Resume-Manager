@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Alert, Button } from 'reactstrap';
 
 import ResumeManagerApi from '../api';
+import ContactInfoCard from '../components/ContactInfoCard.jsx';
 import DocumentSelect from '../components/DocumentSelect';
 import NewDocumentForm from '../components/NewDocumentForm';
 import SectionsList from '../components/SectionsList.jsx';
@@ -76,26 +77,43 @@ function Document() {
    * @see ResumeManagerApi.createDocument for formData properties.
    */
   async function createDocument(formData) {
+    let newDocument;
     try {
-      const newDocument = await ResumeManagerApi.createDocument(formData);
+      newDocument = await ResumeManagerApi.createDocument(formData);
 
       // Adds the new document to list of already retrieved ones to reduce an
       // extra, unnecessary network call.  Shallow copying because the data
       // might be large.
       setDocuments([...documents, { ...newDocument }]);
-
-      // Gets and adds contact info to the new document.  This is done instead
-      // of calling the URL to retrieve a document and its contents, because
-      // this requires less processing by the database.
-      newDocument.contactInfo = await ResumeManagerApi.getContactInfo();
-
-      setDocument(newDocument);
     } catch (err) {
       setErrorMessages(err);
       setTimeout(() => setErrorMessages(null), 5000);
+      return;
     } finally {
       setIsNewDocumentFormOpen(false);
     }
+
+    try {
+      // Gets and adds contact info to the new document.  This is done instead
+      // of calling the URL to retrieve a document and its contents, because
+      // this requires less processing by the database.
+      const contactInfo = await ResumeManagerApi.getContactInfo();
+
+      // Removing extra username property, because document Object/state doesn't
+      // have it.
+      delete contactInfo.username;
+
+      newDocument.contactInfo = contactInfo;
+    } catch (err) {
+      // Do nothing if API call throws an error, because contact info is not
+      // significant in a new document.  It can always be updated in the master.
+      // If error is thrown, then user will see empty fields for contact info.
+      // User can always re-input the information.  The re-inputted information
+      // will just update the database.
+      console.warn(err);
+    }
+
+    setDocument(newDocument);
   }
 
   /**
@@ -136,7 +154,7 @@ function Document() {
         </Button>
         {document && !document.isMaster && (
           <Button onClick={deleteDocument}>
-            {<img src={trashIcon} alt="trash icon" />}
+            <img src={trashIcon} alt="trash icon" />
           </Button>
         )}
         {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
@@ -153,7 +171,13 @@ function Document() {
             close={closeNewDocumentForm}
           />
         )}
-        {document && <SectionsList />}
+
+        {document && (
+          <article>
+            <ContactInfoCard />
+            <SectionsList />
+          </article>
+        )}
       </main>
     </DocumentContext.Provider>
   );

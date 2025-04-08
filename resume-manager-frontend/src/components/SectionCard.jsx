@@ -61,7 +61,7 @@ function SectionCard({ section }) {
     <Card className="SectionCard text-center" data-id={section.id}>
       <CardHeader className="text-end" onClick={deleteSection}>
         {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
-        {<img src={trashIcon} alt="trash icon" />}
+        <img src={trashIcon} alt="trash icon" />
       </CardHeader>
       <CardBody>
         <CardTitle>{section.sectionName}</CardTitle>

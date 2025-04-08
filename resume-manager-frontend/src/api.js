@@ -153,6 +153,31 @@ class ResumeManagerApi {
   }
 
   /**
+   * Creates or updates a user's contact information.  Full name is required
+   * when creating a new contact info entry in the database.
+   *
+   * @param {Object} data - Contains info for updating contact info.
+   * @param {String} [data.fullName] - Full name of the user.
+   * @param {String} [data.location] - Any kind of location description for the
+   *  user. This can be full address, nearest city, etc..
+   * @param {String} [data.email] - Email of the user.
+   * @param {String} [data.phone] - Phone number of the user.
+   * @param {String} [data.linkedin] - LinkedIn URL address for the profile of
+   *  the user.
+   * @param {String} [data.github] - GitHub URL address for the user's GitHub
+   *  profile.
+   * @returns {Object} Updated contact information data.
+   */
+  static async updateContactInfo(data) {
+    const res = await this.request(
+      `users/${this.#username}/contact-info`,
+      data,
+      'put'
+    );
+    return res.contactInfo;
+  }
+
+  /**
    * Creates a new resume or template.
    *
    * @param {Object} data - Holds the info for creating a new document.

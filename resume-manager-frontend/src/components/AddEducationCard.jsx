@@ -107,7 +107,7 @@ function AddEducationCard() {
       {isRevealed ? (
         <>
           <CardHeader className="text-end" onClick={toggleOpen}>
-            {<img src={trashIcon} alt="trash icon" />}
+            <img src={trashIcon} alt="trash icon" />
           </CardHeader>
           <CardBody>
             <Form className="AddEducationCard__form" onSubmit={handleSubmit}>
