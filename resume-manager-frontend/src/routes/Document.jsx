@@ -56,7 +56,12 @@ function Document() {
     if (documentId === '0') {
       setIsNewDocumentFormOpen(true);
     } else {
-      setDocument(await ResumeManagerApi.getDocument(documentId));
+      try {
+        setDocument(await ResumeManagerApi.getDocument(documentId));
+      } catch (err) {
+        setErrorMessages(err);
+        setTimeout(() => setErrorMessages(null), 5000);
+      }
     }
 
     setIsDocumentSelectOpen(false);
@@ -71,19 +76,26 @@ function Document() {
    * @see ResumeManagerApi.createDocument for formData properties.
    */
   async function createDocument(formData) {
-    const newDocument = await ResumeManagerApi.createDocument(formData);
+    try {
+      const newDocument = await ResumeManagerApi.createDocument(formData);
 
-    // Adds the new document to list of already retrieved ones to reduce an
-    // extra, unnecessary network call.
-    setDocuments([...documents, { ...newDocument }]);
+      // Adds the new document to list of already retrieved ones to reduce an
+      // extra, unnecessary network call.  Shallow copying because the data
+      // might be large.
+      setDocuments([...documents, { ...newDocument }]);
 
-    // Gets and adds contact info to the new document.  This is done instead of
-    // calling the URL to retrieve a document and its contents, because this
-    // requires less processing by the database.
-    newDocument.contactInfo = await ResumeManagerApi.getContactInfo();
+      // Gets and adds contact info to the new document.  This is done instead
+      // of calling the URL to retrieve a document and its contents, because
+      // this requires less processing by the database.
+      newDocument.contactInfo = await ResumeManagerApi.getContactInfo();
 
-    setDocument(newDocument);
-    setIsNewDocumentFormOpen(false);
+      setDocument(newDocument);
+    } catch (err) {
+      setErrorMessages(err);
+      setTimeout(() => setErrorMessages(null), 5000);
+    } finally {
+      setIsNewDocumentFormOpen(false);
+    }
   }
 
   /**
