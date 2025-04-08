@@ -21,7 +21,7 @@ function Document() {
   const [documents, setDocuments] = useState([]);
   const [isDocumentSelectOpen, setIsDocumentSelectOpen] = useState(true);
   const [isNewDocumentFormOpen, setIsNewDocumentFormOpen] = useState(false);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
   const { user } = useContext(UserContext);
 
   // --------------------------------------------------
@@ -61,7 +61,7 @@ function Document() {
         setDocument(await ResumeManagerApi.getDocument(documentId));
       } catch (err) {
         setErrorMessages(err);
-        setTimeout(() => setErrorMessages(null), 5000);
+        setTimeout(() => setErrorMessages([]), 5000);
       }
     }
 
@@ -87,7 +87,7 @@ function Document() {
       setDocuments([...documents, { ...newDocument }]);
     } catch (err) {
       setErrorMessages(err);
-      setTimeout(() => setErrorMessages(null), 5000);
+      setTimeout(() => setErrorMessages([]), 5000);
       return;
     } finally {
       setIsNewDocumentFormOpen(false);
@@ -127,7 +127,7 @@ function Document() {
       await ResumeManagerApi.deleteDocument(documentId);
     } catch (err) {
       setErrorMessages(err);
-      setTimeout(() => setErrorMessages(null), 5000);
+      setTimeout(() => setErrorMessages([]), 5000);
       return;
     }
 
@@ -157,7 +157,11 @@ function Document() {
             <img src={trashIcon} alt="trash icon" />
           </Button>
         )}
-        {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+        {errorMessages.map((msg) => (
+          <Alert key={msg} color="danger">
+            {msg}
+          </Alert>
+        ))}
         {isDocumentSelectOpen && (
           <DocumentSelect
             documents={documents}

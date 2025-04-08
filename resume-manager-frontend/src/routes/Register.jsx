@@ -25,7 +25,7 @@ function Register() {
     password: '',
   };
   const [formData, setFormData] = useState(initialFormData);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
   const { registerUser } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -83,7 +83,11 @@ function Register() {
                 onChange={handleChange}
               />
             </FormGroup>
-            {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+            {errorMessages.map((msg) => (
+              <Alert key={msg} color="danger">
+                {msg}
+              </Alert>
+            ))}
             <Button color="light" type="submit">
               Submit
             </Button>

@@ -33,7 +33,7 @@ import {
  */
 function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
   const [documentId, setDocumentId] = useState(null);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   function handleChange(evt) {
     const { value } = evt.target;
@@ -110,7 +110,11 @@ function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
               </Card>
             </Label>
           </FormGroup>
-          {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+          {errorMessages.map((msg) => (
+            <Alert key={msg} color="danger">
+              {msg}
+            </Alert>
+          ))}
         </ModalBody>
         <ModalFooter>
           <Button type="submit">Open</Button>

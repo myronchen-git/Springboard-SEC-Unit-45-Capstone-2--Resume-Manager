@@ -20,7 +20,7 @@ import trashIcon from '../assets/trash.svg';
 function AttachEducationCard() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [educationId, setEducationId] = useState(null);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [availableEducations, setAvailableEducations] = useState([]);
   const [document, setDocument] = useContext(DocumentContext);
 
@@ -39,7 +39,7 @@ function AttachEducationCard() {
   function toggleOpen() {
     setIsRevealed(!isRevealed);
     setEducationId(null);
-    setErrorMessages(null);
+    setErrorMessages([]);
   }
 
   function handleChange(evt) {
@@ -101,7 +101,11 @@ function AttachEducationCard() {
                   );
                 })}
               </Input>
-              {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
               <Button color="light" type="submit">
                 Add
               </Button>

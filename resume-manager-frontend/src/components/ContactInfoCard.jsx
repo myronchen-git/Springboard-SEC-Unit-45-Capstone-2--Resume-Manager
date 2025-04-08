@@ -31,7 +31,7 @@ const contactInfoProperties = [
 
 function ContactInfoCard() {
   const [isEditing, setIsEditing] = useState(false);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [document, setDocument] = useContext(DocumentContext);
 
   const contactInfoData =
@@ -48,7 +48,7 @@ function ContactInfoCard() {
   function toggleEdit() {
     setIsEditing(!isEditing);
     setFormData(contactInfoData);
-    setErrorMessages(null);
+    setErrorMessages([]);
   }
 
   function handleChange(evt) {
@@ -106,7 +106,11 @@ function ContactInfoCard() {
                 />
               </FormGroup>
             ))}
-            {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+            {errorMessages.map((msg) => (
+              <Alert key={msg} color="danger">
+                {msg}
+              </Alert>
+            ))}
             <Button color="light" type="submit">
               Submit
             </Button>

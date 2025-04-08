@@ -29,7 +29,7 @@ function NewDocumentForm({ createDocument, close }) {
     isTemplate: false,
   };
   const [formData, setFormData] = useState(initialFormData);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -85,7 +85,11 @@ function NewDocumentForm({ createDocument, close }) {
             />
             <Label htmlFor="NewDocumentForm__input-template">Template?</Label>
           </FormGroup>
-          {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+          {errorMessages.map((msg) => (
+            <Alert key={msg} color="danger">
+              {msg}
+            </Alert>
+          ))}
         </ModalBody>
         <ModalFooter>
           <Button type="submit">Create</Button>

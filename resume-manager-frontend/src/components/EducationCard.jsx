@@ -17,7 +17,7 @@ import trashIcon from '../assets/trash.svg';
  */
 function EducationCard({ item: education }) {
   const [document, setDocument] = useContext(DocumentContext);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -48,7 +48,7 @@ function EducationCard({ item: education }) {
       }
     } catch (err) {
       setErrorMessages(err);
-      setTimeout(() => setErrorMessages(null), 5000);
+      setTimeout(() => setErrorMessages([]), 5000);
       return;
     }
 
@@ -70,7 +70,11 @@ function EducationCard({ item: education }) {
   return (
     <Card className="EducationCard" data-id={education.id}>
       <CardHeader className="text-end" onClick={deleteEducation}>
-        {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+        {errorMessages.map((msg) => (
+          <Alert key={msg} color="danger">
+            {msg}
+          </Alert>
+        ))}
         <img src={trashIcon} alt="trash icon" />
       </CardHeader>
       <CardBody>

@@ -34,7 +34,7 @@ function AddEducationCard() {
     activities: '',
   };
   const [formData, setFormData] = useState(initialFormData);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
@@ -42,7 +42,7 @@ function AddEducationCard() {
   function toggleOpen() {
     setIsRevealed(!isRevealed);
     setFormData(initialFormData);
-    setErrorMessages(null);
+    setErrorMessages([]);
   }
 
   function handleChange(evt) {
@@ -129,7 +129,11 @@ function AddEducationCard() {
                   />
                 </FormGroup>
               ))}
-              {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
               <Button color="light" type="submit">
                 Add
               </Button>

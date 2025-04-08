@@ -29,14 +29,14 @@ import trashIcon from '../assets/trash.svg';
 function AddSectionCard({ availableSections, addSection }) {
   const [isRevealed, setIsRevealed] = useState(false);
   const [sectionId, setSectionId] = useState(null);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
   function toggleOpen() {
     setIsRevealed(!isRevealed);
     setSectionId(null);
-    setErrorMessages(null);
+    setErrorMessages([]);
   }
 
   function handleChange(evt) {
@@ -87,7 +87,11 @@ function AddSectionCard({ availableSections, addSection }) {
                   );
                 })}
               </Input>
-              {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
               <Button color="light" type="submit">
                 Add
               </Button>

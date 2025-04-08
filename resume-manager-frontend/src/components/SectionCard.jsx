@@ -20,7 +20,7 @@ import trashIcon from '../assets/trash.svg';
  */
 function SectionCard({ section }) {
   const [document, setDocument] = useContext(DocumentContext);
-  const [errorMessages, setErrorMessages] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -39,7 +39,7 @@ function SectionCard({ section }) {
       await ResumeManagerApi.deleteSection(document.id, sectionId);
     } catch (err) {
       setErrorMessages(err);
-      setTimeout(() => setErrorMessages(null), 5000);
+      setTimeout(() => setErrorMessages([]), 5000);
       return;
     }
 
@@ -60,7 +60,11 @@ function SectionCard({ section }) {
   return (
     <Card className="SectionCard text-center" data-id={section.id}>
       <CardHeader className="text-end" onClick={deleteSection}>
-        {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
+        {errorMessages.map((msg) => (
+          <Alert key={msg} color="danger">
+            {msg}
+          </Alert>
+        ))}
         <img src={trashIcon} alt="trash icon" />
       </CardHeader>
       <CardBody>
