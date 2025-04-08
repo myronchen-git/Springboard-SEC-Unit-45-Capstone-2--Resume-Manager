@@ -143,6 +143,16 @@ class ResumeManagerApi {
   }
 
   /**
+   * Gets a user's contact information, such as full name, location, and email.
+   *
+   * @returns {Object} Contact information data.
+   */
+  static async getContactInfo() {
+    const res = await this.request(`users/${this.#username}/contact-info`);
+    return res.contactInfo;
+  }
+
+  /**
    * Creates a new resume or template.
    *
    * @param {Object} data - Holds the info for creating a new document.
@@ -161,13 +171,16 @@ class ResumeManagerApi {
   }
 
   /**
-   * Gets a user's contact information, such as full name, location, and email.
+   * Deletes a document, which could be a resume or template.
    *
-   * @returns {Object} Contact information data.
+   * @param {String | Number} documentId - ID of the document to delete.
    */
-  static async getContactInfo() {
-    const res = await this.request(`users/${this.#username}/contact-info`);
-    return res.contactInfo;
+  static async deleteDocument(documentId) {
+    await this.request(
+      `users/${this.#username}/documents/${documentId}`,
+      {},
+      'delete'
+    );
   }
 
   /**

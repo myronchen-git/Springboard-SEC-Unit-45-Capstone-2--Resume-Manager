@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
-import { Button } from 'reactstrap';
+import { Alert, Button } from 'reactstrap';
 
 import ResumeManagerApi from '../api';
 import DocumentSelect from '../components/DocumentSelect';
 import NewDocumentForm from '../components/NewDocumentForm';
 import SectionsList from '../components/SectionsList.jsx';
 import { DocumentContext, UserContext } from '../contexts.jsx';
+
+import trashIcon from '../assets/trash.svg';
 
 // ==================================================
 
@@ -18,6 +20,7 @@ function Document() {
   const [documents, setDocuments] = useState([]);
   const [isDocumentSelectOpen, setIsDocumentSelectOpen] = useState(true);
   const [isNewDocumentFormOpen, setIsNewDocumentFormOpen] = useState(false);
+  const [errorMessages, setErrorMessages] = useState(null);
   const { user } = useContext(UserContext);
 
   // --------------------------------------------------
@@ -83,14 +86,48 @@ function Document() {
     setIsNewDocumentFormOpen(false);
   }
 
+  /**
+   * Deletes a document, which could be a resume or template.  Updates the
+   * document and documents state locally to reflect deletion.
+   */
+  async function deleteDocument() {
+    const documentId = window.document.querySelector('#Document').dataset.id;
+
+    try {
+      await ResumeManagerApi.deleteDocument(documentId);
+    } catch (err) {
+      setErrorMessages(err);
+      setTimeout(() => setErrorMessages(null), 5000);
+      return;
+    }
+
+    // Clear out currently-viewing document.
+    setDocument(null);
+
+    // Find the document in the list of documents and remove it.
+    const documentIdx = documents.findIndex(
+      (document) => document.id == documentId
+    );
+    documents.splice(documentIdx, 1);
+
+    // Shallow copying because the data might be large.
+    setDocuments([...documents]);
+  }
+
   // --------------------------------------------------
 
   return (
     <DocumentContext.Provider value={[document, setDocument]}>
-      <main className="Document">
+      <main id="Document" data-id={document?.id}>
         <Button onClick={() => setIsDocumentSelectOpen(true)}>
           Select Document
         </Button>
+        {document && !document.isMaster && (
+          <Button onClick={deleteDocument}>
+            {<img src={trashIcon} alt="trash icon" />}
+          </Button>
+        )}
+        {errorMessages && <Alert color="danger">{errorMessages}</Alert>}
         {isDocumentSelectOpen && (
           <DocumentSelect
             documents={documents}
