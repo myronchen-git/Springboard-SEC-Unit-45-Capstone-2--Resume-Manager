@@ -4,6 +4,7 @@ import { DocumentContext } from '../contexts.jsx';
 import AddEducationCard from './AddEducationCard.jsx';
 import AttachEducationCard from './AttachEducationCard.jsx';
 import EducationCard from './EducationCard.jsx';
+import ExperienceCard from './ExperienceCard.jsx';
 
 import { SECTION_ID_TO_DATABASE_NAME } from '../commonData.js';
 
@@ -21,7 +22,7 @@ function SectionItemsList({ sectionId }) {
 
   // Holds the components that can be used to display a section item.
   // Section IDs are the index positions.
-  const sectionComponents = [null, EducationCard];
+  const sectionComponents = [null, EducationCard, ExperienceCard];
   const addSectionComponents = [null, AddEducationCard];
   const attachSectionComponents = [null, AttachEducationCard];
 
