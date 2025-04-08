@@ -28,6 +28,12 @@ async function addNewSectionItem(document, sectionId, formData) {
         formData
       ));
       break;
+    case 2:
+      ({ experience: sectionItemObject } = await ResumeManagerApi.addExperience(
+        document.id,
+        formData
+      ));
+      break;
     default:
       throw new TypeError('Developer Error: unrecognized section type.');
   }

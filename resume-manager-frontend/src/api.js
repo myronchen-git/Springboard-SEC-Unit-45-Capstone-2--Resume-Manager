@@ -375,6 +375,36 @@ class ResumeManagerApi {
       'delete'
     );
   }
+
+  /**
+   * Creates a new experience entry and adds it to a document.
+   *
+   * @param {String | Number} documentId - ID of the document to add an
+   *  experience to.
+   * @param {Object} data - Holds the info for creating a new experience.
+   * @param {String} data.title - Job title or equivalent.
+   * @param {String} data.organization - Name of the company or other type of
+   *  organization.
+   * @param {String} data.location - Location of the organization.
+   * @param {String} data.startDate - The start date of joining the
+   *  organization.
+   * @param {String} [data.endDate] - The end date of leaving the organization.
+   * @returns {{
+   *    experience: Object,
+   *    document_x_experience: Object
+   *  }}
+   *  experience - The experience ID and all of the given info.
+   *  document_x_experience - The ID of the document_x_experience, the document
+   *  ID that owns the experience, the experience ID, and the position of the
+   *  experience among other experiences in the document.
+   */
+  static async addExperience(documentId, data) {
+    return await this.request(
+      `users/${this.#username}/documents/${documentId}/experiences`,
+      data,
+      'post'
+    );
+  }
 }
 
 // ==================================================

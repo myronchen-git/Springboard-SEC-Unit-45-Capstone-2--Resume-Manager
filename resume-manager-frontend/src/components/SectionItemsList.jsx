@@ -2,6 +2,7 @@ import { useContext } from 'react';
 
 import { DocumentContext } from '../contexts.jsx';
 import AddEducationCard from './AddEducationCard.jsx';
+import AddExperienceCard from './AddExperienceCard.jsx';
 import AttachEducationCard from './AttachEducationCard.jsx';
 import EducationCard from './EducationCard.jsx';
 import ExperienceCard from './ExperienceCard.jsx';
@@ -23,7 +24,7 @@ function SectionItemsList({ sectionId }) {
   // Holds the components that can be used to display a section item.
   // Section IDs are the index positions.
   const sectionComponents = [null, EducationCard, ExperienceCard];
-  const addSectionComponents = [null, AddEducationCard];
+  const addSectionComponents = [null, AddEducationCard, AddExperienceCard];
   const attachSectionComponents = [null, AttachEducationCard];
 
   // Code for creating components stored here.
