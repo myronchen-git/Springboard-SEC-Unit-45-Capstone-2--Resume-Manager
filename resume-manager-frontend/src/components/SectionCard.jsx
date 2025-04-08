@@ -28,12 +28,11 @@ function SectionCard({ section }) {
    * Removes a section from a document.  In other words, this deletes a
    * document-section relationship.
    *
-   * @param {Event} evt - The click event of the HTML element with a parent two
-   *  levels up, where the parent contains the "id" data attribute for the
-   *  section ID.
+   * @param {Event} evt - The click event of the HTML element with a parent that
+   *  has the "id" data attribute for the section ID.
    */
   async function deleteSection(evt) {
-    const sectionId = evt.target.parentElement.parentElement.dataset.id;
+    const sectionId = evt.target.closest('.SectionCard').dataset.id;
 
     try {
       await ResumeManagerApi.deleteSection(document.id, sectionId);
@@ -59,13 +58,13 @@ function SectionCard({ section }) {
 
   return (
     <Card className="SectionCard text-center" data-id={section.id}>
-      <CardHeader className="text-end" onClick={deleteSection}>
+      <CardHeader className="text-end">
         {errorMessages.map((msg) => (
           <Alert key={msg} color="danger">
             {msg}
           </Alert>
         ))}
-        <img src={trashIcon} alt="trash icon" />
+        <img src={trashIcon} alt="trash icon" onClick={deleteSection} />
       </CardHeader>
       <CardBody>
         <CardTitle>{section.sectionName}</CardTitle>

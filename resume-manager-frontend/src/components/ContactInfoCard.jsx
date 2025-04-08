@@ -84,8 +84,8 @@ function ContactInfoCard() {
 
   return (
     <Card className="ContactInfoCard" tag="article">
-      <CardHeader className="text-end" onClick={toggleEdit}>
-        <img src={editIcon} alt="edit icon" />
+      <CardHeader className="text-end">
+        <img src={editIcon} alt="edit icon" onClick={toggleEdit} />
       </CardHeader>
       {isEditing ? (
         <CardBody>

@@ -79,8 +79,8 @@ function AttachEducationCard() {
     <Card>
       {isRevealed ? (
         <>
-          <CardHeader className="text-end" onClick={toggleOpen}>
-            <img src={trashIcon} alt="trash icon" />
+          <CardHeader className="text-end">
+            <img src={trashIcon} alt="trash icon" onClick={toggleOpen} />
           </CardHeader>
           <CardBody>
             <Form onSubmit={handleSubmit}>

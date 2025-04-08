@@ -30,12 +30,11 @@ function EducationCard({ item: education }) {
    *
    * Locally updates the document object in the app state.
    *
-   * @param {Event} evt - The click event, which contains an HTML element that
-   *  has a parent two levels up with an "id" data attribute for the education
-   *  ID.
+   * @param {Event} evt - The click event of the HTML element with a parent that
+   *  has the "id" data attribute for the education ID.
    */
   async function deleteEducation(evt) {
-    const educationId = evt.target.parentElement.parentElement.dataset.id;
+    const educationId = evt.target.closest('.EducationCard').dataset.id;
 
     try {
       if (document.isMaster) {
@@ -69,13 +68,13 @@ function EducationCard({ item: education }) {
 
   return (
     <Card className="EducationCard" data-id={education.id}>
-      <CardHeader className="text-end" onClick={deleteEducation}>
+      <CardHeader className="text-end">
         {errorMessages.map((msg) => (
           <Alert key={msg} color="danger">
             {msg}
           </Alert>
         ))}
-        <img src={trashIcon} alt="trash icon" />
+        <img src={trashIcon} alt="trash icon" onClick={deleteEducation} />
       </CardHeader>
       <CardBody>
         {education.school}

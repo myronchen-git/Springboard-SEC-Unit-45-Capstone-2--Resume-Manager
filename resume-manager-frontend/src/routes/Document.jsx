@@ -119,9 +119,12 @@ function Document() {
   /**
    * Deletes a document, which could be a resume or template.  Updates the
    * document and documents state locally to reflect deletion.
+   *
+   * @param {Event} evt - The click event of the HTML element with a parent that
+   *  has the "id" data attribute for the document ID.
    */
-  async function deleteDocument() {
-    const documentId = window.document.querySelector('#Document').dataset.id;
+  async function deleteDocument(evt) {
+    const documentId = evt.target.closest('#Document').dataset.id;
 
     try {
       await ResumeManagerApi.deleteDocument(documentId);
