@@ -439,6 +439,37 @@ class ResumeManagerApi {
     );
     return res.document_x_experience;
   }
+
+  /**
+   * Deletes an experience entry from the database.
+   *
+   * @param {String} experienceId - ID of the experience to delete.
+   */
+  static async deleteExperience(experienceId) {
+    await this.request(
+      `users/${this.#username}/experiences/${experienceId}`,
+      {},
+      'delete'
+    );
+  }
+
+  /**
+   * Removes an experience from a document, but does not delete the entry
+   * itself. This is used for non-master resumes.
+   *
+   * @param {String} documentId - ID of the document to remove the experience
+   *  from.
+   * @param {String} experienceId - ID of the experience to remove.
+   */
+  static async removeExperienceFromDocument(documentId, experienceId) {
+    await this.request(
+      `users/${
+        this.#username
+      }/documents/${documentId}/experiences/${experienceId}`,
+      {},
+      'delete'
+    );
+  }
 }
 
 // ==================================================
