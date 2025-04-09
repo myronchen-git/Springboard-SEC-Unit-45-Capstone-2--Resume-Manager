@@ -3,6 +3,7 @@ import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../api.js';
 import { DocumentContext } from '../contexts.jsx';
+import TextSnippetsList from './TextSnippetsList.jsx';
 
 import trashIcon from '../assets/trash.svg';
 
@@ -87,6 +88,9 @@ function ExperienceCard({ item: experience }) {
         <br />
         {experience.endDate}
         <br />
+        {experience.bullets && (
+          <TextSnippetsList textSnippets={experience.bullets} />
+        )}
       </CardBody>
     </Card>
   );
