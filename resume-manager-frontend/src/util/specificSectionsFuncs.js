@@ -85,6 +85,12 @@ async function attachSectionItem(
         sectionItemId
       );
       break;
+    case 2:
+      await ResumeManagerApi.attachExperienceToDocument(
+        document.id,
+        sectionItemId
+      );
+      break;
     default:
       throw new TypeError('Developer Error: unrecognized section type.');
   }

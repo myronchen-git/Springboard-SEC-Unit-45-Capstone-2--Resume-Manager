@@ -4,6 +4,7 @@ import { DocumentContext } from '../contexts.jsx';
 import AddEducationCard from './AddEducationCard.jsx';
 import AddExperienceCard from './AddExperienceCard.jsx';
 import AttachEducationCard from './AttachEducationCard.jsx';
+import AttachExperienceCard from './AttachExperienceCard.jsx';
 import EducationCard from './EducationCard.jsx';
 import ExperienceCard from './ExperienceCard.jsx';
 
@@ -25,7 +26,11 @@ function SectionItemsList({ sectionId }) {
   // Section IDs are the index positions.
   const sectionComponents = [null, EducationCard, ExperienceCard];
   const addSectionComponents = [null, AddEducationCard, AddExperienceCard];
-  const attachSectionComponents = [null, AttachEducationCard];
+  const attachSectionComponents = [
+    null,
+    AttachEducationCard,
+    AttachExperienceCard,
+  ];
 
   // Code for creating components stored here.
   // Note that sectionId must be an integer > 0.

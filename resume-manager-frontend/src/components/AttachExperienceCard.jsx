@@ -1,0 +1,129 @@
+import { useContext, useEffect, useState } from 'react';
+import {
+  Alert,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Form,
+  Input,
+} from 'reactstrap';
+
+import ResumeManagerApi from '../api.js';
+import { DocumentContext } from '../contexts.jsx';
+import { attachSectionItem } from '../util/specificSectionsFuncs.js';
+
+import trashIcon from '../assets/trash.svg';
+
+// ==================================================
+
+function AttachExperienceCard() {
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [experienceId, setExperienceId] = useState(null);
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [availableExperiences, setAvailableExperiences] = useState([]);
+  const [document, setDocument] = useContext(DocumentContext);
+
+  // --------------------------------------------------
+
+  useEffect(() => {
+    async function runEffect() {
+      setAvailableExperiences(await ResumeManagerApi.getExperiences());
+    }
+
+    runEffect();
+  }, []);
+
+  // --------------------------------------------------
+
+  function toggleOpen() {
+    setIsRevealed(!isRevealed);
+    setExperienceId(null);
+    setErrorMessages([]);
+  }
+
+  function handleChange(evt) {
+    const { value } = evt.target;
+    setExperienceId(value);
+  }
+
+  async function handleSubmit(evt) {
+    evt.preventDefault();
+
+    if (experienceId) {
+      try {
+        const experienceToAttach = availableExperiences.find(
+          (experience) => experience.id == experienceId
+        );
+
+        const updatedDocument = await attachSectionItem(
+          document,
+          2,
+          experienceId,
+          experienceToAttach
+        );
+
+        setDocument(updatedDocument);
+      } catch (err) {
+        setErrorMessages(err);
+        return;
+      }
+
+      toggleOpen();
+    }
+  }
+
+  // --------------------------------------------------
+
+  return (
+    <Card>
+      {isRevealed ? (
+        <>
+          <CardHeader className="text-end">
+            <img src={trashIcon} alt="trash icon" onClick={toggleOpen} />
+          </CardHeader>
+          <CardBody>
+            <Form onSubmit={handleSubmit}>
+              <Input
+                type="select"
+                name="experienceId"
+                defaultValue=""
+                onChange={handleChange}
+              >
+                <option value="" disabled>
+                  Choose an experience
+                </option>
+                {availableExperiences.map((experience) => {
+                  return (
+                    <option key={experience.id} value={experience.id}>
+                      {`${experience.organization} - ${experience.title} (${
+                        experience.startDate
+                      } ... ${experience.endDate || ''})`}
+                    </option>
+                  );
+                })}
+              </Input>
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
+              <Button color="light" type="submit">
+                Add
+              </Button>
+            </Form>
+          </CardBody>
+        </>
+      ) : (
+        <CardBody onClick={toggleOpen}>
+          Attach Experience
+          <br />+
+        </CardBody>
+      )}
+    </Card>
+  );
+}
+
+// ==================================================
+
+export default AttachExperienceCard;

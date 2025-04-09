@@ -335,7 +335,7 @@ class ResumeManagerApi {
    *  ID, education ID, and position of education within document.
    */
   static async attachEducationToDocument(documentId, educationId) {
-    const res = this.request(
+    const res = await this.request(
       `users/${
         this.#username
       }/documents/${documentId}/educations/${educationId}`,
@@ -377,6 +377,17 @@ class ResumeManagerApi {
   }
 
   /**
+   * Gets all experiences from a user.
+   *
+   * @returns {Object[]} A list of experience Objects, each containing info like
+   *  job title and organization name.
+   */
+  static async getExperiences() {
+    const res = await this.request(`users/${this.#username}/experiences`);
+    return res.experiences;
+  }
+
+  /**
    * Creates a new experience entry and adds it to a document.
    *
    * @param {String | Number} documentId - ID of the document to add an
@@ -404,6 +415,29 @@ class ResumeManagerApi {
       data,
       'post'
     );
+  }
+
+  /**
+   * Attaches an already created experience to a document.  In other words, this
+   * creates a document-experience relationship.  This is used for documents
+   * that are not the master resume.
+   *
+   * @param {Number | String} documentId - ID of the document to attach an
+   *  experience to.
+   * @param {Number | String} experienceId - ID of the experience to attach.
+   * @returns {Object} The document_x_experience Object, which contains the ID
+   *  of the document_x_experience, document ID, experience ID, and position of
+   *  experience within document.
+   */
+  static async attachExperienceToDocument(documentId, experienceId) {
+    const res = await this.request(
+      `users/${
+        this.#username
+      }/documents/${documentId}/experiences/${experienceId}`,
+      {},
+      'post'
+    );
+    return res.document_x_experience;
   }
 }
 
