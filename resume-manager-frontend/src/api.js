@@ -1,6 +1,8 @@
 import { jwtDecode } from 'jwt-decode';
 import axios from '../node_modules/axios';
 
+import { SECTION_ID_TO_DATABASE_NAME } from './commonData.js';
+
 // ==================================================
 
 const BASE_URL =
@@ -468,6 +470,38 @@ class ResumeManagerApi {
       }/documents/${documentId}/experiences/${experienceId}`,
       {},
       'delete'
+    );
+  }
+
+  /**
+   * Creates a new text snippet entry and adds it to a document and section item.
+   *
+   * @param {String | Number} documentId - ID of the document that the associated
+   *  section is in.
+   * @param {String | Number} sectionId - ID of the section type.
+   * @param {String | Number} sectionItemId - ID of the specific item in the section.
+   * @param {Object} data - Holds the info for creating a new text snippet.
+   * @param {String} data.type - The type of content, such as bullet point
+   *  or description.
+   * @param {String} data.content - Content of the text snippet.
+   * @returns {{
+   *    textSnippet: Object,
+   *    sectionItemXTextSnippet: Object
+   *  }}
+   *  textSnippet - Text snippet ID, version, owner, parent, type, and content.
+   *  sectionItemXTextSnippet - Not actually called sectionItemXTextSnippet but
+   *  can be experienceXTextSnippet or non-existent.  Includes the
+   *  document-section item ID that owns the text snippet, text snippet ID,
+   *  version of the text snippet, and position of the text snippet among other
+   *  text snippets in the section item and document.
+   */
+  static async addTextSnippet(documentId, sectionId, sectionItemId, data) {
+    return await this.request(
+      `users/${this.#username}/documents/${documentId}/${
+        SECTION_ID_TO_DATABASE_NAME[sectionId]
+      }/${sectionItemId}/text-snippets`,
+      data,
+      'post'
     );
   }
 }

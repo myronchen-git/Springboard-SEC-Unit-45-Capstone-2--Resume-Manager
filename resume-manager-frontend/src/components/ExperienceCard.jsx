@@ -65,6 +65,34 @@ function ExperienceCard({ item: experience }) {
     setDocument(documentClone);
   }
 
+  /**
+   * Sends a request to the back-end to create a new text snippet for this
+   * specific education and document, and updates the document Object / state.
+   *
+   * @param {Object} formData - The data required for creating a new text snippet.
+   */
+  async function addTextSnippet(formData) {
+    const { textSnippet } = await ResumeManagerApi.addTextSnippet(
+      document.id,
+      2,
+      experience.id,
+      formData
+    );
+
+    // Clone document so that React sees the document state has been modified.
+    // A shallow copy is done as a shortcut for updating the document by
+    // allowing the bullets property of the experience argument to be mutated.
+    // This saves from having to find the experience again.
+    const documentCopy = { ...document };
+
+    experience.bullets
+      ? experience.bullets.push(textSnippet)
+      : (experience.bullets = [textSnippet]);
+
+    // Update document.
+    setDocument(documentCopy);
+  }
+
   // --------------------------------------------------
 
   return (
@@ -88,9 +116,10 @@ function ExperienceCard({ item: experience }) {
         <br />
         {experience.endDate}
         <br />
-        {experience.bullets && (
-          <TextSnippetsList textSnippets={experience.bullets} />
-        )}
+        <TextSnippetsList
+          textSnippets={experience.bullets}
+          addTextSnippet={addTextSnippet}
+        />
       </CardBody>
     </Card>
   );

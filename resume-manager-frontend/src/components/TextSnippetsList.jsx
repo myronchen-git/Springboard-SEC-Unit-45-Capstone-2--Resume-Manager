@@ -1,13 +1,37 @@
+import { useContext } from 'react';
+
+import { DocumentContext } from '../contexts.jsx';
+import AddTextSnippetCard from './AddTextSnippetCard.jsx';
 import TextSnippetCard from './TextSnippetCard.jsx';
 
 // ==================================================
 
-function TextSnippetsList({ textSnippets }) {
+/**
+ * Renders a list of text snippets for a section item, such as an experience.
+ *
+ * @param {Object} props - React component properties.
+ * @param {Object[]} props.textSnippets - A list of text snippet Objects to use
+ *  for rendering.
+ * @param {Function} props.addTextSnippet - Takes the data for a new text
+ *  snippet. Then creates and adds a text snippet to an education, skill,
+ *  project, etc..
+ */
+function TextSnippetsList({ textSnippets, addTextSnippet }) {
+  const [document] = useContext(DocumentContext);
+
+  // --------------------------------------------------
+
   return (
     <div className="SectionItemsList">
-      {textSnippets.map((textSnippet) => (
-        <TextSnippetCard key={textSnippet.id} textSnippet={textSnippet} />
-      ))}
+      {textSnippets &&
+        textSnippets.map((textSnippet) => (
+          <TextSnippetCard key={textSnippet.id} textSnippet={textSnippet} />
+        ))}
+      {document.isMaster ? (
+        <AddTextSnippetCard addTextSnippet={addTextSnippet} />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
