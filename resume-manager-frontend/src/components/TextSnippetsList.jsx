@@ -2,6 +2,7 @@ import { useContext } from 'react';
 
 import { DocumentContext } from '../contexts.jsx';
 import AddTextSnippetCard from './AddTextSnippetCard.jsx';
+import AttachTextSnippetCard from './AttachTextSnippetCard.jsx';
 import TextSnippetCard from './TextSnippetCard.jsx';
 
 // ==================================================
@@ -16,7 +17,11 @@ import TextSnippetCard from './TextSnippetCard.jsx';
  *  snippet. Then creates and adds a text snippet to an education, skill,
  *  project, etc..
  */
-function TextSnippetsList({ textSnippets, addTextSnippet }) {
+function TextSnippetsList({
+  textSnippets,
+  addTextSnippet,
+  getAvailableTextSnippets,
+}) {
   const [document] = useContext(DocumentContext);
 
   // --------------------------------------------------
@@ -30,7 +35,9 @@ function TextSnippetsList({ textSnippets, addTextSnippet }) {
       {document.isMaster ? (
         <AddTextSnippetCard addTextSnippet={addTextSnippet} />
       ) : (
-        <></>
+        <AttachTextSnippetCard
+          getAvailableTextSnippets={getAvailableTextSnippets}
+        />
       )}
     </div>
   );

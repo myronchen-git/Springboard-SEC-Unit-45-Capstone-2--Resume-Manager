@@ -504,6 +504,21 @@ class ResumeManagerApi {
       'post'
     );
   }
+
+  /**
+   * Gets all text snippets belonging to an experience.
+   *
+   * @param {String | Number} experienceId - ID of the experience to fetch text
+   *  snippets for.
+   * @returns {Object[]} A list of text snippet Objects, each containing info
+   *  like content.
+   */
+  static async getTextSnippetsForExperience(experienceId) {
+    const res = await this.request(
+      `users/${this.#username}/experiences/${experienceId}/text-snippets`
+    );
+    return res.textSnippets;
+  }
 }
 
 // ==================================================
