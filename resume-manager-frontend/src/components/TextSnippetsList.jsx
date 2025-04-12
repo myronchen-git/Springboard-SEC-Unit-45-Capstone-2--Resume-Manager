@@ -21,6 +21,7 @@ function TextSnippetsList({
   textSnippets,
   addTextSnippet,
   getAvailableTextSnippets,
+  attachTextSnippet,
 }) {
   const [document] = useContext(DocumentContext);
 
@@ -37,6 +38,7 @@ function TextSnippetsList({
       ) : (
         <AttachTextSnippetCard
           getAvailableTextSnippets={getAvailableTextSnippets}
+          attachTextSnippet={attachTextSnippet}
         />
       )}
     </div>

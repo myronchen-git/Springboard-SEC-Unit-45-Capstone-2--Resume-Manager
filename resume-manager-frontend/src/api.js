@@ -474,12 +474,14 @@ class ResumeManagerApi {
   }
 
   /**
-   * Creates a new text snippet entry and adds it to a document and section item.
+   * Creates a new text snippet entry and adds it to a document and section
+   * item.
    *
-   * @param {String | Number} documentId - ID of the document that the associated
-   *  section is in.
+   * @param {String | Number} documentId - ID of the document that the
+   *  associated section is in.
    * @param {String | Number} sectionId - ID of the section type.
-   * @param {String | Number} sectionItemId - ID of the specific item in the section.
+   * @param {String | Number} sectionItemId - ID of the specific item in the
+   *  section.
    * @param {Object} data - Holds the info for creating a new text snippet.
    * @param {String} data.type - The type of content, such as bullet point
    *  or description.
@@ -518,6 +520,39 @@ class ResumeManagerApi {
       `users/${this.#username}/experiences/${experienceId}/text-snippets`
     );
     return res.textSnippets;
+  }
+
+  /**
+   * Attaches a text snippet to an experience in a non-master document.  In
+   * other words, this creates an experience-text snippet relationship.
+   *
+   * @param {String | Number} documentId - ID of the document that the
+   *  associated experience is in.
+   * @param {String | Number} experienceId - ID of the experience to a text
+   *  snippet to.
+   * @param {String | Number} textSnippetId - ID part of the text snippet to
+   *  attach.
+   * @param {String} textSnippetVersion - Version part of the text snippet to
+   *  attach.
+   * @returns {Object} The experience_x_textSnippet Object, which contains the
+   *  ID of the document_x_experience, text snippet ID and version, and position
+   *  of the text snippet within the experience.
+   */
+  static async attachTextSnippetToExperience(
+    documentId,
+    experienceId,
+    textSnippetId,
+    textSnippetVersion
+  ) {
+    const res = await this.request(
+      `users/${
+        this.#username
+      }/documents/${documentId}/experiences/${experienceId}` +
+        `/text-snippets/${textSnippetId}`,
+      { textSnippetVersion },
+      'post'
+    );
+    return res.experienceXTextSnippet;
   }
 }
 

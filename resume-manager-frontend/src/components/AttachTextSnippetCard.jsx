@@ -13,7 +13,10 @@ import trashIcon from '../assets/trash.svg';
 
 // ==================================================
 
-function AttachTextSnippetCard({ getAvailableTextSnippets }) {
+function AttachTextSnippetCard({
+  getAvailableTextSnippets,
+  attachTextSnippet,
+}) {
   const [isRevealed, setIsRevealed] = useState(false);
   const [textSnippetIdAndVersion, setTextSnippetIdAndVersion] = useState([]);
   const [errorMessages, setErrorMessages] = useState([]);
@@ -45,7 +48,24 @@ function AttachTextSnippetCard({ getAvailableTextSnippets }) {
   async function handleSubmit(evt) {
     evt.preventDefault();
 
-    // Call API
+    if (textSnippetIdAndVersion.length) {
+      const id = textSnippetIdAndVersion[0];
+      const version = textSnippetIdAndVersion[1];
+
+      try {
+        const textSnippetToAttach = availableTextSnippets.find(
+          (textSnippet) =>
+            textSnippet.id == id && textSnippet.version == version
+        );
+
+        await attachTextSnippet(id, version, textSnippetToAttach);
+      } catch (err) {
+        setErrorMessages(err);
+        return;
+      }
+
+      toggleOpen();
+    }
   }
 
   // --------------------------------------------------

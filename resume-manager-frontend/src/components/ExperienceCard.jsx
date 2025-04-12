@@ -110,6 +110,42 @@ function ExperienceCard({ item: experience }) {
     [experience]
   );
 
+  /**
+   * Attaches a text snippet to an experience in a document.
+   * Sends a request to the back-end to attach a text snippet to an experience
+   * in a document and creates a document clone with the text snippet in it.
+   * The clone will be used to update the document state locally, without having
+   * to make another GET request.
+   *
+   * @param {String | Number} id - ID part of the text snippet to attach.
+   * @param {String | Number} version - Version part of the text snippet to
+   *  attach.
+   * @param {Object} textSnippetToAttach - The text snippet Object retrieved
+   *  from the back-end and selected in the AttachTextSnippetCard component.
+   */
+  const attachTextSnippet = useCallback(
+    async (id, version, textSnippetToAttach) => {
+      await ResumeManagerApi.attachTextSnippetToExperience(
+        document.id,
+        experience.id,
+        id,
+        version
+      );
+
+      // Clone document so that React sees the document state has been modified.
+      const documentCopy = { ...document };
+
+      // Add text snippet to local version of experience.
+      experience.bullets
+        ? experience.bullets.push(textSnippetToAttach)
+        : (experience.bullets = [textSnippetToAttach]);
+
+      // Update document.
+      setDocument(documentCopy);
+    },
+    [document, experience, setDocument]
+  );
+
   // --------------------------------------------------
 
   return (
@@ -137,6 +173,7 @@ function ExperienceCard({ item: experience }) {
           textSnippets={experience.bullets}
           addTextSnippet={addTextSnippet}
           getAvailableTextSnippets={getAvailableTextSnippets}
+          attachTextSnippet={attachTextSnippet}
         />
       </CardBody>
     </Card>
