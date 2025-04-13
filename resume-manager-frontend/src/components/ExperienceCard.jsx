@@ -31,20 +31,15 @@ function ExperienceCard({ item: experience }) {
    * document, but keeps the experience entry.
    *
    * Locally updates the document object in the app state.
-   *
-   * @param {Event} evt - The click event of the HTML element with a parent that
-   *  has the "id" data attribute for the experience ID.
    */
-  async function deleteExperience(evt) {
-    const experienceId = evt.target.closest('.ExperienceCard').dataset.id;
-
+  async function deleteExperience() {
     try {
       if (document.isMaster) {
-        await ResumeManagerApi.deleteExperience(experienceId);
+        await ResumeManagerApi.deleteExperience(experience.id);
       } else {
         await ResumeManagerApi.removeExperienceFromDocument(
           document.id,
-          experienceId
+          experience.id
         );
       }
     } catch (err) {
@@ -53,17 +48,17 @@ function ExperienceCard({ item: experience }) {
       return;
     }
 
-    // Clone document so that React sees the document state has been modified.
-    const documentClone = structuredClone(document);
+    // Clone Array to indicate to other components that it has been changed.
+    document.experiences = [...document.experiences];
 
     // Find the experience in the document Object and remove it.
-    const experienceIdx = documentClone.experiences.findIndex(
-      (experience) => experience.id == experienceId
+    const experienceIdx = document.experiences.findIndex(
+      (experienceInDocument) => experienceInDocument.id == experience.id
     );
-    documentClone.experiences.splice(experienceIdx, 1);
+    document.experiences.splice(experienceIdx, 1);
 
-    // Update document.
-    setDocument(documentClone);
+    // Update document to re-render.
+    setDocument({ ...document });
   }
 
   /**
@@ -179,7 +174,7 @@ function ExperienceCard({ item: experience }) {
   // --------------------------------------------------
 
   return (
-    <Card className="ExperienceCard" data-id={experience.id}>
+    <Card className="ExperienceCard">
       <CardHeader className="text-end">
         {errorMessages.map((msg) => (
           <Alert key={msg} color="danger">

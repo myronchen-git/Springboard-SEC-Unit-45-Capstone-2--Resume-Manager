@@ -27,37 +27,33 @@ function SectionCard({ section }) {
   /**
    * Removes a section from a document.  In other words, this deletes a
    * document-section relationship.
-   *
-   * @param {Event} evt - The click event of the HTML element with a parent that
-   *  has the "id" data attribute for the section ID.
    */
-  async function deleteSection(evt) {
-    const sectionId = evt.target.closest('.SectionCard').dataset.id;
-
+  async function deleteSection() {
     try {
-      await ResumeManagerApi.deleteSection(document.id, sectionId);
+      await ResumeManagerApi.deleteSection(document.id, section.id);
     } catch (err) {
       setErrorMessages(err);
       setTimeout(() => setErrorMessages([]), 5000);
       return;
     }
 
-    // Clone document so that React sees the document state has been modified.
-    const documentClone = structuredClone(document);
+    // Clone Array to indicate to other components that it has been changed.
+    document.sections = [...document.sections];
 
     // Find the section in the document Object and remove it.
-    const sectionIdx = documentClone.sections.findIndex(
-      (section) => section.id == sectionId
+    const sectionIdx = document.sections.findIndex(
+      (sectionInDocument) => sectionInDocument.id == section.id
     );
-    documentClone.sections.splice(sectionIdx, 1);
+    document.sections.splice(sectionIdx, 1);
 
-    setDocument(documentClone);
+    // Update document to re-render.
+    setDocument({ ...document });
   }
 
   // --------------------------------------------------
 
   return (
-    <Card className="SectionCard text-center" data-id={section.id}>
+    <Card className="SectionCard text-center">
       <CardHeader className="text-end">
         {errorMessages.map((msg) => (
           <Alert key={msg} color="danger">

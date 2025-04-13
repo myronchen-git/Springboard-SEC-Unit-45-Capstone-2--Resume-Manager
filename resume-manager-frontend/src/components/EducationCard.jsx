@@ -29,20 +29,15 @@ function EducationCard({ item: education }) {
    * document, but keeps the education entry.
    *
    * Locally updates the document object in the app state.
-   *
-   * @param {Event} evt - The click event of the HTML element with a parent that
-   *  has the "id" data attribute for the education ID.
    */
-  async function deleteEducation(evt) {
-    const educationId = evt.target.closest('.EducationCard').dataset.id;
-
+  async function deleteEducation() {
     try {
       if (document.isMaster) {
-        await ResumeManagerApi.deleteEducation(educationId);
+        await ResumeManagerApi.deleteEducation(education.id);
       } else {
         await ResumeManagerApi.removeEducationFromDocument(
           document.id,
-          educationId
+          education.id
         );
       }
     } catch (err) {
@@ -51,23 +46,23 @@ function EducationCard({ item: education }) {
       return;
     }
 
-    // Clone document so that React sees the document state has been modified.
-    const documentClone = structuredClone(document);
+    // Clone Array to indicate to other components that it has been changed.
+    document.educations = [...document.educations];
 
     // Find the education in the document Object and remove it.
-    const educationIdx = documentClone.educations.findIndex(
-      (education) => education.id == educationId
+    const educationIdx = document.educations.findIndex(
+      (educationInDocument) => educationInDocument.id == education.id
     );
-    documentClone.educations.splice(educationIdx, 1);
+    document.educations.splice(educationIdx, 1);
 
-    // Update document.
-    setDocument(documentClone);
+    // Update document to re-render.
+    setDocument({ ...document });
   }
 
   // --------------------------------------------------
 
   return (
-    <Card className="EducationCard" data-id={education.id}>
+    <Card className="EducationCard">
       <CardHeader className="text-end">
         {errorMessages.map((msg) => (
           <Alert key={msg} color="danger">
