@@ -146,6 +146,34 @@ function ExperienceCard({ item: experience }) {
     [document, experience, setDocument]
   );
 
+  /**
+   * Removes a text snippet from this experience in the document state.
+   *
+   * @param {String | Number} textSnippetId - ID part of the text snippet to
+   *  remove.
+   * @param {String | Number} version - Version part of the text snippet to
+   *  remove.
+   */
+  const removeTextSnippetFromDocumentState = useCallback(
+    (textSnippetId, textSnippetVersion) => {
+      // Find the text snippet in the experience Object.
+      const textSnippetIdx = experience.bullets.findIndex(
+        (textSnippet) =>
+          textSnippet.id == textSnippetId &&
+          textSnippet.version == textSnippetVersion
+      );
+
+      // Clone bullets Array to indicate to other components that it has been
+      // changed.  Then remove the text snippet.
+      experience.bullets = [...experience.bullets];
+      experience.bullets.splice(textSnippetIdx, 1);
+
+      // Update document to re-render.
+      setDocument({ ...document });
+    },
+    [experience, document, setDocument]
+  );
+
   // --------------------------------------------------
 
   return (
@@ -174,6 +202,9 @@ function ExperienceCard({ item: experience }) {
           addTextSnippet={addTextSnippet}
           getAvailableTextSnippets={getAvailableTextSnippets}
           attachTextSnippet={attachTextSnippet}
+          removeTextSnippetFromDocumentState={
+            removeTextSnippetFromDocumentState
+          }
         />
       </CardBody>
     </Card>

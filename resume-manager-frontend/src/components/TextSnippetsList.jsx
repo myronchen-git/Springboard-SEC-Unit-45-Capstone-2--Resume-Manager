@@ -22,6 +22,7 @@ function TextSnippetsList({
   addTextSnippet,
   getAvailableTextSnippets,
   attachTextSnippet,
+  removeTextSnippetFromDocumentState,
 }) {
   const [document] = useContext(DocumentContext);
 
@@ -31,7 +32,13 @@ function TextSnippetsList({
     <div className="SectionItemsList">
       {textSnippets &&
         textSnippets.map((textSnippet) => (
-          <TextSnippetCard key={textSnippet.id} textSnippet={textSnippet} />
+          <TextSnippetCard
+            key={textSnippet.id}
+            textSnippet={textSnippet}
+            removeTextSnippetFromDocumentState={
+              removeTextSnippetFromDocumentState
+            }
+          />
         ))}
       {document.isMaster ? (
         <AddTextSnippetCard addTextSnippet={addTextSnippet} />

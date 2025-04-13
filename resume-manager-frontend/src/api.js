@@ -554,6 +554,24 @@ class ResumeManagerApi {
     );
     return res.experienceXTextSnippet;
   }
+
+  /**
+   * Deletes a text snippet from the database.  The text snippet version is
+   * placed in the request body, because it is complex and contains - (dashes),
+   * : (colons), and . (periods).
+   *
+   * @param {String | Number} textSnippetId - ID part of the text snippet to
+   *  delete.
+   * @param {String} textSnippetVersion - Version part of the text snippet to
+   *  delete.
+   */
+  static async deleteTextSnippet(textSnippetId, textSnippetVersion) {
+    await this.request(
+      `users/${this.#username}/text-snippets/${textSnippetId}`,
+      { textSnippetVersion },
+      'delete'
+    );
+  }
 }
 
 // ==================================================
