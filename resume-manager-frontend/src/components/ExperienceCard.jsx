@@ -82,18 +82,18 @@ function ExperienceCard({ item: experience }) {
         formData
       );
 
-      // Clone document so that React sees the document state has been modified.
-      // A shallow copy is done as a shortcut for updating the document by
-      // allowing the bullets property of the experience argument to be mutated.
-      // This saves from having to find the experience again.
-      const documentCopy = { ...document };
-
+      // Add text snippet to local version of experience. This mutates the
+      // experience Object to save from having to find the experience again.
+      // This is possible, because a shallow copy of the document will be
+      // performed.  Note that a new Array is set for bullets to indicate to
+      // other React components that there has been a change.
       experience.bullets
-        ? experience.bullets.push(textSnippet)
+        ? (experience.bullets = [...experience.bullets, textSnippet])
         : (experience.bullets = [textSnippet]);
 
-      // Update document.
-      setDocument(documentCopy);
+      // Update document with a clone to re-render. A shallow copy is done as a
+      // quicker way of updating the document, instead of deep copying.
+      setDocument({ ...document });
     },
     [document, setDocument, experience]
   );
@@ -132,16 +132,18 @@ function ExperienceCard({ item: experience }) {
         version
       );
 
-      // Clone document so that React sees the document state has been modified.
-      const documentCopy = { ...document };
-
-      // Add text snippet to local version of experience.
+      // Add text snippet to local version of experience. This mutates the
+      // experience Object to save from having to find the experience again.
+      // This is possible, because a shallow copy of the document will be
+      // performed.  Note that a new Array is set for bullets to indicate to
+      // other React components that there has been a change.
       experience.bullets
-        ? experience.bullets.push(textSnippetToAttach)
+        ? (experience.bullets = [...experience.bullets, textSnippetToAttach])
         : (experience.bullets = [textSnippetToAttach]);
 
-      // Update document.
-      setDocument(documentCopy);
+      // Update document with a clone to re-render. A shallow copy is done as a
+      // quicker way of updating the document, instead of deep copying.
+      setDocument({ ...document });
     },
     [document, experience, setDocument]
   );
