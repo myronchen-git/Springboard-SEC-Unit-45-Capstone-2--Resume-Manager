@@ -572,6 +572,30 @@ class ResumeManagerApi {
       'delete'
     );
   }
+
+  /**
+   * Removes a text snippet from an experience in a document, but does not
+   * delete the entry itself. This is used for non-master resumes.
+   *
+   * @param {String | Number} documentId - ID of the document to remove the text
+   *  snippet from.
+   * @param {String | Number} experienceId - ID of the experience to remove the
+   *  text snippet from.
+   * @param {String | Number} textSnippetId - ID of the text snippet to remove.
+   */
+  static async removeTextSnippetFromExperience(
+    documentId,
+    experienceId,
+    textSnippetId
+  ) {
+    await this.request(
+      `users/${
+        this.#username
+      }/documents/${documentId}/experiences/${experienceId}/text-snippets/${textSnippetId}`,
+      {},
+      'delete'
+    );
+  }
 }
 
 // ==================================================

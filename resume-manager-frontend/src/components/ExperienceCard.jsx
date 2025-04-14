@@ -173,6 +173,19 @@ function ExperienceCard({ item: experience }) {
     [experience, document, setDocument]
   );
 
+  const detachTextSnippet = useCallback(
+    async (textSnippetId) => {
+      await ResumeManagerApi.removeTextSnippetFromExperience(
+        document.id,
+        experience.id,
+        textSnippetId
+      );
+
+      removeTextSnippetFromDocumentState(textSnippetId);
+    },
+    [document, experience, removeTextSnippetFromDocumentState]
+  );
+
   // --------------------------------------------------
 
   return (
@@ -201,6 +214,7 @@ function ExperienceCard({ item: experience }) {
           addTextSnippet={addTextSnippet}
           getAvailableTextSnippets={getAvailableTextSnippets}
           attachTextSnippet={attachTextSnippet}
+          detachTextSnippet={detachTextSnippet}
           removeTextSnippetFromDocumentState={
             removeTextSnippetFromDocumentState
           }

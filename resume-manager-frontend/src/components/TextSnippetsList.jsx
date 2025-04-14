@@ -22,6 +22,7 @@ function TextSnippetsList({
   addTextSnippet,
   getAvailableTextSnippets,
   attachTextSnippet,
+  detachTextSnippet,
   removeTextSnippetFromDocumentState,
 }) {
   const [document] = useContext(DocumentContext);
@@ -35,6 +36,7 @@ function TextSnippetsList({
           <TextSnippetCard
             key={textSnippet.id}
             textSnippet={textSnippet}
+            detachTextSnippet={detachTextSnippet}
             removeTextSnippetFromDocumentState={
               removeTextSnippetFromDocumentState
             }

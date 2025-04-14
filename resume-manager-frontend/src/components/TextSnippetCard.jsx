@@ -19,6 +19,7 @@ import trashIcon from '../assets/trash.svg';
  */
 function TextSnippetCard({
   textSnippet,
+  detachTextSnippet,
   removeTextSnippetFromDocumentState,
   addBullet = true,
 }) {
@@ -44,7 +45,7 @@ function TextSnippetCard({
           textSnippet.version
         );
       } else {
-        // TODO: Remove text snippet from section in document.
+        await detachTextSnippet(textSnippet.id);
       }
     } catch (err) {
       setErrorMessages(err);
