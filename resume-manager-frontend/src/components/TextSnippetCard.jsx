@@ -52,7 +52,7 @@ function TextSnippetCard({
       return;
     }
 
-    removeTextSnippetFromDocumentState(textSnippet.id, textSnippet.version);
+    removeTextSnippetFromDocumentState(textSnippet.id);
   }
 
   // --------------------------------------------------

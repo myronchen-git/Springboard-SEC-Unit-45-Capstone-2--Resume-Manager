@@ -148,25 +148,27 @@ function ExperienceCard({ item: experience }) {
    *
    * @param {String | Number} textSnippetId - ID part of the text snippet to
    *  remove.
-   * @param {String | Number} version - Version part of the text snippet to
-   *  remove.
    */
   const removeTextSnippetFromDocumentState = useCallback(
-    (textSnippetId, textSnippetVersion) => {
-      // Find the text snippet in the experience Object.
-      const textSnippetIdx = experience.bullets.findIndex(
-        (textSnippet) =>
-          textSnippet.id == textSnippetId &&
-          textSnippet.version == textSnippetVersion
+    (textSnippetId) => {
+      const documentClone = { ...document };
+
+      // Replace experience because it's an input and to have this function
+      // remain "pure".
+      const experienceClone = { ...experience };
+      const experienceIdx = documentClone.experiences.findIndex(
+        (exp) => exp.id == experienceClone.id
+      );
+      documentClone.experiences[experienceIdx] = experienceClone;
+
+      // Remove the text snippet.  Also make a clone of the bullets Array to
+      // indicate to other components that it has been changed.
+      experienceClone.bullets = experienceClone.bullets.filter(
+        (textSnippet) => textSnippet.id != textSnippetId
       );
 
-      // Clone bullets Array to indicate to other components that it has been
-      // changed.  Then remove the text snippet.
-      experience.bullets = [...experience.bullets];
-      experience.bullets.splice(textSnippetIdx, 1);
-
       // Update document to re-render.
-      setDocument({ ...document });
+      setDocument(documentClone);
     },
     [experience, document, setDocument]
   );
