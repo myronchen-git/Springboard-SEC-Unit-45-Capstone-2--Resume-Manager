@@ -201,7 +201,7 @@ function Document() {
           <DocumentSelect
             documents={documents}
             loadDocument={loadDocument}
-            closeDocumentSelect={() => setIsDocumentSelectOpen(false)}
+            close={() => setIsDocumentSelectOpen(false)}
           />
         )}
         {isNewDocumentFormOpen && (

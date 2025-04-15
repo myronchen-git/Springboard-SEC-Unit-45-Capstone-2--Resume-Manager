@@ -27,11 +27,11 @@ import {
  *  display which documents to open.
  * @param {Function} props.loadDocument - Fetches the selected document or
  *  creates a new one.
- * @param {Function} props.closeDocumentSelect - Closes this component by
+ * @param {Function} props.close - Closes this component by
  *  setting a state, which will then cause this component to unmount.  This is
  *  used to cancel document selection.
  */
-function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
+function DocumentSelect({ documents, loadDocument, close }) {
   const [documentId, setDocumentId] = useState(null);
   const [errorMessages, setErrorMessages] = useState([]);
 
@@ -77,7 +77,7 @@ function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
                     <CardText>
                       Created on: {new Date(doc.createdOn).toString()}
                       <br />
-                      Last updated: {doc.lastUpdated}
+                      Last updated: {new Date(doc.lastUpdated).toString()}
                       <br />
                       Master: {doc.isMaster.toString()}
                       <br />
@@ -118,7 +118,7 @@ function DocumentSelect({ documents, loadDocument, closeDocumentSelect }) {
         </ModalBody>
         <ModalFooter>
           <Button type="submit">Open</Button>
-          <Button onClick={closeDocumentSelect}>Cancel</Button>
+          <Button onClick={close}>Cancel</Button>
         </ModalFooter>
       </Form>
     </Modal>
