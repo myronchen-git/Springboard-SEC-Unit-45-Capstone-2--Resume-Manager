@@ -42,14 +42,6 @@ function Document() {
 
   // --------------------------------------------------
 
-  function closeDocumentSelect() {
-    setIsDocumentSelectOpen(false);
-  }
-
-  function closeNewDocumentForm() {
-    setIsNewDocumentFormOpen(false);
-  }
-
   /**
    * Gets a document and its contents for displaying.  A document ID of 0
    * signifies to create a new document.
@@ -209,13 +201,13 @@ function Document() {
           <DocumentSelect
             documents={documents}
             loadDocument={loadDocument}
-            closeDocumentSelect={closeDocumentSelect}
+            closeDocumentSelect={() => setIsDocumentSelectOpen(false)}
           />
         )}
         {isNewDocumentFormOpen && (
           <NewDocumentForm
             createDocument={createDocument}
-            close={closeNewDocumentForm}
+            close={() => setIsNewDocumentFormOpen(false)}
           />
         )}
         {isEditDocumentFormOpen && (
