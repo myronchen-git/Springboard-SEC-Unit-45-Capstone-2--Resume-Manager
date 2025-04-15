@@ -237,6 +237,28 @@ class ResumeManagerApi {
   }
 
   /**
+   * Updates a document's properties, but not the section contents.  If document
+   * is master resume, then only documentName can be updated.
+   *
+   * @param {String | Number} documentId - ID of the document to update
+   *  properties of.
+   * @param {Object} data - Contains info for updating document.
+   * @param {String} [data.documentName] - New name of the document.
+   * @param {Boolean} [data.isTemplate] - Whether this document should be a
+   *  template.
+   * @param {Boolean} [data.isLocked] - Whether this document should be locked.
+   * @returns {Object} document - Returns all info of the updated document.
+   */
+  static async updateDocument(documentId, data) {
+    const res = await this.request(
+      `users/${this.#username}/documents/${documentId}`,
+      data,
+      'patch'
+    );
+    return res.document;
+  }
+
+  /**
    * Gets all allowed sections that a resume can contain.
    *
    * @returns {Object[]} A list of section Objects that can be used in

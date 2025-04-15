@@ -14,7 +14,7 @@ import {
 import ResumeManagerApi from '../api.js';
 import { DocumentContext } from '../contexts.jsx';
 
-import editIcon from '../assets/pencil.svg';
+import pencilIcon from '../assets/pencil.svg';
 
 // ==================================================
 
@@ -85,7 +85,7 @@ function ContactInfoCard() {
   return (
     <Card className="ContactInfoCard" tag="article">
       <CardHeader className="text-end">
-        <img src={editIcon} alt="edit icon" onClick={toggleEdit} />
+        <img src={pencilIcon} alt="edit icon" onClick={toggleEdit} />
       </CardHeader>
       {isEditing ? (
         <CardBody>

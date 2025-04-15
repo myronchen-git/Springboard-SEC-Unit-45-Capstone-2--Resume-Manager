@@ -4,10 +4,12 @@ import { Alert, Button } from 'reactstrap';
 import ResumeManagerApi from '../api';
 import ContactInfoCard from '../components/ContactInfoCard.jsx';
 import DocumentSelect from '../components/DocumentSelect';
+import EditDocumentForm from '../components/EditDocumentForm.jsx';
 import NewDocumentForm from '../components/NewDocumentForm';
 import SectionsList from '../components/SectionsList.jsx';
 import { DocumentContext, UserContext } from '../contexts.jsx';
 
+import pencilIcon from '../assets/pencil.svg';
 import trashIcon from '../assets/trash.svg';
 
 // ==================================================
@@ -21,6 +23,7 @@ function Document() {
   const [documents, setDocuments] = useState([]);
   const [isDocumentSelectOpen, setIsDocumentSelectOpen] = useState(true);
   const [isNewDocumentFormOpen, setIsNewDocumentFormOpen] = useState(false);
+  const [isEditDocumentFormOpen, setIsEditDocumentFormOpen] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const { user } = useContext(UserContext);
 
@@ -142,6 +145,43 @@ function Document() {
     setDocuments([...documents]);
   }
 
+  /**
+   * Sends an API request to update a document's properties.  Then updates the
+   * list of documents and the document state with the updated info.
+   *
+   * @param {Object} formData - Holds updated document properties.
+   * @see ResumeManagerApi.updateDocument for formData properties.
+   */
+  async function editDocument(formData) {
+    let updatedDocument;
+    try {
+      updatedDocument = await ResumeManagerApi.updateDocument(
+        document.id,
+        formData
+      );
+    } catch (err) {
+      setErrorMessages(err);
+      setTimeout(() => setErrorMessages([]), 5000);
+      return;
+    } finally {
+      setIsEditDocumentFormOpen(false);
+    }
+
+    const documentsCopy = [...documents];
+
+    // Find the document in the list of documents and replace it.
+    const documentIdx = documentsCopy.findIndex(
+      (documentInDocuments) => documentInDocuments.id == document.id
+    );
+    documentsCopy[documentIdx] = updatedDocument;
+
+    // Updating documents list.
+    setDocuments(documentsCopy);
+
+    // Updating document state.
+    setDocument({ ...document, ...updatedDocument });
+  }
+
   // --------------------------------------------------
 
   return (
@@ -150,6 +190,11 @@ function Document() {
         <Button onClick={() => setIsDocumentSelectOpen(true)}>
           Select Document
         </Button>
+        {document && (
+          <Button onClick={() => setIsEditDocumentFormOpen(true)}>
+            <img src={pencilIcon} alt="edit icon" />
+          </Button>
+        )}
         {document && !document.isMaster && (
           <Button onClick={deleteDocument}>
             <img src={trashIcon} alt="trash icon" />
@@ -173,7 +218,12 @@ function Document() {
             close={closeNewDocumentForm}
           />
         )}
-
+        {isEditDocumentFormOpen && (
+          <EditDocumentForm
+            editDocument={editDocument}
+            close={() => setIsEditDocumentFormOpen(false)}
+          />
+        )}
         {document && (
           <article>
             <ContactInfoCard />
