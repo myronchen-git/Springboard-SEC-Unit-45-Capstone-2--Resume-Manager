@@ -370,6 +370,38 @@ class ResumeManagerApi {
   }
 
   /**
+   * Updates an education, only if the document is the master resume.
+   *
+   * @param {String | Number} documentId - ID of the document that the education
+   *  is in.
+   * @param {String | Number} educationId - ID of the education being updated.
+   * @param {Object} data - Contains info for updating education info.
+   * @param {String} [data.school] - School or education center name.
+   * @param {String} [data.location] - Location of school.
+   * @param {String} [data.startDate] - The start date of joining the school.
+   * @param {String} [data.endDate] - The end date of leaving the school.
+   * @param {String} [data.degree] - The degree name that was or will be given
+   *  from the school.
+   * @param {String} [data.gpa] - The grade point average throughout the
+   *  attendance.
+   * @param {String} [data.awardsAndHonors] - Any awards or honors given by the
+   *  school.
+   * @param {String} [data.activities] - Any activities done in relation to the
+   *  school.
+   * @returns {Object} All of the education's current info from the database.
+   */
+  static async updateEducation(documentId, educationId, data) {
+    const res = await this.request(
+      `users/${
+        this.#username
+      }/documents/${documentId}/educations/${educationId}`,
+      data,
+      'patch'
+    );
+    return res.education;
+  }
+
+  /**
    * Deletes an education entry from the database.
    *
    * @param {String} educationId - ID of the education to delete.

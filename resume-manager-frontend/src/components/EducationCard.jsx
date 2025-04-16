@@ -3,7 +3,11 @@ import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../api.js';
 import { DocumentContext } from '../contexts.jsx';
+import EducationForm from './EducationForm.jsx';
 
+import { EDUCATION_FIELDS } from '../commonData.js';
+
+import pencilIcon from '../assets/pencil.svg';
 import trashIcon from '../assets/trash.svg';
 
 // ==================================================
@@ -17,9 +21,42 @@ import trashIcon from '../assets/trash.svg';
  */
 function EducationCard({ item: education }) {
   const [document, setDocument] = useContext(DocumentContext);
+  const [isEducationFormOpen, setIsEducationFormOpen] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
+
+  /**
+   * Sends an API request to update an education's properties.  Then updates the
+   * list of educations with the returned updated info.
+   *
+   * @param {Object} formData - Holds updated education properties.
+   * @see ResumeManagerApi.updateEducation for formData properties.
+   */
+  async function editEducation(formData) {
+    const updatedEducation = await ResumeManagerApi.updateEducation(
+      document.id,
+      education.id,
+      formData
+    );
+
+    // Removing owner property because it is not necessary.
+    delete updatedEducation.owner;
+
+    // Clone to indicate to React that things were changed.
+    const documentClone = { ...document, educations: [...document.educations] };
+
+    // Find the education in the document Object and replace it.
+    const educationIdx = documentClone.educations.findIndex(
+      (educationInDocument) => educationInDocument.id == education.id
+    );
+    documentClone.educations[educationIdx] = updatedEducation;
+
+    // Update document to re-render.
+    setDocument(documentClone);
+
+    setIsEducationFormOpen(false);
+  }
 
   /**
    * If the document is the master resume, deletes the education, that was
@@ -61,6 +98,13 @@ function EducationCard({ item: education }) {
 
   // --------------------------------------------------
 
+  // Convert current null fields in education to empty Strings, so that they are
+  // properly displayed in form inputs.
+  const initialFormData = EDUCATION_FIELDS.reduce((obj, field) => {
+    obj[field.jsName] = education[field.jsName] || '';
+    return obj;
+  }, {});
+
   return (
     <Card className="EducationCard">
       <CardHeader className="text-end">
@@ -69,25 +113,43 @@ function EducationCard({ item: education }) {
             {msg}
           </Alert>
         ))}
+        {document.isMaster && (
+          <img
+            src={pencilIcon}
+            alt="edit icon"
+            onClick={() =>
+              setIsEducationFormOpen((previousState) => !previousState)
+            }
+          />
+        )}
         <img src={trashIcon} alt="trash icon" onClick={deleteEducation} />
       </CardHeader>
       <CardBody>
-        {education.school}
-        <br />
-        {education.location}
-        <br />
-        {education.startDate}
-        <br />
-        {education.endDate}
-        <br />
-        {education.degree}
-        <br />
-        {education.gpa}
-        <br />
-        {education.awardsAndHonors}
-        <br />
-        {education.activities}
-        <br />
+        {isEducationFormOpen ? (
+          <EducationForm
+            initialFormData={initialFormData}
+            processSubmission={editEducation}
+          />
+        ) : (
+          <>
+            {education.school}
+            <br />
+            {education.location}
+            <br />
+            {education.startDate}
+            <br />
+            {education.endDate}
+            <br />
+            {education.degree}
+            <br />
+            {education.gpa}
+            <br />
+            {education.awardsAndHonors}
+            <br />
+            {education.activities}
+            <br />
+          </>
+        )}
       </CardBody>
     </Card>
   );
