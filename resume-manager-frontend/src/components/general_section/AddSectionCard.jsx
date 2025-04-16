@@ -9,7 +9,7 @@ import {
   Input,
 } from 'reactstrap';
 
-import trashIcon from '../assets/trash.svg';
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 

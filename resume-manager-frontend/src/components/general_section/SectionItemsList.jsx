@@ -1,14 +1,14 @@
 import { useContext } from 'react';
 
-import { DocumentContext } from '../contexts.jsx';
-import AddEducationCard from './AddEducationCard.jsx';
-import AddExperienceCard from './AddExperienceCard.jsx';
-import AttachEducationCard from './AttachEducationCard.jsx';
-import AttachExperienceCard from './AttachExperienceCard.jsx';
-import EducationCard from './EducationCard.jsx';
-import ExperienceCard from './ExperienceCard.jsx';
+import { DocumentContext } from '../../contexts.jsx';
+import AddEducationCard from '../education/AddEducationCard.jsx';
+import AttachEducationCard from '../education/AttachEducationCard.jsx';
+import EducationCard from '../education/EducationCard.jsx';
+import AddExperienceCard from '../experience/AddExperienceCard.jsx';
+import AttachExperienceCard from '../experience/AttachExperienceCard.jsx';
+import ExperienceCard from '../experience/ExperienceCard.jsx';
 
-import { SECTION_ID_TO_DATABASE_NAME } from '../commonData.js';
+import { SECTION_ID_TO_DATABASE_NAME } from '../../commonData.js';
 
 // ==================================================
 

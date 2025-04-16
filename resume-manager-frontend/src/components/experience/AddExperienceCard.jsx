@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Alert,
   Button,
@@ -11,25 +11,28 @@ import {
   Label,
 } from 'reactstrap';
 
-import trashIcon from '../assets/trash.svg';
+import { DocumentContext } from '../../contexts.jsx';
+import { addNewSectionItem } from '../../util/specificSectionsFuncs.js';
+
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 
 /**
- * Component for showing and controlling the form to add a new text snippet
- * entry.
- *
- * @param {Function} addTextSnippet - Takes the data for a new text snippet.
- *  Then creates and adds a text snippet to an education, skill, project, etc..
+ * Component for showing and controlling the form to add a new experience entry.
  */
-function AddTextSnippetCard({ addTextSnippet }) {
+function AddExperienceCard() {
   const [isRevealed, setIsRevealed] = useState(false);
   const initialFormData = {
-    type: 'plain',
-    content: '',
+    title: '',
+    organization: '',
+    location: '',
+    startDate: '',
+    endDate: '',
   };
   const [formData, setFormData] = useState(initialFormData);
   const [errorMessages, setErrorMessages] = useState([]);
+  const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 
@@ -55,7 +58,12 @@ function AddTextSnippetCard({ addTextSnippet }) {
     }
 
     try {
-      await addTextSnippet(formDataCopy);
+      const updatedDocument = await addNewSectionItem(
+        document,
+        2,
+        formDataCopy
+      );
+      setDocument(updatedDocument);
     } catch (err) {
       setErrorMessages(err);
       return;
@@ -69,32 +77,46 @@ function AddTextSnippetCard({ addTextSnippet }) {
   // Used for reducing duplicate code for inputs.  Always keep up to date, with
   // optional fields last!
   // [JavaScript name, user-facing name]
-  const fields = [['content', 'Content']];
+  const fields = [
+    ['title', 'Job Title'],
+    ['organization', 'Organization'],
+    ['location', 'Location'],
+    ['startDate', 'Start Date'],
+    ['endDate', 'End Date'],
+  ];
 
   // Always keep up to date!
-  const optionalFieldsStartIndex = 1;
+  const optionalFieldsStartIndex = 4;
 
   const getRequiredIndicator = (idx) => idx < optionalFieldsStartIndex && ' *';
+  const getPlaceholder = (fieldName) =>
+    fieldName.toLowerCase().includes('date') ? 'YYYY-MM-DD' : '';
+  const getPattern = (fieldName) =>
+    fieldName.toLowerCase().includes('date')
+      ? '^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$'
+      : '.*';
 
   return (
-    <Card className="AddTextSnippetCard">
+    <Card className="AddExperienceCard">
       {isRevealed ? (
         <>
           <CardHeader className="text-end">
             <img src={trashIcon} alt="trash icon" onClick={toggleOpen} />
           </CardHeader>
           <CardBody>
-            <Form className="AddTextSnippetCard__form" onSubmit={handleSubmit}>
+            <Form className="AddExperienceCard__form" onSubmit={handleSubmit}>
               {fields.map((field, idx) => (
                 <FormGroup key={field[0]} className="text-start">
-                  <Label htmlFor={`AddTextSnippetCard__input-${field[0]}`}>
+                  <Label htmlFor={`AddExperienceCard__input-${field[0]}`}>
                     <b>{field[1]}</b>
                     {getRequiredIndicator(idx)}
                   </Label>
                   <Input
-                    id={`AddTextSnippetCard__input-${field[0]}`}
+                    id={`AddExperienceCard__input-${field[0]}`}
                     type="text"
                     name={field[0]}
+                    placeholder={getPlaceholder(field[0])}
+                    pattern={getPattern(field[0])}
                     value={formData[field[0]]}
                     required={idx < optionalFieldsStartIndex}
                     onChange={handleChange}
@@ -114,7 +136,7 @@ function AddTextSnippetCard({ addTextSnippet }) {
         </>
       ) : (
         <CardBody onClick={toggleOpen}>
-          Add Text
+          Add Experience
           <br />+
         </CardBody>
       )}
@@ -124,4 +146,4 @@ function AddTextSnippetCard({ addTextSnippet }) {
 
 // ==================================================
 
-export default AddTextSnippetCard;
+export default AddExperienceCard;

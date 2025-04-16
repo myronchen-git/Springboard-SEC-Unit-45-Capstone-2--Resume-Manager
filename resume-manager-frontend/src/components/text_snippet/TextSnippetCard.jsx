@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
-import ResumeManagerApi from '../api';
-import { DocumentContext } from '../contexts';
+import ResumeManagerApi from '../../api.js';
+import { DocumentContext } from '../../contexts.jsx';
 
-import trashIcon from '../assets/trash.svg';
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 

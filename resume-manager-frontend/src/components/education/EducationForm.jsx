@@ -6,7 +6,7 @@ import {
   EDUCATION_OPTIONAL_FIELDS_START_INDEX,
   getFormInputPattern,
   getFormInputPlaceholder,
-} from '../commonData.js';
+} from '../../commonData.js';
 
 // ==================================================
 

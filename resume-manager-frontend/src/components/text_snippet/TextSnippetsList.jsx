@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { DocumentContext } from '../contexts.jsx';
+import { DocumentContext } from '../../contexts.jsx';
 import AddTextSnippetCard from './AddTextSnippetCard.jsx';
 import AttachTextSnippetCard from './AttachTextSnippetCard.jsx';
 import TextSnippetCard from './TextSnippetCard.jsx';

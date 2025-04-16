@@ -2,11 +2,11 @@ import { useContext, useEffect, useState } from 'react';
 import { Alert, Button } from 'reactstrap';
 
 import ResumeManagerApi from '../api';
-import ContactInfoCard from '../components/ContactInfoCard.jsx';
-import DocumentSelect from '../components/DocumentSelect';
-import EditDocumentForm from '../components/EditDocumentForm.jsx';
-import NewDocumentForm from '../components/NewDocumentForm';
-import SectionsList from '../components/SectionsList.jsx';
+import ContactInfoCard from '../components/contact_info/ContactInfoCard.jsx';
+import DocumentSelect from '../components/document/DocumentSelect';
+import EditDocumentForm from '../components/document/EditDocumentForm.jsx';
+import NewDocumentForm from '../components/document/NewDocumentForm';
+import SectionsList from '../components/general_section/SectionsList.jsx';
 import { DocumentContext, UserContext } from '../contexts.jsx';
 
 import pencilIcon from '../assets/pencil.svg';

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,61 +9,56 @@ import {
   Input,
 } from 'reactstrap';
 
-import ResumeManagerApi from '../api.js';
-import { DocumentContext } from '../contexts.jsx';
-import { attachSectionItem } from '../util/specificSectionsFuncs.js';
-
-import trashIcon from '../assets/trash.svg';
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 
-function AttachExperienceCard() {
+function AttachTextSnippetCard({
+  getAvailableTextSnippets,
+  attachTextSnippet,
+}) {
   const [isRevealed, setIsRevealed] = useState(false);
-  const [experienceId, setExperienceId] = useState(null);
+  const [textSnippetIdAndVersion, setTextSnippetIdAndVersion] = useState([]);
   const [errorMessages, setErrorMessages] = useState([]);
-  const [availableExperiences, setAvailableExperiences] = useState([]);
-  const [document, setDocument] = useContext(DocumentContext);
+  const [availableTextSnippets, setAvailableTextSnippets] = useState(null);
 
   // --------------------------------------------------
 
   useEffect(() => {
     async function runEffect() {
-      setAvailableExperiences(await ResumeManagerApi.getExperiences());
+      setAvailableTextSnippets(await getAvailableTextSnippets());
     }
 
     runEffect();
-  }, []);
+  }, [getAvailableTextSnippets]);
 
   // --------------------------------------------------
 
   function toggleOpen() {
     setIsRevealed(!isRevealed);
-    setExperienceId(null);
+    setTextSnippetIdAndVersion([]);
     setErrorMessages([]);
   }
 
   function handleChange(evt) {
     const { value } = evt.target;
-    setExperienceId(value);
+    setTextSnippetIdAndVersion(value.split('|'));
   }
 
   async function handleSubmit(evt) {
     evt.preventDefault();
 
-    if (experienceId) {
+    if (textSnippetIdAndVersion.length) {
+      const id = textSnippetIdAndVersion[0];
+      const version = textSnippetIdAndVersion[1];
+
       try {
-        const experienceToAttach = availableExperiences.find(
-          (experience) => experience.id == experienceId
+        const textSnippetToAttach = availableTextSnippets.find(
+          (textSnippet) =>
+            textSnippet.id == id && textSnippet.version == version
         );
 
-        const updatedDocument = await attachSectionItem(
-          document,
-          2,
-          experienceId,
-          experienceToAttach
-        );
-
-        setDocument(updatedDocument);
+        await attachTextSnippet(id, version, textSnippetToAttach);
       } catch (err) {
         setErrorMessages(err);
         return;
@@ -86,19 +81,20 @@ function AttachExperienceCard() {
             <Form onSubmit={handleSubmit}>
               <Input
                 type="select"
-                name="experienceId"
+                name="textSnippetIdAndVersion"
                 defaultValue=""
                 onChange={handleChange}
               >
                 <option value="" disabled>
-                  Choose an experience
+                  Choose a text
                 </option>
-                {availableExperiences.map((experience) => {
+                {availableTextSnippets.map((textSnippet) => {
                   return (
-                    <option key={experience.id} value={experience.id}>
-                      {`${experience.organization} - ${experience.title} (${
-                        experience.startDate
-                      } ... ${experience.endDate || ''})`}
+                    <option
+                      key={textSnippet.id}
+                      value={textSnippet.id + '|' + textSnippet.version}
+                    >
+                      {textSnippet.content}
                     </option>
                   );
                 })}
@@ -116,7 +112,7 @@ function AttachExperienceCard() {
         </>
       ) : (
         <CardBody onClick={toggleOpen}>
-          Attach Experience
+          Attach Text
           <br />+
         </CardBody>
       )}
@@ -126,4 +122,4 @@ function AttachExperienceCard() {
 
 // ==================================================
 
-export default AttachExperienceCard;
+export default AttachTextSnippetCard;

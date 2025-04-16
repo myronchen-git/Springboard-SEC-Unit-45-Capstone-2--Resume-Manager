@@ -1,11 +1,11 @@
 import { useCallback, useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
-import ResumeManagerApi from '../api.js';
-import { DocumentContext } from '../contexts.jsx';
-import TextSnippetsList from './TextSnippetsList.jsx';
+import ResumeManagerApi from '../../api.js';
+import { DocumentContext } from '../../contexts.jsx';
+import TextSnippetsList from '../text_snippet/TextSnippetsList.jsx';
 
-import trashIcon from '../assets/trash.svg';
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 

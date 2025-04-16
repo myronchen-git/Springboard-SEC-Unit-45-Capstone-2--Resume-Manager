@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,56 +9,61 @@ import {
   Input,
 } from 'reactstrap';
 
-import trashIcon from '../assets/trash.svg';
+import ResumeManagerApi from '../../api.js';
+import { DocumentContext } from '../../contexts.jsx';
+import { attachSectionItem } from '../../util/specificSectionsFuncs.js';
+
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 
-function AttachTextSnippetCard({
-  getAvailableTextSnippets,
-  attachTextSnippet,
-}) {
+function AttachEducationCard() {
   const [isRevealed, setIsRevealed] = useState(false);
-  const [textSnippetIdAndVersion, setTextSnippetIdAndVersion] = useState([]);
+  const [educationId, setEducationId] = useState(null);
   const [errorMessages, setErrorMessages] = useState([]);
-  const [availableTextSnippets, setAvailableTextSnippets] = useState(null);
+  const [availableEducations, setAvailableEducations] = useState([]);
+  const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 
   useEffect(() => {
     async function runEffect() {
-      setAvailableTextSnippets(await getAvailableTextSnippets());
+      setAvailableEducations(await ResumeManagerApi.getEducations());
     }
 
     runEffect();
-  }, [getAvailableTextSnippets]);
+  }, []);
 
   // --------------------------------------------------
 
   function toggleOpen() {
     setIsRevealed(!isRevealed);
-    setTextSnippetIdAndVersion([]);
+    setEducationId(null);
     setErrorMessages([]);
   }
 
   function handleChange(evt) {
     const { value } = evt.target;
-    setTextSnippetIdAndVersion(value.split('|'));
+    setEducationId(value);
   }
 
   async function handleSubmit(evt) {
     evt.preventDefault();
 
-    if (textSnippetIdAndVersion.length) {
-      const id = textSnippetIdAndVersion[0];
-      const version = textSnippetIdAndVersion[1];
-
+    if (educationId) {
       try {
-        const textSnippetToAttach = availableTextSnippets.find(
-          (textSnippet) =>
-            textSnippet.id == id && textSnippet.version == version
+        const educationToAttach = availableEducations.find(
+          (education) => education.id == educationId
         );
 
-        await attachTextSnippet(id, version, textSnippetToAttach);
+        const updatedDocument = await attachSectionItem(
+          document,
+          1,
+          educationId,
+          educationToAttach
+        );
+
+        setDocument(updatedDocument);
       } catch (err) {
         setErrorMessages(err);
         return;
@@ -81,20 +86,17 @@ function AttachTextSnippetCard({
             <Form onSubmit={handleSubmit}>
               <Input
                 type="select"
-                name="textSnippetIdAndVersion"
+                name="educationId"
                 defaultValue=""
                 onChange={handleChange}
               >
                 <option value="" disabled>
-                  Choose a text
+                  Choose an education
                 </option>
-                {availableTextSnippets.map((textSnippet) => {
+                {availableEducations.map((education) => {
                   return (
-                    <option
-                      key={textSnippet.id}
-                      value={textSnippet.id + '|' + textSnippet.version}
-                    >
-                      {textSnippet.content}
+                    <option key={education.id} value={education.id}>
+                      {`${education.school}, ${education.degree}`}
                     </option>
                   );
                 })}
@@ -112,7 +114,7 @@ function AttachTextSnippetCard({
         </>
       ) : (
         <CardBody onClick={toggleOpen}>
-          Attach Text
+          Attach Education
           <br />+
         </CardBody>
       )}
@@ -122,4 +124,4 @@ function AttachTextSnippetCard({
 
 // ==================================================
 
-export default AttachTextSnippetCard;
+export default AttachEducationCard;

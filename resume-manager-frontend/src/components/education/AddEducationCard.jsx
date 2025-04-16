@@ -11,10 +11,10 @@ import {
   Label,
 } from 'reactstrap';
 
-import { DocumentContext } from '../contexts.jsx';
-import { addNewSectionItem } from '../util/specificSectionsFuncs.js';
+import { DocumentContext } from '../../contexts.jsx';
+import { addNewSectionItem } from '../../util/specificSectionsFuncs.js';
 
-import trashIcon from '../assets/trash.svg';
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 

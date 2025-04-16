@@ -1,14 +1,14 @@
 import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
-import ResumeManagerApi from '../api.js';
-import { DocumentContext } from '../contexts.jsx';
+import ResumeManagerApi from '../../api.js';
+import { DocumentContext } from '../../contexts.jsx';
 import EducationForm from './EducationForm.jsx';
 
-import { EDUCATION_FIELDS } from '../commonData.js';
+import { EDUCATION_FIELDS } from '../../commonData.js';
 
-import pencilIcon from '../assets/pencil.svg';
-import trashIcon from '../assets/trash.svg';
+import pencilIcon from '../../assets/pencil.svg';
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 

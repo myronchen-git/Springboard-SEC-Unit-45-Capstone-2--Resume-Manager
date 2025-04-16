@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
-import ResumeManagerApi from '../api.js';
-import { DocumentContext } from '../contexts.jsx';
+import ResumeManagerApi from '../../api.js';
+import { DocumentContext } from '../../contexts.jsx';
 import AddSectionCard from './AddSectionCard.jsx';
 import SectionCard from './SectionCard.jsx';
 

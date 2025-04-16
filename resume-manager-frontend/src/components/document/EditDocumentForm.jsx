@@ -11,7 +11,7 @@ import {
   ModalFooter,
 } from 'reactstrap';
 
-import { DocumentContext } from '../contexts';
+import { DocumentContext } from '../../contexts';
 
 // ==================================================
 

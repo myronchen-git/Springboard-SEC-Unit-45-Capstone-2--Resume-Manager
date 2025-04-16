@@ -9,26 +9,26 @@ import {
   Input,
 } from 'reactstrap';
 
-import ResumeManagerApi from '../api.js';
-import { DocumentContext } from '../contexts.jsx';
-import { attachSectionItem } from '../util/specificSectionsFuncs.js';
+import ResumeManagerApi from '../../api.js';
+import { DocumentContext } from '../../contexts.jsx';
+import { attachSectionItem } from '../../util/specificSectionsFuncs.js';
 
-import trashIcon from '../assets/trash.svg';
+import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 
-function AttachEducationCard() {
+function AttachExperienceCard() {
   const [isRevealed, setIsRevealed] = useState(false);
-  const [educationId, setEducationId] = useState(null);
+  const [experienceId, setExperienceId] = useState(null);
   const [errorMessages, setErrorMessages] = useState([]);
-  const [availableEducations, setAvailableEducations] = useState([]);
+  const [availableExperiences, setAvailableExperiences] = useState([]);
   const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 
   useEffect(() => {
     async function runEffect() {
-      setAvailableEducations(await ResumeManagerApi.getEducations());
+      setAvailableExperiences(await ResumeManagerApi.getExperiences());
     }
 
     runEffect();
@@ -38,29 +38,29 @@ function AttachEducationCard() {
 
   function toggleOpen() {
     setIsRevealed(!isRevealed);
-    setEducationId(null);
+    setExperienceId(null);
     setErrorMessages([]);
   }
 
   function handleChange(evt) {
     const { value } = evt.target;
-    setEducationId(value);
+    setExperienceId(value);
   }
 
   async function handleSubmit(evt) {
     evt.preventDefault();
 
-    if (educationId) {
+    if (experienceId) {
       try {
-        const educationToAttach = availableEducations.find(
-          (education) => education.id == educationId
+        const experienceToAttach = availableExperiences.find(
+          (experience) => experience.id == experienceId
         );
 
         const updatedDocument = await attachSectionItem(
           document,
-          1,
-          educationId,
-          educationToAttach
+          2,
+          experienceId,
+          experienceToAttach
         );
 
         setDocument(updatedDocument);
@@ -86,17 +86,19 @@ function AttachEducationCard() {
             <Form onSubmit={handleSubmit}>
               <Input
                 type="select"
-                name="educationId"
+                name="experienceId"
                 defaultValue=""
                 onChange={handleChange}
               >
                 <option value="" disabled>
-                  Choose an education
+                  Choose an experience
                 </option>
-                {availableEducations.map((education) => {
+                {availableExperiences.map((experience) => {
                   return (
-                    <option key={education.id} value={education.id}>
-                      {`${education.school}, ${education.degree}`}
+                    <option key={experience.id} value={experience.id}>
+                      {`${experience.organization} - ${experience.title} (${
+                        experience.startDate
+                      } ... ${experience.endDate || ''})`}
                     </option>
                   );
                 })}
@@ -114,7 +116,7 @@ function AttachEducationCard() {
         </>
       ) : (
         <CardBody onClick={toggleOpen}>
-          Attach Education
+          Attach Experience
           <br />+
         </CardBody>
       )}
@@ -124,4 +126,4 @@ function AttachEducationCard() {
 
 // ==================================================
 
-export default AttachEducationCard;
+export default AttachExperienceCard;

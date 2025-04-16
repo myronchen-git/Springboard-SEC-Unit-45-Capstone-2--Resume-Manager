@@ -11,10 +11,10 @@ import {
   Label,
 } from 'reactstrap';
 
-import ResumeManagerApi from '../api.js';
-import { DocumentContext } from '../contexts.jsx';
+import ResumeManagerApi from '../../api.js';
+import { DocumentContext } from '../../contexts.jsx';
 
-import pencilIcon from '../assets/pencil.svg';
+import pencilIcon from '../../assets/pencil.svg';
 
 // ==================================================
 
