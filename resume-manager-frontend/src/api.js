@@ -352,9 +352,9 @@ class ResumeManagerApi {
    * creates a document-education relationship.  This is used for documents that
    * are not the master resume.
    *
-   * @param {Number | String} documentId - ID of the document to attach an
+   * @param {String | Number} documentId - ID of the document to attach an
    *  education to.
-   * @param {Number | String} educationId - ID of the education to attach.
+   * @param {String | Number} educationId - ID of the education to attach.
    * @returns {Object} The document_x_education Object, which contains document
    *  ID, education ID, and position of education within document.
    */
@@ -478,9 +478,9 @@ class ResumeManagerApi {
    * creates a document-experience relationship.  This is used for documents
    * that are not the master resume.
    *
-   * @param {Number | String} documentId - ID of the document to attach an
+   * @param {String | Number} documentId - ID of the document to attach an
    *  experience to.
-   * @param {Number | String} experienceId - ID of the experience to attach.
+   * @param {String | Number} experienceId - ID of the experience to attach.
    * @returns {Object} The document_x_experience Object, which contains the ID
    *  of the document_x_experience, document ID, experience ID, and position of
    *  experience within document.
@@ -494,6 +494,30 @@ class ResumeManagerApi {
       'post'
     );
     return res.document_x_experience;
+  }
+
+  /**
+   * Updates an experience.  Does not update the bullets / text snippets /
+   * achievements.
+   *
+   * @param {String | Number} experienceId - ID of the experience to update.
+   * @param {Object} data - Holds the info for updating an experience.
+   * @param {String} [data.title] - Job title or equivalent.
+   * @param {String} [data.organization] - Name of the company or other type of
+   *  organization.
+   * @param {String} [data.location] - Location of the organization.
+   * @param {String} [data.startDate] - Start date of joining the organization.
+   * @param {String} [data.endDate] - End date of leaving the organization.
+   * @returns {Object} All of the experience's current info from the database,
+   *  but does not include text snippets.
+   */
+  static async updateExperience(experienceId, data) {
+    const res = await this.request(
+      `users/${this.#username}/experiences/${experienceId}`,
+      data,
+      'patch'
+    );
+    return res.experience;
   }
 
   /**

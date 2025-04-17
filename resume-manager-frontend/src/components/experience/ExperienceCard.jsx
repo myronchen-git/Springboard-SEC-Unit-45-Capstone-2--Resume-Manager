@@ -2,9 +2,15 @@ import { useCallback, useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
+import {
+  EXPERIENCE_FIELDS,
+  EXPERIENCE_OPTIONAL_FIELDS_START_INDEX,
+} from '../../commonData.js';
 import { DocumentContext } from '../../contexts.jsx';
+import GenericForm from '../GenericForm.jsx';
 import TextSnippetsList from '../text_snippet/TextSnippetsList.jsx';
 
+import pencilIcon from '../../assets/pencil.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -18,10 +24,49 @@ import trashIcon from '../../assets/trash.svg';
  */
 function ExperienceCard({ item: experience }) {
   const [document, setDocument] = useContext(DocumentContext);
-
+  const [isEditExperienceFormOpen, setIsEditExperienceFormOpen] =
+    useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
+
+  /**
+   * Sends an API request to update an experience's properties.  Then updates
+   * the list of experiences with the returned updated info.
+   *
+   * @param {Object} formData - Holds updated experience properties.
+   * @see ResumeManagerApi.updateExperience for formData properties.
+   */
+  async function editExperience(formData) {
+    let updatedExperience = await ResumeManagerApi.updateExperience(
+      experience.id,
+      formData
+    );
+
+    // Removing owner property because it is not necessary.
+    delete updatedExperience.owner;
+
+    // Get old properties and replace them with the updated ones.  Keep old
+    // properties that are not updated.
+    updatedExperience = { ...experience, ...updatedExperience };
+
+    // Clone to indicate to React that things were changed.
+    const documentClone = {
+      ...document,
+      experiences: [...document.experiences],
+    };
+
+    // Find the experience in the document Object and replace it.
+    const experienceIdx = documentClone.experiences.findIndex(
+      (experienceInDocument) => experienceInDocument.id == experience.id
+    );
+    documentClone.experiences[experienceIdx] = updatedExperience;
+
+    // Update document to re-render.
+    setDocument(documentClone);
+
+    setIsEditExperienceFormOpen(false);
+  }
 
   /**
    * If the document is the master resume, deletes the experience, that was
@@ -63,7 +108,7 @@ function ExperienceCard({ item: experience }) {
 
   /**
    * Sends a request to the back-end to create a new text snippet for this
-   * specific education and document, and updates the document Object / state.
+   * specific experience and document, and updates the document Object / state.
    *
    * @param {Object} formData - The data required for creating a new text
    *  snippet.
@@ -188,6 +233,13 @@ function ExperienceCard({ item: experience }) {
 
   // --------------------------------------------------
 
+  // Convert current null fields in experience to empty Strings, so that they
+  // are properly displayed in form inputs.
+  const initialFormData = EXPERIENCE_FIELDS.reduce((obj, field) => {
+    obj[field.jsName] = experience[field.jsName] || '';
+    return obj;
+  }, {});
+
   return (
     <Card className="ExperienceCard">
       <CardHeader className="text-end">
@@ -196,29 +248,49 @@ function ExperienceCard({ item: experience }) {
             {msg}
           </Alert>
         ))}
+        {document.isMaster && (
+          <img
+            src={pencilIcon}
+            alt="edit icon"
+            onClick={() =>
+              setIsEditExperienceFormOpen((previousState) => !previousState)
+            }
+          />
+        )}
         <img src={trashIcon} alt="trash icon" onClick={deleteExperience} />
       </CardHeader>
       <CardBody>
-        {experience.title}
-        <br />
-        {experience.organization}
-        <br />
-        {experience.location}
-        <br />
-        {experience.startDate}
-        <br />
-        {experience.endDate}
-        <br />
-        <TextSnippetsList
-          textSnippets={experience.bullets}
-          addTextSnippet={addTextSnippet}
-          getAvailableTextSnippets={getAvailableTextSnippets}
-          attachTextSnippet={attachTextSnippet}
-          detachTextSnippet={detachTextSnippet}
-          removeTextSnippetFromDocumentState={
-            removeTextSnippetFromDocumentState
-          }
-        />
+        {isEditExperienceFormOpen ? (
+          <GenericForm
+            fields={EXPERIENCE_FIELDS}
+            optionalFieldsStartIndex={EXPERIENCE_OPTIONAL_FIELDS_START_INDEX}
+            initialFormData={initialFormData}
+            processSubmission={editExperience}
+          />
+        ) : (
+          <>
+            {experience.title}
+            <br />
+            {experience.organization}
+            <br />
+            {experience.location}
+            <br />
+            {experience.startDate}
+            <br />
+            {experience.endDate}
+            <br />
+            <TextSnippetsList
+              textSnippets={experience.bullets}
+              addTextSnippet={addTextSnippet}
+              getAvailableTextSnippets={getAvailableTextSnippets}
+              attachTextSnippet={attachTextSnippet}
+              detachTextSnippet={detachTextSnippet}
+              removeTextSnippetFromDocumentState={
+                removeTextSnippetFromDocumentState
+              }
+            />
+          </>
+        )}
       </CardBody>
     </Card>
   );

@@ -8,8 +8,12 @@ const SECTION_ID_TO_DATABASE_NAME = Object.freeze([
   'projects',
 ]);
 
-// For listing the correct fields in HTML forms.
-// Always keep up to date, with optional fields last!
+// --------------------------------------------------
+
+// The following fields are for listing the correct fields in HTML forms.
+// Always keep them up to date, with optional fields last!
+// And always keep the optional fields start index up to date!
+
 const EDUCATION_FIELDS = Object.freeze(
   [
     { jsName: 'school', displayName: 'School Name' },
@@ -23,9 +27,21 @@ const EDUCATION_FIELDS = Object.freeze(
   ].map((item) => Object.freeze(item))
 );
 
-// For listing the correct fields in HTML forms.
-// Always keep up to date!
 const EDUCATION_OPTIONAL_FIELDS_START_INDEX = 5;
+
+const EXPERIENCE_FIELDS = Object.freeze(
+  [
+    { jsName: 'title', displayName: 'Job Title' },
+    { jsName: 'organization', displayName: 'Organization' },
+    { jsName: 'location', displayName: 'Location' },
+    { jsName: 'startDate', displayName: 'Start Date' },
+    { jsName: 'endDate', displayName: 'End Date' },
+  ].map((item) => Object.freeze(item))
+);
+
+const EXPERIENCE_OPTIONAL_FIELDS_START_INDEX = 4;
+
+// --------------------------------------------------
 
 // Mainly for handling dates in form inputs.
 const getFormInputPlaceholder = (fieldName) =>
@@ -40,6 +56,8 @@ const getFormInputPattern = (fieldName) =>
 export {
   EDUCATION_FIELDS,
   EDUCATION_OPTIONAL_FIELDS_START_INDEX,
+  EXPERIENCE_FIELDS,
+  EXPERIENCE_OPTIONAL_FIELDS_START_INDEX,
   SECTION_ID_TO_DATABASE_NAME,
   getFormInputPattern,
   getFormInputPlaceholder,
