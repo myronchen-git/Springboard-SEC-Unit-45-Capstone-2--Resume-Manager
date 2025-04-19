@@ -20,8 +20,9 @@ import TextSnippetCard from './TextSnippetCard.jsx';
 function TextSnippetsList({
   textSnippets,
   addTextSnippet,
-  getAvailableTextSnippets,
   attachTextSnippet,
+  getAvailableTextSnippets,
+  replaceTextSnippetInDocumentState,
   detachTextSnippet,
   removeTextSnippetFromDocumentState,
 }) {
@@ -36,6 +37,9 @@ function TextSnippetsList({
           <TextSnippetCard
             key={textSnippet.id}
             textSnippet={textSnippet}
+            replaceTextSnippetInDocumentState={
+              replaceTextSnippetInDocumentState
+            }
             detachTextSnippet={detachTextSnippet}
             removeTextSnippetFromDocumentState={
               removeTextSnippetFromDocumentState

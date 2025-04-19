@@ -41,6 +41,14 @@ const EXPERIENCE_FIELDS = Object.freeze(
 
 const EXPERIENCE_OPTIONAL_FIELDS_START_INDEX = 4;
 
+const TEXT_SNIPPET_FIELDS = Object.freeze(
+  [{ jsName: 'content', displayName: 'Content' }].map((item) =>
+    Object.freeze(item)
+  )
+);
+
+const TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX = 1;
+
 // --------------------------------------------------
 
 // Mainly for handling dates in form inputs.
@@ -59,6 +67,8 @@ export {
   EXPERIENCE_FIELDS,
   EXPERIENCE_OPTIONAL_FIELDS_START_INDEX,
   SECTION_ID_TO_DATABASE_NAME,
+  TEXT_SNIPPET_FIELDS,
+  TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX,
   getFormInputPattern,
   getFormInputPlaceholder,
 };

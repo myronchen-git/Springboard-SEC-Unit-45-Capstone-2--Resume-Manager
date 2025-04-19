@@ -2,8 +2,14 @@ import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
+import {
+  TEXT_SNIPPET_FIELDS,
+  TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX,
+} from '../../commonData.js';
 import { DocumentContext } from '../../contexts.jsx';
+import GenericForm from '../GenericForm.jsx';
 
+import pencilIcon from '../../assets/pencil.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -19,14 +25,46 @@ import trashIcon from '../../assets/trash.svg';
  */
 function TextSnippetCard({
   textSnippet,
+  replaceTextSnippetInDocumentState,
   detachTextSnippet,
   removeTextSnippetFromDocumentState,
   addBullet = true,
 }) {
   const [document] = useContext(DocumentContext);
+  const [isEditTextSnippetFormOpen, setIsEditTextSnippetFormOpen] =
+    useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
+
+  /**
+   * Sends an API request to update a text snippet.  Then calls a passed-down
+   * function to update the relevant section in the document state.
+   *
+   * @param {Object} formData - Contains the updated text snippet properties or
+   *  content.
+   */
+  async function editTextSnippet(formData) {
+    let updatedTextSnippet;
+    try {
+      updatedTextSnippet = await ResumeManagerApi.updateTextSnippet(
+        textSnippet.id,
+        textSnippet.version,
+        formData
+      );
+
+      // Removing owner property because it is not needed.
+      delete updatedTextSnippet.owner;
+    } catch (err) {
+      setErrorMessages(err);
+      setTimeout(() => setErrorMessages([]), 5000);
+      return;
+    }
+
+    replaceTextSnippetInDocumentState(updatedTextSnippet);
+
+    setIsEditTextSnippetFormOpen(false);
+  }
 
   /**
    * If the document is the master resume, deletes the text snippet, that was
@@ -58,6 +96,13 @@ function TextSnippetCard({
 
   // --------------------------------------------------
 
+  // Convert current null fields in experience to empty Strings, so that they
+  // are properly displayed in form inputs.
+  const initialFormData = TEXT_SNIPPET_FIELDS.reduce((obj, field) => {
+    obj[field.jsName] = textSnippet[field.jsName] || '';
+    return obj;
+  }, {});
+
   return (
     <Card className="TextSnippetCard">
       <CardHeader className="text-end">
@@ -66,11 +111,31 @@ function TextSnippetCard({
             {msg}
           </Alert>
         ))}
+        {document.isMaster && (
+          <img
+            src={pencilIcon}
+            alt="edit icon"
+            onClick={() =>
+              setIsEditTextSnippetFormOpen((previousState) => !previousState)
+            }
+          />
+        )}
         <img src={trashIcon} alt="trash icon" onClick={deleteTextSnippet} />
       </CardHeader>
       <CardBody className="text-start">
-        {addBullet && <>&bull; </>}
-        {textSnippet.content}
+        {isEditTextSnippetFormOpen ? (
+          <GenericForm
+            fields={TEXT_SNIPPET_FIELDS}
+            optionalFieldsStartIndex={TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX}
+            initialFormData={initialFormData}
+            processSubmission={editTextSnippet}
+          />
+        ) : (
+          <>
+            {addBullet && <>&bull; </>}
+            {textSnippet.content}
+          </>
+        )}
       </CardBody>
     </Card>
   );

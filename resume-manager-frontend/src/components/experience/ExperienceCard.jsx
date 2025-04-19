@@ -189,6 +189,36 @@ function ExperienceCard({ item: experience }) {
   );
 
   /**
+   * Updates the document state by replacing a text snippet in this experience's
+   * bullets with an updated one.
+   *
+   * @param {Object} textSnippet - New text snippet to use in bullets.
+   */
+  const replaceTextSnippetInDocumentState = useCallback(
+    (textSnippet) => {
+      const documentClone = { ...document };
+
+      // Replace experience because it's an input and to have this function
+      // remain "pure".
+      const experienceClone = { ...experience };
+      const experienceIdx = documentClone.experiences.findIndex(
+        (exp) => exp.id == experienceClone.id
+      );
+      documentClone.experiences[experienceIdx] = experienceClone;
+
+      // Replace text snippet in experience.  There should be at most one text
+      // snippet for a particular ID.
+      const textSnippetIdx = experienceClone.bullets.findIndex(
+        (snippet) => snippet.id === textSnippet.id
+      );
+      experienceClone.bullets[textSnippetIdx] = textSnippet;
+
+      setDocument(documentClone);
+    },
+    [experience, document, setDocument]
+  );
+
+  /**
    * Removes a text snippet from this experience in the document state.
    *
    * @param {String | Number} textSnippetId - ID part of the text snippet to
@@ -282,8 +312,11 @@ function ExperienceCard({ item: experience }) {
             <TextSnippetsList
               textSnippets={experience.bullets}
               addTextSnippet={addTextSnippet}
-              getAvailableTextSnippets={getAvailableTextSnippets}
               attachTextSnippet={attachTextSnippet}
+              getAvailableTextSnippets={getAvailableTextSnippets}
+              replaceTextSnippetInDocumentState={
+                replaceTextSnippetInDocumentState
+              }
               detachTextSnippet={detachTextSnippet}
               removeTextSnippetFromDocumentState={
                 removeTextSnippetFromDocumentState
