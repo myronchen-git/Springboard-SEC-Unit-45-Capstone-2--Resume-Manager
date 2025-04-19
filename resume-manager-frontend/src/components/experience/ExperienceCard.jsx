@@ -248,6 +248,13 @@ function ExperienceCard({ item: experience }) {
     [experience, document, setDocument]
   );
 
+  /**
+   * Removes a text snippet from this experience, but does not delete the
+   * snippet itself.
+   *
+   * @param {String | Number} textSnippetId - ID part of the text snippet to
+   *  remove.
+   */
   const detachTextSnippet = useCallback(
     async (textSnippetId) => {
       await ResumeManagerApi.removeTextSnippetFromExperience(
@@ -255,10 +262,8 @@ function ExperienceCard({ item: experience }) {
         experience.id,
         textSnippetId
       );
-
-      removeTextSnippetFromDocumentState(textSnippetId);
     },
-    [document, experience, removeTextSnippetFromDocumentState]
+    [document, experience]
   );
 
   // --------------------------------------------------
