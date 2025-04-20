@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
@@ -6,7 +6,7 @@ import {
   EXPERIENCE_FIELDS,
   EXPERIENCE_OPTIONAL_FIELDS_START_INDEX,
 } from '../../commonData.js';
-import { DocumentContext } from '../../contexts.jsx';
+import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 import TextSnippetsList from '../text_snippet/TextSnippetsList.jsx';
 
@@ -139,18 +139,6 @@ function ExperienceCard({ item: experience }) {
   );
 
   /**
-   * Gets all text snippets for this experience.
-   *
-   * @returns {Object[]} A list of text snippet Objects, each containing info
-   *  like content.
-   */
-  const getAvailableTextSnippets = useCallback(
-    async () =>
-      await ResumeManagerApi.getTextSnippetsForExperience(experience.id),
-    [experience]
-  );
-
-  /**
    * Attaches a text snippet to an experience in a document.
    * Sends a request to the back-end to attach a text snippet to an experience
    * in a document and creates a document clone with the text snippet in it.
@@ -189,6 +177,18 @@ function ExperienceCard({ item: experience }) {
   );
 
   /**
+   * Gets all text snippets for this experience.
+   *
+   * @returns {Object[]} A list of text snippet Objects, each containing info
+   *  like content.
+   */
+  const getAvailableTextSnippets = useCallback(
+    async () =>
+      await ResumeManagerApi.getTextSnippetsForExperience(experience.id),
+    [experience]
+  );
+
+  /**
    * Updates the document state by replacing a text snippet in this experience's
    * bullets with an updated one.
    *
@@ -216,6 +216,24 @@ function ExperienceCard({ item: experience }) {
       setDocument(documentClone);
     },
     [experience, document, setDocument]
+  );
+
+  /**
+   * Removes a text snippet from this experience, but does not delete the
+   * snippet itself.
+   *
+   * @param {String | Number} textSnippetId - ID part of the text snippet to
+   *  remove.
+   */
+  const detachTextSnippet = useCallback(
+    async (textSnippetId) => {
+      await ResumeManagerApi.removeTextSnippetFromExperience(
+        document.id,
+        experience.id,
+        textSnippetId
+      );
+    },
+    [document, experience]
   );
 
   /**
@@ -248,22 +266,25 @@ function ExperienceCard({ item: experience }) {
     [experience, document, setDocument]
   );
 
-  /**
-   * Removes a text snippet from this experience, but does not delete the
-   * snippet itself.
-   *
-   * @param {String | Number} textSnippetId - ID part of the text snippet to
-   *  remove.
-   */
-  const detachTextSnippet = useCallback(
-    async (textSnippetId) => {
-      await ResumeManagerApi.removeTextSnippetFromExperience(
-        document.id,
-        experience.id,
-        textSnippetId
-      );
-    },
-    [document, experience]
+  // --------------------------------------------------
+
+  const textSnippetContextValues = useMemo(
+    () => ({
+      addTextSnippet,
+      attachTextSnippet,
+      getAvailableTextSnippets,
+      replaceTextSnippetInDocumentState,
+      detachTextSnippet,
+      removeTextSnippetFromDocumentState,
+    }),
+    [
+      addTextSnippet,
+      attachTextSnippet,
+      getAvailableTextSnippets,
+      replaceTextSnippetInDocumentState,
+      detachTextSnippet,
+      removeTextSnippetFromDocumentState,
+    ]
   );
 
   // --------------------------------------------------
@@ -314,19 +335,9 @@ function ExperienceCard({ item: experience }) {
             <br />
             {experience.endDate}
             <br />
-            <TextSnippetsList
-              textSnippets={experience.bullets}
-              addTextSnippet={addTextSnippet}
-              attachTextSnippet={attachTextSnippet}
-              getAvailableTextSnippets={getAvailableTextSnippets}
-              replaceTextSnippetInDocumentState={
-                replaceTextSnippetInDocumentState
-              }
-              detachTextSnippet={detachTextSnippet}
-              removeTextSnippetFromDocumentState={
-                removeTextSnippetFromDocumentState
-              }
-            />
+            <TextSnippetContext.Provider value={textSnippetContextValues}>
+              <TextSnippetsList textSnippets={experience.bullets} />
+            </TextSnippetContext.Provider>
           </>
         )}
       </CardBody>

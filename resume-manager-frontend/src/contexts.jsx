@@ -12,6 +12,11 @@ const UserContext = createContext({});
  */
 const DocumentContext = createContext(null);
 
+/**
+ * Holds text snippet functions.
+ */
+const TextSnippetContext = createContext({});
+
 // ==================================================
 
-export { DocumentContext, UserContext };
+export { DocumentContext, TextSnippetContext, UserContext };

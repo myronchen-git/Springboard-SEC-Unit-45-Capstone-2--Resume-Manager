@@ -6,7 +6,7 @@ import {
   TEXT_SNIPPET_FIELDS,
   TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX,
 } from '../../commonData.js';
-import { DocumentContext } from '../../contexts.jsx';
+import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 
 import pencilIcon from '../../assets/pencil.svg';
@@ -23,16 +23,17 @@ import trashIcon from '../../assets/trash.svg';
  * @param {Boolean} props.addBullet - Whether to add a bullet point to the
  *  beginning of the text content.
  */
-function TextSnippetCard({
-  textSnippet,
-  replaceTextSnippetInDocumentState,
-  detachTextSnippet,
-  removeTextSnippetFromDocumentState,
-  addBullet = true,
-}) {
+function TextSnippetCard({ textSnippet, addBullet = true }) {
   const [document] = useContext(DocumentContext);
+  const {
+    replaceTextSnippetInDocumentState,
+    detachTextSnippet,
+    removeTextSnippetFromDocumentState,
+  } = useContext(TextSnippetContext);
+
   const [isEditTextSnippetFormOpen, setIsEditTextSnippetFormOpen] =
     useState(false);
+
   const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------

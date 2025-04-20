@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,18 +9,25 @@ import {
   Input,
 } from 'reactstrap';
 
+import { TextSnippetContext } from '../../contexts.jsx';
+
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 
-function AttachTextSnippetCard({
-  getAvailableTextSnippets,
-  attachTextSnippet,
-}) {
+/**
+ * Component for showing and controlling the form to attach a text snippet to a
+ * section item.
+ */
+function AttachTextSnippetCard() {
+  const { attachTextSnippet, getAvailableTextSnippets } =
+    useContext(TextSnippetContext);
+
   const [isRevealed, setIsRevealed] = useState(false);
   const [textSnippetIdAndVersion, setTextSnippetIdAndVersion] = useState([]);
-  const [errorMessages, setErrorMessages] = useState([]);
   const [availableTextSnippets, setAvailableTextSnippets] = useState(null);
+
+  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Alert,
   Button,
@@ -11,6 +11,8 @@ import {
   Label,
 } from 'reactstrap';
 
+import { TextSnippetContext } from '../../contexts.jsx';
+
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -18,17 +20,17 @@ import trashIcon from '../../assets/trash.svg';
 /**
  * Component for showing and controlling the form to add a new text snippet
  * entry.
- *
- * @param {Function} addTextSnippet - Takes the data for a new text snippet.
- *  Then creates and adds a text snippet to an education, skill, project, etc..
  */
-function AddTextSnippetCard({ addTextSnippet }) {
+function AddTextSnippetCard() {
+  const { addTextSnippet } = useContext(TextSnippetContext);
+
   const [isRevealed, setIsRevealed] = useState(false);
   const initialFormData = {
     type: 'plain',
     content: '',
   };
   const [formData, setFormData] = useState(initialFormData);
+
   const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
