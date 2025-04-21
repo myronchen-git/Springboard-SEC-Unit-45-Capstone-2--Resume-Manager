@@ -1,3 +1,4 @@
+import { Draggable } from '@hello-pangea/dnd';
 import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader, CardTitle } from 'reactstrap';
 
@@ -5,6 +6,7 @@ import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
 import SectionItemsList from './SectionItemsList.jsx';
 
+import dotsIcon from '../../assets/three-dots-vertical.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -17,8 +19,10 @@ import trashIcon from '../../assets/trash.svg';
  * @param {Number} props.section.id - ID number of section.
  * @param {String} props.section.sectionName - Name of the section for
  *  displaying on document.
+ * @param {Number} props.idx - Index of section in the list of sections.  This
+ *  is used for @hello-pangea/dnd.
  */
-function SectionCard({ section }) {
+function SectionCard({ section, idx }) {
   const [document, setDocument] = useContext(DocumentContext);
   const [errorMessages, setErrorMessages] = useState([]);
 
@@ -53,20 +57,31 @@ function SectionCard({ section }) {
   // --------------------------------------------------
 
   return (
-    <Card className="SectionCard text-center">
-      <CardHeader className="text-end">
-        {errorMessages.map((msg) => (
-          <Alert key={msg} color="danger">
-            {msg}
-          </Alert>
-        ))}
-        <img src={trashIcon} alt="trash icon" onClick={deleteSection} />
-      </CardHeader>
-      <CardBody>
-        <CardTitle>{section.sectionName}</CardTitle>
-        <SectionItemsList sectionId={section.id} />
-      </CardBody>
-    </Card>
+    <Draggable draggableId={'section-' + section.id} index={idx}>
+      {(provided) => (
+        <div ref={provided.innerRef} {...provided.draggableProps}>
+          <Card className="SectionCard text-center">
+            <CardHeader className="text-end">
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
+              <img src={trashIcon} alt="trash icon" onClick={deleteSection} />
+              <img
+                src={dotsIcon}
+                alt="reposition icon"
+                {...provided.dragHandleProps}
+              />
+            </CardHeader>
+            <CardBody>
+              <CardTitle>{section.sectionName}</CardTitle>
+              <SectionItemsList sectionId={section.id} />
+            </CardBody>
+          </Card>
+        </div>
+      )}
+    </Draggable>
   );
 }
 

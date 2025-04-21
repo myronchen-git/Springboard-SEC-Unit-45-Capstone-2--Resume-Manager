@@ -288,6 +288,24 @@ class ResumeManagerApi {
   }
 
   /**
+   * Updates all section positions in a document.
+   *
+   * @param {String | Number} documentId - ID of the document that is having its
+   *  sections repositioned.
+   * @param {Number[]} sectionIds - A list of section IDs in the desired order.
+   * @returns {Array} A list of Section Objects in order of position in the
+   *  document, each containing general section info.
+   */
+  static async repositionSections(documentId, sectionIds) {
+    const res = await this.request(
+      `users/${this.#username}/documents/${documentId}/sections`,
+      sectionIds,
+      'put'
+    );
+    return res.sections;
+  }
+
+  /**
    * Deletes a section from a document.  Since sections are currently not
    * user-created, this will delete the document-section relationships.
    *

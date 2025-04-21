@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
@@ -11,8 +12,11 @@ import SectionCard from './SectionCard.jsx';
  * Renders a list of sections for a resume.
  */
 function SectionsList() {
-  const [availableSections, setAvailableSections] = useState([]);
   const [document, setDocument] = useContext(DocumentContext);
+
+  const [availableSections, setAvailableSections] = useState([]);
+  const repositionTimeoutIdRef = useRef(null);
+  const oldSections = useRef(null);
 
   // --------------------------------------------------
 
@@ -57,17 +61,79 @@ function SectionsList() {
     setDocument(documentClone);
   }
 
+  /**
+   * Repositions sections visually and sends an API request to the back-end to
+   * save the new positions.  The API request is delayed to reduce unnecessary
+   * network calls.
+   *
+   * @param {Number} sourceIndex - Original index of section.
+   * @param {Number} destinationIndex - Desired index of section.
+   */
+  const repositionSections = useCallback(
+    async (sourceIndex, destinationIndex) => {
+      const timeDelay = 3000;
+
+      // Save old sections ordering to use if API request fails, with disregard
+      // to how many repositions have been performed.
+      oldSections.current ||= [...document.sections];
+
+      // Get a new sections Array with each section in their new positions.
+      const newSections = [...document.sections];
+      const [removed] = newSections.splice(sourceIndex, 1);
+      newSections.splice(destinationIndex, 0, removed);
+
+      // Update document state to show reordered sections.
+      setDocument({ ...document, sections: newSections });
+
+      const newSectionIds = newSections.map((section) => section.id);
+
+      // Reset timeout if there already is one.  Set timeout to make a delayed
+      // API request.
+      clearTimeout(repositionTimeoutIdRef.current);
+      repositionTimeoutIdRef.current = setTimeout(async () => {
+        try {
+          await ResumeManagerApi.repositionSections(document.id, newSectionIds);
+        } catch (err) {
+          // TODO: display error message
+
+          // Put sections back to their original order.
+          setDocument({ ...document, sections: oldSections.current });
+        } finally {
+          repositionTimeoutIdRef.current = null;
+          oldSections.current = null;
+        }
+      }, timeDelay);
+    },
+    [document, setDocument]
+  );
+
+  async function onDragEnd(result) {
+    const { destination, source } = result;
+
+    if (destination && destination.index !== source.index)
+      await repositionSections(source.index, destination.index);
+  }
+
   // --------------------------------------------------
 
   const existingSections = document?.sections
-    ? document.sections.map((section) => {
-        return <SectionCard key={section.id} section={section} />;
+    ? document.sections.map((section, idx) => {
+        return <SectionCard key={section.id} section={section} idx={idx} />;
       })
     : [];
 
   return (
     <article>
-      {existingSections}
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="sections-list">
+          {(provided) => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              {existingSections}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       <AddSectionCard
         availableSections={availableSections}
         addSection={addSection}
