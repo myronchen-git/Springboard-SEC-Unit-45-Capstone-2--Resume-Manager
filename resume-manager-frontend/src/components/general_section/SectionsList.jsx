@@ -17,6 +17,7 @@ function SectionsList() {
   const [availableSections, setAvailableSections] = useState([]);
   const repositionTimeoutIdRef = useRef(null);
   const oldSections = useRef(null);
+  const oldEducations = useRef(null);
 
   // --------------------------------------------------
 
@@ -107,11 +108,58 @@ function SectionsList() {
     [document, setDocument]
   );
 
-  async function onDragEnd(result) {
-    const { destination, source } = result;
+  /**
+   * Repositions educations visually and sends an API request to the back-end to
+   * save the new positions.  The API request is delayed to reduce unnecessary
+   * network calls.
+   *
+   * @param {Number} sourceIndex - Original index of education.
+   * @param {Number} destinationIndex - Desired index of education.
+   */
+  const repositionEducations = useCallback(
+    async (sourceIndex, destinationIndex) => {
+      const timeDelay = 3000;
 
-    if (destination && destination.index !== source.index)
-      await repositionSections(source.index, destination.index);
+      oldEducations.current ||= [...document.educations];
+
+      const newEducations = [...document.educations];
+      const [removed] = newEducations.splice(sourceIndex, 1);
+      newEducations.splice(destinationIndex, 0, removed);
+
+      setDocument({ ...document, educations: newEducations });
+
+      const newEducationIds = newEducations.map((education) => education.id);
+
+      clearTimeout(repositionTimeoutIdRef.current);
+      repositionTimeoutIdRef.current = setTimeout(async () => {
+        try {
+          await ResumeManagerApi.repositionEducations(
+            document.id,
+            newEducationIds
+          );
+        } catch (err) {
+          // TODO: display error message
+
+          // Put educations back to their original order.
+          setDocument({ ...document, educations: oldEducations.current });
+        } finally {
+          repositionTimeoutIdRef.current = null;
+          oldEducations.current = null;
+        }
+      }, timeDelay);
+    },
+    [document, setDocument]
+  );
+
+  async function onDragEnd(result) {
+    const { destination, source, type } = result;
+
+    if (destination && destination.index !== source.index) {
+      if (type === 'sections')
+        return await repositionSections(source.index, destination.index);
+      if (type === 'educations')
+        return await repositionEducations(source.index, destination.index);
+    }
   }
 
   // --------------------------------------------------
@@ -125,7 +173,7 @@ function SectionsList() {
   return (
     <article>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="sections-list">
+        <Droppable droppableId="sections-list" type="sections">
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
               {existingSections}

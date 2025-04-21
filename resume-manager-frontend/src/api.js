@@ -420,6 +420,25 @@ class ResumeManagerApi {
   }
 
   /**
+   * Updates all education positions within the education section in a document.
+   *
+   * @param {String | Number} documentId - ID of the document that is having its
+   *  educations repositioned.
+   * @param {Number[]} educationIds - A list of education IDs in the desired
+   *  order.
+   * @returns {Array} A list of Education Objects in order of position in the
+   *  document, each containing education info.
+   */
+  static async repositionEducations(documentId, educationIds) {
+    const res = await this.request(
+      `users/${this.#username}/documents/${documentId}/educations`,
+      educationIds,
+      'put'
+    );
+    return res.educations;
+  }
+
+  /**
    * Deletes an education entry from the database.
    *
    * @param {String} educationId - ID of the education to delete.

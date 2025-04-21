@@ -1,3 +1,4 @@
+import { Draggable } from '@hello-pangea/dnd';
 import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
@@ -8,6 +9,7 @@ import EducationForm from './EducationForm.jsx';
 import { EDUCATION_FIELDS } from '../../commonData.js';
 
 import pencilIcon from '../../assets/pencil.svg';
+import dotsIcon from '../../assets/three-dots-vertical.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -18,8 +20,10 @@ import trashIcon from '../../assets/trash.svg';
  * @param {Object} props - React component properties.
  * @param {Object} props.item - The education object, that contains properties
  *  like school name and location, to display.
+ * @param {Number} props.idx - Index of education in the list of educations.
+ *  This is used for @hello-pangea/dnd.
  */
-function EducationCard({ item: education }) {
+function EducationCard({ item: education, idx }) {
   const [document, setDocument] = useContext(DocumentContext);
   const [isEducationFormOpen, setIsEducationFormOpen] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
@@ -106,52 +110,63 @@ function EducationCard({ item: education }) {
   }, {});
 
   return (
-    <Card className="EducationCard">
-      <CardHeader className="text-end">
-        {errorMessages.map((msg) => (
-          <Alert key={msg} color="danger">
-            {msg}
-          </Alert>
-        ))}
-        {document.isMaster && (
-          <img
-            src={pencilIcon}
-            alt="edit icon"
-            onClick={() =>
-              setIsEducationFormOpen((previousState) => !previousState)
-            }
-          />
-        )}
-        <img src={trashIcon} alt="trash icon" onClick={deleteEducation} />
-      </CardHeader>
-      <CardBody>
-        {isEducationFormOpen ? (
-          <EducationForm
-            initialFormData={initialFormData}
-            processSubmission={editEducation}
-          />
-        ) : (
-          <>
-            {education.school}
-            <br />
-            {education.location}
-            <br />
-            {education.startDate}
-            <br />
-            {education.endDate}
-            <br />
-            {education.degree}
-            <br />
-            {education.gpa}
-            <br />
-            {education.awardsAndHonors}
-            <br />
-            {education.activities}
-            <br />
-          </>
-        )}
-      </CardBody>
-    </Card>
+    <Draggable draggableId={'education-' + education.id} index={idx}>
+      {(provided) => (
+        <div ref={provided.innerRef} {...provided.draggableProps}>
+          <Card className="EducationCard">
+            <CardHeader className="text-end">
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
+              {document.isMaster && (
+                <img
+                  src={pencilIcon}
+                  alt="edit icon"
+                  onClick={() =>
+                    setIsEducationFormOpen((previousState) => !previousState)
+                  }
+                />
+              )}
+              <img src={trashIcon} alt="trash icon" onClick={deleteEducation} />
+              <img
+                src={dotsIcon}
+                alt="reposition icon"
+                {...provided.dragHandleProps}
+              />
+            </CardHeader>
+            <CardBody>
+              {isEducationFormOpen ? (
+                <EducationForm
+                  initialFormData={initialFormData}
+                  processSubmission={editEducation}
+                />
+              ) : (
+                <>
+                  {education.school}
+                  <br />
+                  {education.location}
+                  <br />
+                  {education.startDate}
+                  <br />
+                  {education.endDate}
+                  <br />
+                  {education.degree}
+                  <br />
+                  {education.gpa}
+                  <br />
+                  {education.awardsAndHonors}
+                  <br />
+                  {education.activities}
+                  <br />
+                </>
+              )}
+            </CardBody>
+          </Card>
+        </div>
+      )}
+    </Draggable>
   );
 }
 

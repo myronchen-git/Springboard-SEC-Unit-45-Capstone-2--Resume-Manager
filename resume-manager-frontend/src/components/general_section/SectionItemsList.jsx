@@ -1,3 +1,4 @@
+import { Droppable } from '@hello-pangea/dnd';
 import { useContext } from 'react';
 
 import { DocumentContext } from '../../contexts.jsx';
@@ -38,7 +39,9 @@ function SectionItemsList({ sectionId }) {
   const renderedItems =
     SectionComponent == undefined
       ? null
-      : items.map((item) => <SectionComponent key={item.id} item={item} />);
+      : items.map((item, idx) => (
+          <SectionComponent key={item.id} item={item} idx={idx} />
+        ));
 
   function renderAddItemForm(sectId) {
     // Note that sectionId must be an integer > 0.
@@ -58,7 +61,14 @@ function SectionItemsList({ sectionId }) {
 
   return (
     <div className="SectionItemsList">
-      {renderedItems}
+      <Droppable droppableId={databaseName + '-list'} type={databaseName}>
+        {(provided) => (
+          <div ref={provided.innerRef} {...provided.droppableProps}>
+            {renderedItems}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
       {document.isMaster
         ? renderAddItemForm(sectionId)
         : renderAttachItemForm(sectionId)}
