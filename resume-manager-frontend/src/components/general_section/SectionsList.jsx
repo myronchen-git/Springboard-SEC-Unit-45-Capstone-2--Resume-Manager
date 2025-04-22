@@ -36,7 +36,7 @@ function SectionsList() {
    * front-end.  The section is created locally in the front-end to avoid making
    * a network call, though this could cause desync issues.
    *
-   * @param {String} sectionId - ID of the section to add.
+   * @param {Number} sectionId - ID of the section to add.
    */
   async function addSection(sectionId) {
     await ResumeManagerApi.addSection(document.id, sectionId);
@@ -47,7 +47,7 @@ function SectionsList() {
     // Create an Object for the new section, so that it can be inserted into the
     // document Object/state.
     const sectionName = availableSections.find(
-      (section) => section.id == sectionId
+      (section) => section.id === sectionId
     ).sectionName;
     const newSection = { id: sectionId, sectionName };
 

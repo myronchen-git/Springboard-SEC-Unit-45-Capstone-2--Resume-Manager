@@ -65,8 +65,8 @@ async function addNewSectionItem(document, sectionId, formData) {
  *  contains document properties and section contents.
  * @param {Number} sectionId - The ID of the section to add a new education,
  *  experience, etc. to.
- * @param {String | Number} sectionItemId - The ID of the education, experience,
- *  etc. to attach to the document.
+ * @param {Number} sectionItemId - The ID of the education, experience, etc. to
+ *  attach to the document.
  * @param {Object} sectionItemObject - Object containing the data that will be
  *  displayed in the document.
  * @returns {Object} A clone of the document Object, but with the section item

@@ -51,15 +51,17 @@ function AttachEducationCard() {
     evt.preventDefault();
 
     if (educationId) {
+      const convertedEducationId = Number(educationId);
+
       try {
         const educationToAttach = availableEducations.find(
-          (education) => education.id == educationId
+          (education) => education.id === convertedEducationId
         );
 
         const updatedDocument = await attachSectionItem(
           document,
           1,
-          educationId,
+          convertedEducationId,
           educationToAttach
         );
 

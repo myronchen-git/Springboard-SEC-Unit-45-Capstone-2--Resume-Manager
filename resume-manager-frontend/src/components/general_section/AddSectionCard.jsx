@@ -49,7 +49,7 @@ function AddSectionCard({ availableSections, addSection }) {
 
     if (sectionId) {
       try {
-        await addSection(sectionId);
+        await addSection(Number(sectionId));
       } catch (err) {
         setErrorMessages(err);
         return;

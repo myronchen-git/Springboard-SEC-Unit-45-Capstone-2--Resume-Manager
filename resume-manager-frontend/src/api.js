@@ -200,7 +200,7 @@ class ResumeManagerApi {
   /**
    * Deletes a document, which could be a resume or template.
    *
-   * @param {String | Number} documentId - ID of the document to delete.
+   * @param {Number} documentId - ID of the document to delete.
    */
   static async deleteDocument(documentId) {
     await this.request(
@@ -225,7 +225,7 @@ class ResumeManagerApi {
   /**
    * Gets a document with all its contents.
    *
-   * @param {String} documentId - ID of the document to retrieve.
+   * @param {Number} documentId - ID of the document to retrieve.
    * @returns {Object} Document properties, contact info, education, experience,
    *  etc.
    */
@@ -240,8 +240,7 @@ class ResumeManagerApi {
    * Updates a document's properties, but not the section contents.  If document
    * is master resume, then only documentName can be updated.
    *
-   * @param {String | Number} documentId - ID of the document to update
-   *  properties of.
+   * @param {Number} documentId - ID of the document to update properties of.
    * @param {Object} data - Contains info for updating document.
    * @param {String} [data.documentName] - New name of the document.
    * @param {Boolean} [data.isTemplate] - Whether this document should be a
@@ -273,8 +272,8 @@ class ResumeManagerApi {
    * Attaches a section to a document.  In other words, creates a
    * document-section relationship.
    *
-   * @param {String} documentId - ID of the document to add a section to.
-   * @param {String} sectionId - ID of the section to add.
+   * @param {Number} documentId - ID of the document to add a section to.
+   * @param {Number} sectionId - ID of the section to add.
    * @returns {Object} The document_x_section Object, which contains document
    *  ID, section ID, and position of section within document.
    */
@@ -290,8 +289,8 @@ class ResumeManagerApi {
   /**
    * Updates all section positions in a document.
    *
-   * @param {String | Number} documentId - ID of the document that is having its
-   *  sections repositioned.
+   * @param {Number} documentId - ID of the document that is having its sections
+   *  repositioned.
    * @param {Number[]} sectionIds - A list of section IDs in the desired order.
    * @returns {Array} A list of Section Objects in order of position in the
    *  document, each containing general section info.
@@ -309,8 +308,8 @@ class ResumeManagerApi {
    * Deletes a section from a document.  Since sections are currently not
    * user-created, this will delete the document-section relationships.
    *
-   * @param {String} documentId - ID of the document to remove a section from.
-   * @param {String} sectionId - ID of the section to remove.
+   * @param {Number} documentId - ID of the document to remove a section from.
+   * @param {Number} sectionId - ID of the section to remove.
    */
   static async deleteSection(documentId, sectionId) {
     await this.request(
@@ -370,9 +369,8 @@ class ResumeManagerApi {
    * creates a document-education relationship.  This is used for documents that
    * are not the master resume.
    *
-   * @param {String | Number} documentId - ID of the document to attach an
-   *  education to.
-   * @param {String | Number} educationId - ID of the education to attach.
+   * @param {Number} documentId - ID of the document to attach an education to.
+   * @param {Number} educationId - ID of the education to attach.
    * @returns {Object} The document_x_education Object, which contains document
    *  ID, education ID, and position of education within document.
    */
@@ -390,9 +388,8 @@ class ResumeManagerApi {
   /**
    * Updates an education, only if the document is the master resume.
    *
-   * @param {String | Number} documentId - ID of the document that the education
-   *  is in.
-   * @param {String | Number} educationId - ID of the education being updated.
+   * @param {Number} documentId - ID of the document that the education is in.
+   * @param {Number} educationId - ID of the education being updated.
    * @param {Object} data - Contains info for updating education info.
    * @param {String} [data.school] - School or education center name.
    * @param {String} [data.location] - Location of school.
@@ -422,7 +419,7 @@ class ResumeManagerApi {
   /**
    * Updates all education positions within the education section in a document.
    *
-   * @param {String | Number} documentId - ID of the document that is having its
+   * @param {Number} documentId - ID of the document that is having its
    *  educations repositioned.
    * @param {Number[]} educationIds - A list of education IDs in the desired
    *  order.
@@ -483,8 +480,7 @@ class ResumeManagerApi {
   /**
    * Creates a new experience entry and adds it to a document.
    *
-   * @param {String | Number} documentId - ID of the document to add an
-   *  experience to.
+   * @param {Number} documentId - ID of the document to add an experience to.
    * @param {Object} data - Holds the info for creating a new experience.
    * @param {String} data.title - Job title or equivalent.
    * @param {String} data.organization - Name of the company or other type of
@@ -515,9 +511,8 @@ class ResumeManagerApi {
    * creates a document-experience relationship.  This is used for documents
    * that are not the master resume.
    *
-   * @param {String | Number} documentId - ID of the document to attach an
-   *  experience to.
-   * @param {String | Number} experienceId - ID of the experience to attach.
+   * @param {Number} documentId - ID of the document to attach an experience to.
+   * @param {Number} experienceId - ID of the experience to attach.
    * @returns {Object} The document_x_experience Object, which contains the ID
    *  of the document_x_experience, document ID, experience ID, and position of
    *  experience within document.
@@ -537,7 +532,7 @@ class ResumeManagerApi {
    * Updates an experience.  Does not update the bullets / text snippets /
    * achievements.
    *
-   * @param {String | Number} experienceId - ID of the experience to update.
+   * @param {Number} experienceId - ID of the experience to update.
    * @param {Object} data - Holds the info for updating an experience.
    * @param {String} [data.title] - Job title or equivalent.
    * @param {String} [data.organization] - Name of the company or other type of
@@ -592,11 +587,10 @@ class ResumeManagerApi {
    * Creates a new text snippet entry and adds it to a document and section
    * item.
    *
-   * @param {String | Number} documentId - ID of the document that the
-   *  associated section is in.
-   * @param {String | Number} sectionId - ID of the section type.
-   * @param {String | Number} sectionItemId - ID of the specific item in the
-   *  section.
+   * @param {Number} documentId - ID of the document that the associated section
+   *  is in.
+   * @param {Number} sectionId - ID of the section type.
+   * @param {Number} sectionItemId - ID of the specific item in the section.
    * @param {Object} data - Holds the info for creating a new text snippet.
    * @param {String} data.type - The type of content, such as bullet point
    *  or description.
@@ -625,8 +619,8 @@ class ResumeManagerApi {
   /**
    * Gets all text snippets belonging to an experience.
    *
-   * @param {String | Number} experienceId - ID of the experience to fetch text
-   *  snippets for.
+   * @param {Number} experienceId - ID of the experience to fetch text snippets
+   *  for.
    * @returns {Object[]} A list of text snippet Objects, each containing info
    *  like content.
    */
@@ -641,12 +635,10 @@ class ResumeManagerApi {
    * Attaches a text snippet to an experience in a non-master document.  In
    * other words, this creates an experience-text snippet relationship.
    *
-   * @param {String | Number} documentId - ID of the document that the
-   *  associated experience is in.
-   * @param {String | Number} experienceId - ID of the experience to a text
-   *  snippet to.
-   * @param {String | Number} textSnippetId - ID part of the text snippet to
-   *  attach.
+   * @param {Number} documentId - ID of the document that the associated
+   *  experience is in.
+   * @param {Number} experienceId - ID of the experience to a text snippet to.
+   * @param {Number} textSnippetId - ID part of the text snippet to attach.
    * @param {String} textSnippetVersion - Version part of the text snippet to
    *  attach.
    * @returns {Object} The experience_x_textSnippet Object, which contains the
@@ -677,8 +669,7 @@ class ResumeManagerApi {
    * The text snippet version is placed in the request body, because it is
    * complex and contains - (dashes), : (colons), and . (periods).
    *
-   * @param {String | Number} textSnippetId - ID part of the text snippet to
-   *  update.
+   * @param {Number} textSnippetId - ID part of the text snippet to update.
    * @param {String} textSnippetVersion - Version part of the text snippet to
    *  update.
    * @param {Object} data - Contains info for updating the text snippet.
@@ -702,8 +693,7 @@ class ResumeManagerApi {
    * The text snippet version is placed in the request body, because it is
    * complex and contains - (dashes), : (colons), and . (periods).
    *
-   * @param {String | Number} textSnippetId - ID part of the text snippet to
-   *  delete.
+   * @param {Number} textSnippetId - ID part of the text snippet to delete.
    * @param {String} textSnippetVersion - Version part of the text snippet to
    *  delete.
    */
@@ -719,11 +709,11 @@ class ResumeManagerApi {
    * Removes a text snippet from an experience in a document, but does not
    * delete the entry itself. This is used for non-master resumes.
    *
-   * @param {String | Number} documentId - ID of the document to remove the text
+   * @param {Number} documentId - ID of the document to remove the text snippet
+   *  from.
+   * @param {Number} experienceId - ID of the experience to remove the text
    *  snippet from.
-   * @param {String | Number} experienceId - ID of the experience to remove the
-   *  text snippet from.
-   * @param {String | Number} textSnippetId - ID of the text snippet to remove.
+   * @param {Number} textSnippetId - ID of the text snippet to remove.
    */
   static async removeTextSnippetFromExperience(
     documentId,

@@ -56,13 +56,13 @@ function AttachTextSnippetCard() {
     evt.preventDefault();
 
     if (textSnippetIdAndVersion.length) {
-      const id = textSnippetIdAndVersion[0];
+      const id = Number(textSnippetIdAndVersion[0]);
       const version = textSnippetIdAndVersion[1];
 
       try {
         const textSnippetToAttach = availableTextSnippets.find(
           (textSnippet) =>
-            textSnippet.id == id && textSnippet.version == version
+            textSnippet.id === id && textSnippet.version === version
         );
 
         await attachTextSnippet(id, version, textSnippetToAttach);

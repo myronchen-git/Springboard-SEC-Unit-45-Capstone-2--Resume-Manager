@@ -51,15 +51,17 @@ function AttachExperienceCard() {
     evt.preventDefault();
 
     if (experienceId) {
+      const convertedExperienceId = Number(experienceId);
+
       try {
         const experienceToAttach = availableExperiences.find(
-          (experience) => experience.id == experienceId
+          (experience) => experience.id === convertedExperienceId
         );
 
         const updatedDocument = await attachSectionItem(
           document,
           2,
-          experienceId,
+          convertedExperienceId,
           experienceToAttach
         );
 

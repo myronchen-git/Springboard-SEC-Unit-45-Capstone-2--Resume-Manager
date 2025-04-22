@@ -44,7 +44,7 @@ function DocumentSelect({ documents, loadDocument, close }) {
     evt.preventDefault();
 
     try {
-      await loadDocument(documentId);
+      await loadDocument(Number(documentId));
     } catch (err) {
       setErrorMessages(err);
       return;

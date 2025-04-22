@@ -46,10 +46,10 @@ function Document() {
    * Gets a document and its contents for displaying.  A document ID of 0
    * signifies to create a new document.
    *
-   * @param {String} documentId - ID of the document to retrieve and display.
+   * @param {Number} documentId - ID of the document to retrieve and display.
    */
   async function loadDocument(documentId) {
-    if (documentId === '0') {
+    if (documentId === 0) {
       setIsNewDocumentFormOpen(true);
     } else {
       try {
