@@ -14,6 +14,19 @@ const SECTION_ID_TO_DATABASE_NAME = Object.freeze([
 // Always keep them up to date, with optional fields last!
 // And always keep the optional fields start index up to date!
 
+const CONTACT_INFO_FIELDS = Object.freeze(
+  [
+    { jsName: 'fullName', displayName: 'Full Name' },
+    { jsName: 'location', displayName: 'Location' },
+    { jsName: 'email', displayName: 'Email' },
+    { jsName: 'phone', displayName: 'Phone' },
+    { jsName: 'linkedin', displayName: 'LinkedIn' },
+    { jsName: 'github', displayName: 'GitHub' },
+  ].map((item) => Object.freeze(item))
+);
+
+const CONTACT_INFO_FIELDS_START_INDEX = 1;
+
 const EDUCATION_FIELDS = Object.freeze(
   [
     { jsName: 'school', displayName: 'School Name' },
@@ -62,6 +75,8 @@ const getFormInputPattern = (fieldName) =>
 // ==================================================
 
 export {
+  CONTACT_INFO_FIELDS,
+  CONTACT_INFO_FIELDS_START_INDEX,
   EDUCATION_FIELDS,
   EDUCATION_OPTIONAL_FIELDS_START_INDEX,
   EXPERIENCE_FIELDS,

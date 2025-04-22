@@ -1,120 +1,76 @@
 import { useContext, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-} from 'reactstrap';
+import { Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
+import GenericForm from '../GenericForm.jsx';
+
+import {
+  CONTACT_INFO_FIELDS,
+  CONTACT_INFO_FIELDS_START_INDEX,
+} from '../../commonData.js';
 
 import pencilIcon from '../../assets/pencil.svg';
 
 // ==================================================
 
-const contactInfoProperties = [
-  { jsName: 'fullName', displayName: 'Full Name' },
-  { jsName: 'location', displayName: 'Location' },
-  { jsName: 'email', displayName: 'Email' },
-  { jsName: 'phone', displayName: 'Phone' },
-  { jsName: 'linkedin', displayName: 'LinkedIn' },
-  { jsName: 'github', displayName: 'GitHub' },
-];
-
-// --------------------------------------------------
-
+/**
+ * Renders a view for displaying and editing contact info.
+ */
 function ContactInfoCard() {
   const [isEditing, setIsEditing] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
   const [document, setDocument] = useContext(DocumentContext);
-
-  const contactInfoData =
-    document.contactInfo ||
-    contactInfoProperties.reduce((obj, { jsName }) => {
-      obj[jsName] = '';
-      return obj;
-    }, {});
-
-  const [formData, setFormData] = useState(contactInfoData);
 
   // --------------------------------------------------
 
-  function toggleEdit() {
-    setIsEditing(!isEditing);
-    setFormData(contactInfoData);
-    setErrorMessages([]);
-  }
+  /**
+   * Sends an API request to update contact info.  Then updates the document
+   * state with the returned updated info.
+   *
+   * @param {Object} formData - Holds updated contact info data.
+   */
+  async function editContactInfo(formData) {
+    const updatedContactInfo = await ResumeManagerApi.updateContactInfo(
+      formData
+    );
 
-  function handleChange(evt) {
-    const { name, value } = evt.target;
-    setFormData((formData) => ({ ...formData, [name]: value }));
-  }
-
-  async function handleSubmit(evt) {
-    evt.preventDefault();
-
-    let updatedContactInfo;
-    try {
-      updatedContactInfo = await ResumeManagerApi.updateContactInfo(formData);
-
-      // Removing extra username property, because document Object/state doesn't
-      // have it.
-      delete updatedContactInfo.username;
-    } catch (err) {
-      setErrorMessages(err);
-      return;
-    }
+    // Removing extra username property, because document Object/state doesn't
+    // have it.
+    delete updatedContactInfo.username;
 
     // Clone document so that React sees the document state has been modified,
     // and then update it with new contact information.
-    const documentClone = structuredClone(document);
-    documentClone.contactInfo = updatedContactInfo;
-    setDocument(documentClone);
+    setDocument({ ...document, contactInfo: updatedContactInfo });
 
-    toggleEdit();
+    setIsEditing(false);
   }
 
   // --------------------------------------------------
+
+  // Convert current null fields in contact info to empty Strings, so that they
+  // are properly displayed in form inputs.
+  const initialFormData = CONTACT_INFO_FIELDS.reduce((obj, field) => {
+    obj[field.jsName] = document.contactInfo?.[field.jsName] || '';
+    return obj;
+  }, {});
 
   return (
     <Card className="ContactInfoCard" tag="article">
       <CardHeader className="text-end">
-        <img src={pencilIcon} alt="edit icon" onClick={toggleEdit} />
+        <img
+          src={pencilIcon}
+          alt="edit icon"
+          onClick={() => setIsEditing((previousState) => !previousState)}
+        />
       </CardHeader>
       {isEditing ? (
         <CardBody>
-          <Form onSubmit={handleSubmit}>
-            {contactInfoProperties.map(({ jsName, displayName }) => (
-              <FormGroup key={jsName} className="text-start">
-                <Label
-                  htmlFor={`ContactInfoCard__input-${jsName.toLowerCase()}`}
-                >
-                  <b>{displayName}</b>
-                </Label>
-                <Input
-                  id={`ContactInfoCard__input-${jsName.toLowerCase()}`}
-                  type="text"
-                  name={jsName}
-                  value={formData?.[jsName] || ''}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-            ))}
-            {errorMessages.map((msg) => (
-              <Alert key={msg} color="danger">
-                {msg}
-              </Alert>
-            ))}
-            <Button color="light" type="submit">
-              Submit
-            </Button>
-          </Form>
+          <GenericForm
+            fields={CONTACT_INFO_FIELDS}
+            optionalFieldsStartIndex={CONTACT_INFO_FIELDS_START_INDEX}
+            initialFormData={initialFormData}
+            processSubmission={editContactInfo}
+          />
         </CardBody>
       ) : (
         <CardBody>
