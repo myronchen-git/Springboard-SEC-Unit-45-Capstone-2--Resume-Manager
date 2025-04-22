@@ -6,6 +6,8 @@ import { DocumentContext } from '../../contexts.jsx';
 import AddSectionCard from './AddSectionCard.jsx';
 import SectionCard from './SectionCard.jsx';
 
+import { SECTION_ID_TO_DATABASE_NAME } from '../../commonData.js';
+
 // ==================================================
 
 /**
@@ -15,9 +17,10 @@ function SectionsList() {
   const [document, setDocument] = useContext(DocumentContext);
 
   const [availableSections, setAvailableSections] = useState([]);
-  const repositionTimeoutIdRef = useRef(null);
-  const oldSections = useRef(null);
-  const oldEducations = useRef(null);
+  // Holds the timeout IDs of [sections, educations, experiences].
+  const repositionTimeoutIdsRef = useRef(new Array(3).fill(null));
+  // Holds old lists of [sections, educations, experiences].
+  const oldListsRef = useRef(new Array(3).fill(null));
 
   // --------------------------------------------------
 
@@ -63,88 +66,59 @@ function SectionsList() {
   }
 
   /**
-   * Repositions sections visually and sends an API request to the back-end to
-   * save the new positions.  The API request is delayed to reduce unnecessary
-   * network calls.
+   * Repositions sections, educations, experiences, etc. visually and sends an
+   * API request to the back-end to save the new positions.  The API request is
+   * delayed to reduce unnecessary network calls.
    *
-   * @param {Number} sourceIndex - Original index of section.
-   * @param {Number} destinationIndex - Desired index of section.
+   * Note that the old lists and related timeout IDs are separated between
+   * sections, educations, experiences, etc. to allow repositioning and
+   * restoring to be independent between sections, etc..
+   *
+   * @param {Number} sourceIndex - Original index of section, etc..
+   * @param {Number} destinationIndex - Desired index of section, etc..
+   * @param {Number} idIdx - Index corresponding to section type, represented in
+   *  this array: [sections, educations, experiences].
+   * @param {Function} repositionFunc - The function in ResumeManagerApi that
+   *  will send the API request to the back-end.
    */
-  const repositionSections = useCallback(
-    async (sourceIndex, destinationIndex) => {
+  const repositionHelper = useCallback(
+    async (sourceIndex, destinationIndex, idIdx, repositionFunc) => {
       const timeDelay = 3000;
+      // Patch to get "sections" name.
+      const sectionName =
+        idIdx === 0 ? 'sections' : SECTION_ID_TO_DATABASE_NAME[idIdx];
+      const timeoutIds = repositionTimeoutIdsRef.current;
+      const oldLists = oldListsRef.current;
 
-      // Save old sections ordering to use if API request fails, with disregard
-      // to how many repositions have been performed.
-      oldSections.current ||= [...document.sections];
+      // Save old ordering to use if API request fails, with disregard to how
+      // many repositions have been performed.
+      oldLists[idIdx] ||= [...document[sectionName]];
 
-      // Get a new sections Array with each section in their new positions.
-      const newSections = [...document.sections];
-      const [removed] = newSections.splice(sourceIndex, 1);
-      newSections.splice(destinationIndex, 0, removed);
+      // Get a new list Array with each item in their new positions.
+      const newList = [...document[sectionName]];
+      const [removed] = newList.splice(sourceIndex, 1);
+      newList.splice(destinationIndex, 0, removed);
 
-      // Update document state to show reordered sections.
-      setDocument({ ...document, sections: newSections });
+      // Update document state to show reordered list.
+      setDocument({ ...document, [sectionName]: newList });
 
-      const newSectionIds = newSections.map((section) => section.id);
+      const newListIds = newList.map((item) => item.id);
 
       // Reset timeout if there already is one.  Set timeout to make a delayed
       // API request.
-      clearTimeout(repositionTimeoutIdRef.current);
-      repositionTimeoutIdRef.current = setTimeout(async () => {
+      clearTimeout(timeoutIds[idIdx]);
+      timeoutIds[idIdx] = setTimeout(async () => {
         try {
-          await ResumeManagerApi.repositionSections(document.id, newSectionIds);
+          await repositionFunc(document.id, newListIds);
         } catch (err) {
           // TODO: display error message
+          console.error(err);
 
-          // Put sections back to their original order.
-          setDocument({ ...document, sections: oldSections.current });
+          // Put list back to its original order.
+          setDocument({ ...document, [sectionName]: oldLists[idIdx] });
         } finally {
-          repositionTimeoutIdRef.current = null;
-          oldSections.current = null;
-        }
-      }, timeDelay);
-    },
-    [document, setDocument]
-  );
-
-  /**
-   * Repositions educations visually and sends an API request to the back-end to
-   * save the new positions.  The API request is delayed to reduce unnecessary
-   * network calls.
-   *
-   * @param {Number} sourceIndex - Original index of education.
-   * @param {Number} destinationIndex - Desired index of education.
-   */
-  const repositionEducations = useCallback(
-    async (sourceIndex, destinationIndex) => {
-      const timeDelay = 3000;
-
-      oldEducations.current ||= [...document.educations];
-
-      const newEducations = [...document.educations];
-      const [removed] = newEducations.splice(sourceIndex, 1);
-      newEducations.splice(destinationIndex, 0, removed);
-
-      setDocument({ ...document, educations: newEducations });
-
-      const newEducationIds = newEducations.map((education) => education.id);
-
-      clearTimeout(repositionTimeoutIdRef.current);
-      repositionTimeoutIdRef.current = setTimeout(async () => {
-        try {
-          await ResumeManagerApi.repositionEducations(
-            document.id,
-            newEducationIds
-          );
-        } catch (err) {
-          // TODO: display error message
-
-          // Put educations back to their original order.
-          setDocument({ ...document, educations: oldEducations.current });
-        } finally {
-          repositionTimeoutIdRef.current = null;
-          oldEducations.current = null;
+          timeoutIds[idIdx] = null;
+          oldLists[idIdx] = null;
         }
       }, timeDelay);
     },
@@ -156,9 +130,19 @@ function SectionsList() {
 
     if (destination && destination.index !== source.index) {
       if (type === 'sections')
-        return await repositionSections(source.index, destination.index);
+        return await repositionHelper(
+          source.index,
+          destination.index,
+          0,
+          ResumeManagerApi.repositionSections.bind(ResumeManagerApi)
+        );
       if (type === 'educations')
-        return await repositionEducations(source.index, destination.index);
+        return await repositionHelper(
+          source.index,
+          destination.index,
+          1,
+          ResumeManagerApi.repositionEducations.bind(ResumeManagerApi)
+        );
     }
   }
 
