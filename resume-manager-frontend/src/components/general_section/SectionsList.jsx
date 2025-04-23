@@ -143,6 +143,14 @@ function SectionsList() {
           1,
           ResumeManagerApi.repositionEducations.bind(ResumeManagerApi)
         );
+      if (type === 'experiences') {
+        return await repositionHelper(
+          source.index,
+          destination.index,
+          2,
+          ResumeManagerApi.repositionExperiences.bind(ResumeManagerApi)
+        );
+      }
     }
   }
 

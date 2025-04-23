@@ -1,3 +1,4 @@
+import { Draggable } from '@hello-pangea/dnd';
 import { useCallback, useContext, useMemo, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
@@ -11,6 +12,7 @@ import GenericForm from '../GenericForm.jsx';
 import TextSnippetsList from '../text_snippet/TextSnippetsList.jsx';
 
 import pencilIcon from '../../assets/pencil.svg';
+import dotsIcon from '../../assets/three-dots-vertical.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -21,8 +23,10 @@ import trashIcon from '../../assets/trash.svg';
  * @param {Object} props - React component properties.
  * @param {Object} props.item - The experience object, that contains properties
  *  like title and organization, to display.
+ * @param {Number} props.idx - Index of experience in the list of experiences.
+ *  This is used for @hello-pangea/dnd.
  */
-function ExperienceCard({ item: experience }) {
+function ExperienceCard({ item: experience, idx }) {
   const [document, setDocument] = useContext(DocumentContext);
   const [isEditExperienceFormOpen, setIsEditExperienceFormOpen] =
     useState(false);
@@ -297,51 +301,70 @@ function ExperienceCard({ item: experience }) {
   }, {});
 
   return (
-    <Card className="ExperienceCard">
-      <CardHeader className="text-end">
-        {errorMessages.map((msg) => (
-          <Alert key={msg} color="danger">
-            {msg}
-          </Alert>
-        ))}
-        {document.isMaster && (
-          <img
-            src={pencilIcon}
-            alt="edit icon"
-            onClick={() =>
-              setIsEditExperienceFormOpen((previousState) => !previousState)
-            }
-          />
-        )}
-        <img src={trashIcon} alt="trash icon" onClick={deleteExperience} />
-      </CardHeader>
-      <CardBody>
-        {isEditExperienceFormOpen ? (
-          <GenericForm
-            fields={EXPERIENCE_FIELDS}
-            optionalFieldsStartIndex={EXPERIENCE_OPTIONAL_FIELDS_START_INDEX}
-            initialFormData={initialFormData}
-            processSubmission={editExperience}
-          />
-        ) : (
-          <>
-            {experience.title}
-            <br />
-            {experience.organization}
-            <br />
-            {experience.location}
-            <br />
-            {experience.startDate}
-            <br />
-            {experience.endDate}
-            <br />
-            <TextSnippetContext.Provider value={textSnippetContextValues}>
-              <TextSnippetsList textSnippets={experience.bullets} />
-            </TextSnippetContext.Provider>
-          </>
-        )}
-      </CardBody>
-    </Card>
+    <Draggable draggableId={'experience-' + experience.id} index={idx}>
+      {(provided) => (
+        <div ref={provided.innerRef} {...provided.draggableProps}>
+          <Card className="ExperienceCard">
+            <CardHeader className="text-end">
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
+              {document.isMaster && (
+                <img
+                  src={pencilIcon}
+                  alt="edit icon"
+                  onClick={() =>
+                    setIsEditExperienceFormOpen(
+                      (previousState) => !previousState
+                    )
+                  }
+                />
+              )}
+              <img
+                src={trashIcon}
+                alt="trash icon"
+                onClick={deleteExperience}
+              />
+              <img
+                src={dotsIcon}
+                alt="reposition icon"
+                {...provided.dragHandleProps}
+              />
+            </CardHeader>
+            <CardBody>
+              {isEditExperienceFormOpen ? (
+                <GenericForm
+                  fields={EXPERIENCE_FIELDS}
+                  optionalFieldsStartIndex={
+                    EXPERIENCE_OPTIONAL_FIELDS_START_INDEX
+                  }
+                  initialFormData={initialFormData}
+                  processSubmission={editExperience}
+                />
+              ) : (
+                <>
+                  {experience.title}
+                  <br />
+                  {experience.organization}
+                  <br />
+                  {experience.location}
+                  <br />
+                  {experience.startDate}
+                  <br />
+                  {experience.endDate}
+                  <br />
+                  <TextSnippetContext.Provider value={textSnippetContextValues}>
+                    <TextSnippetsList textSnippets={experience.bullets} />
+                  </TextSnippetContext.Provider>
+                </>
+              )}
+            </CardBody>
+          </Card>
+        </div>
+      )}
+    </Draggable>
   );
 }
 

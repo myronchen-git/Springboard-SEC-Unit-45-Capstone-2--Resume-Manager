@@ -553,6 +553,26 @@ class ResumeManagerApi {
   }
 
   /**
+   * Updates all experience positions within the experience section in a
+   *  document.
+   *
+   * @param {Number} documentId - ID of the document that is having its
+   *  experiences repositioned.
+   * @param {Number[]} experienceIds - A list of experience IDs in the desired
+   *  order.
+   * @returns {Array} A list of Experience Objects in order of position in the
+   *  document, each containing experience info.
+   */
+  static async repositionExperiences(documentId, experienceIds) {
+    const res = await this.request(
+      `users/${this.#username}/documents/${documentId}/experiences`,
+      experienceIds,
+      'put'
+    );
+    return res.experiences;
+  }
+
+  /**
    * Deletes an experience entry from the database.
    *
    * @param {String} experienceId - ID of the experience to delete.
