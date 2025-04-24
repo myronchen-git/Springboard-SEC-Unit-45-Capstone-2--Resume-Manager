@@ -1,3 +1,4 @@
+import { Draggable } from '@hello-pangea/dnd';
 import { useContext, useState } from 'react';
 import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
@@ -10,6 +11,7 @@ import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 
 import pencilIcon from '../../assets/pencil.svg';
+import dotsIcon from '../../assets/three-dots-vertical.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -20,10 +22,12 @@ import trashIcon from '../../assets/trash.svg';
  * @param {Object} props - React component properties.
  * @param {Object} props.textSnippet - The text snippet object, that contains
  *  properties like content, to display.
+ * @param {Number} props.idx - Index of text snippet in the containing list of
+ *  text snippets.  This is used for @hello-pangea/dnd.
  * @param {Boolean} props.addBullet - Whether to add a bullet point to the
  *  beginning of the text content.
  */
-function TextSnippetCard({ textSnippet, addBullet = true }) {
+function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
   const [document] = useContext(DocumentContext);
   const {
     replaceTextSnippetInDocumentState,
@@ -105,40 +109,62 @@ function TextSnippetCard({ textSnippet, addBullet = true }) {
   }, {});
 
   return (
-    <Card className="TextSnippetCard">
-      <CardHeader className="text-end">
-        {errorMessages.map((msg) => (
-          <Alert key={msg} color="danger">
-            {msg}
-          </Alert>
-        ))}
-        {document.isMaster && (
-          <img
-            src={pencilIcon}
-            alt="edit icon"
-            onClick={() =>
-              setIsEditTextSnippetFormOpen((previousState) => !previousState)
-            }
-          />
-        )}
-        <img src={trashIcon} alt="trash icon" onClick={deleteTextSnippet} />
-      </CardHeader>
-      <CardBody className="text-start">
-        {isEditTextSnippetFormOpen ? (
-          <GenericForm
-            fields={TEXT_SNIPPET_FIELDS}
-            optionalFieldsStartIndex={TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX}
-            initialFormData={initialFormData}
-            processSubmission={editTextSnippet}
-          />
-        ) : (
-          <>
-            {addBullet && <>&bull; </>}
-            {textSnippet.content}
-          </>
-        )}
-      </CardBody>
-    </Card>
+    <Draggable
+      draggableId={`textSnippet-${textSnippet.id}-${textSnippet.version}`}
+      index={idx}
+    >
+      {(provided) => (
+        <div ref={provided.innerRef} {...provided.draggableProps}>
+          <Card className="TextSnippetCard">
+            <CardHeader className="text-end">
+              {errorMessages.map((msg) => (
+                <Alert key={msg} color="danger">
+                  {msg}
+                </Alert>
+              ))}
+              {document.isMaster && (
+                <img
+                  src={pencilIcon}
+                  alt="edit icon"
+                  onClick={() =>
+                    setIsEditTextSnippetFormOpen(
+                      (previousState) => !previousState
+                    )
+                  }
+                />
+              )}
+              <img
+                src={trashIcon}
+                alt="trash icon"
+                onClick={deleteTextSnippet}
+              />
+              <img
+                src={dotsIcon}
+                alt="reposition icon"
+                {...provided.dragHandleProps}
+              />
+            </CardHeader>
+            <CardBody className="text-start">
+              {isEditTextSnippetFormOpen ? (
+                <GenericForm
+                  fields={TEXT_SNIPPET_FIELDS}
+                  optionalFieldsStartIndex={
+                    TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX
+                  }
+                  initialFormData={initialFormData}
+                  processSubmission={editTextSnippet}
+                />
+              ) : (
+                <>
+                  {addBullet && <>&bull; </>}
+                  {textSnippet.content}
+                </>
+              )}
+            </CardBody>
+          </Card>
+        </div>
+      )}
+    </Draggable>
   );
 }
 

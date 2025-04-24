@@ -300,6 +300,8 @@ function ExperienceCard({ item: experience, idx }) {
     return obj;
   }, {});
 
+  const droppableIdName = `experience-${experience.id}-textSnippet`;
+
   return (
     <Draggable draggableId={'experience-' + experience.id} index={idx}>
       {(provided) => (
@@ -356,7 +358,13 @@ function ExperienceCard({ item: experience, idx }) {
                   {experience.endDate}
                   <br />
                   <TextSnippetContext.Provider value={textSnippetContextValues}>
-                    <TextSnippetsList textSnippets={experience.bullets} />
+                    <TextSnippetsList
+                      textSnippets={experience.bullets}
+                      droppableProps={{
+                        droppableId: droppableIdName + '-list',
+                        type: droppableIdName,
+                      }}
+                    />
                   </TextSnippetContext.Provider>
                 </>
               )}

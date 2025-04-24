@@ -708,6 +708,33 @@ class ResumeManagerApi {
   }
 
   /**
+   * Updates all text snippet positions within an experience in a document.
+   *
+   * @param {Number} documentId - ID of the document that the experience belongs
+   *  to.
+   * @param {Number} experienceId - ID of the experience that is having its text
+   *  snippets repositioned.
+   * @param {Number[]} textSnippetIds - A list of text snippet IDs in the
+   *  desired order.
+   * @returns {Array} A list of TextSnippet Objects in order of position within
+   *  experience and document, each containing text snippet info.
+   */
+  static async repositionExperienceTextSnippets(
+    documentId,
+    experienceId,
+    textSnippetIds
+  ) {
+    const res = await this.request(
+      `users/${
+        this.#username
+      }/documents/${documentId}/experiences/${experienceId}/text-snippets`,
+      textSnippetIds,
+      'put'
+    );
+    return res.textSnippets;
+  }
+
+  /**
    * Deletes a text snippet from the database.
    *
    * The text snippet version is placed in the request body, because it is

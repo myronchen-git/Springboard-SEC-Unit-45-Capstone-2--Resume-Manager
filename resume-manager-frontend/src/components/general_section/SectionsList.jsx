@@ -21,6 +21,10 @@ function SectionsList() {
   const repositionTimeoutIdsRef = useRef(new Array(3).fill(null));
   // Holds old lists of [sections, educations, experiences].
   const oldListsRef = useRef(new Array(3).fill(null));
+  const repositionExperienceTextSnippetsTimeoutIdsRef = useRef(new Map());
+  const oldExperienceTextSnippetsRef = useRef(new Map());
+
+  const repositionTimeDelay = 3000;
 
   // --------------------------------------------------
 
@@ -83,7 +87,6 @@ function SectionsList() {
    */
   const repositionHelper = useCallback(
     async (sourceIndex, destinationIndex, idIdx, repositionFunc) => {
-      const timeDelay = 3000;
       // Patch to get "sections" name.
       const sectionName =
         idIdx === 0 ? 'sections' : SECTION_ID_TO_DATABASE_NAME[idIdx];
@@ -120,7 +123,80 @@ function SectionsList() {
           timeoutIds[idIdx] = null;
           oldLists[idIdx] = null;
         }
-      }, timeDelay);
+      }, repositionTimeDelay);
+    },
+    [document, setDocument]
+  );
+
+  /**
+   * Repositions text snippets within an experience visually and sends an API
+   * request to the back-end to save the new positions.  The API request is
+   * delayed to reduce unnecessary network calls.
+   *
+   * Note that the old lists and related timeout IDs are separated between text
+   * snippet lists to allow repositioning and restoring to be independent
+   * between them.
+   *
+   * @param {Number} sourceIndex - Original index of text snippet.
+   * @param {Number} destinationIndex - Desired index of text snippet.
+   * @param {Number} experienceId - ID of the experience that the text snippets
+   *  belong to.
+   */
+  const repositionExperienceTextSnippet = useCallback(
+    (sourceIndex, destinationIndex, experienceId) => {
+      const timeoutIds = repositionExperienceTextSnippetsTimeoutIdsRef.current;
+      const oldTextSnippetLists = oldExperienceTextSnippetsRef.current;
+
+      // Find the index of the experience in the list of experiences, so that it
+      // can be found again in the document state.
+      const experienceIdx = document.experiences.findIndex(
+        (experience) => experience.id === experienceId
+      );
+
+      // Save old ordering to use if API request fails, with disregard to how
+      // many repositions have been performed.
+      const oldBullets = [...document.experiences[experienceIdx].bullets];
+      if (!oldTextSnippetLists.has(experienceId))
+        oldTextSnippetLists.set(experienceId, oldBullets);
+
+      // Get a new list Array with each item in their new positions.
+      const newBullets = [...document.experiences[experienceIdx].bullets];
+      const [removed] = newBullets.splice(sourceIndex, 1);
+      newBullets.splice(destinationIndex, 0, removed);
+
+      // Update document state to show reordered list.
+      const updatedDocument = { ...document };
+      updatedDocument.experiences[experienceIdx].bullets = newBullets;
+      setDocument(updatedDocument);
+
+      const newBulletsIds = newBullets.map((item) => item.id);
+
+      // Reset timeout if there already is one.  Set timeout to make a delayed
+      // API request.
+      if (timeoutIds.has(experienceId))
+        clearTimeout(timeoutIds.get(experienceId));
+      const timeoutId = setTimeout(async () => {
+        try {
+          await ResumeManagerApi.repositionExperienceTextSnippets(
+            document.id,
+            experienceId,
+            newBulletsIds
+          );
+        } catch (err) {
+          // TODO: display error message
+          console.error(err);
+
+          // Put list back to its original order.
+          const originalDocument = { ...document };
+          originalDocument.experiences[experienceIdx].bullets =
+            oldTextSnippetLists.get(experienceId);
+          setDocument(originalDocument);
+        } finally {
+          timeoutIds.delete(experienceId);
+          oldTextSnippetLists.delete(experienceId);
+        }
+      }, repositionTimeDelay);
+      timeoutIds.set(experienceId, timeoutId);
     },
     [document, setDocument]
   );
@@ -149,6 +225,14 @@ function SectionsList() {
           destination.index,
           2,
           ResumeManagerApi.repositionExperiences.bind(ResumeManagerApi)
+        );
+      }
+      if (type.startsWith('experience') && type.endsWith('textSnippet')) {
+        const experienceId = Number(type.split('-')[1]);
+        return await repositionExperienceTextSnippet(
+          source.index,
+          destination.index,
+          experienceId
         );
       }
     }
