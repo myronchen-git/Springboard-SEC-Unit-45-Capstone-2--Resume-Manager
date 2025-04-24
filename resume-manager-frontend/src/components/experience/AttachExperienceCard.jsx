@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Alert,
   Button,
@@ -21,25 +21,18 @@ function AttachExperienceCard() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [experienceId, setExperienceId] = useState(null);
   const [errorMessages, setErrorMessages] = useState([]);
-  const [availableExperiences, setAvailableExperiences] = useState([]);
+  const [availableExperiences, setAvailableExperiences] = useState(null);
   const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 
-  useEffect(() => {
-    async function runEffect() {
-      setAvailableExperiences(await ResumeManagerApi.getExperiences());
-    }
-
-    runEffect();
-  }, []);
-
-  // --------------------------------------------------
-
-  function toggleOpen() {
+  async function toggleOpen() {
     setIsRevealed(!isRevealed);
     setExperienceId(null);
     setErrorMessages([]);
+
+    if (!isRevealed && availableExperiences === null)
+      setAvailableExperiences(await ResumeManagerApi.getExperiences());
   }
 
   function handleChange(evt) {
@@ -95,15 +88,16 @@ function AttachExperienceCard() {
                 <option value="" disabled>
                   Choose an experience
                 </option>
-                {availableExperiences.map((experience) => {
-                  return (
-                    <option key={experience.id} value={experience.id}>
-                      {`${experience.organization} - ${experience.title} (${
-                        experience.startDate
-                      } ... ${experience.endDate || ''})`}
-                    </option>
-                  );
-                })}
+                {availableExperiences &&
+                  availableExperiences.map((experience) => {
+                    return (
+                      <option key={experience.id} value={experience.id}>
+                        {`${experience.organization} - ${experience.title} (${
+                          experience.startDate
+                        } ... ${experience.endDate || ''})`}
+                      </option>
+                    );
+                  })}
               </Input>
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">

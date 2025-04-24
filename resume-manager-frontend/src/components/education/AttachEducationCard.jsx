@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Alert,
   Button,
@@ -21,25 +21,18 @@ function AttachEducationCard() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [educationId, setEducationId] = useState(null);
   const [errorMessages, setErrorMessages] = useState([]);
-  const [availableEducations, setAvailableEducations] = useState([]);
+  const [availableEducations, setAvailableEducations] = useState(null);
   const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 
-  useEffect(() => {
-    async function runEffect() {
-      setAvailableEducations(await ResumeManagerApi.getEducations());
-    }
-
-    runEffect();
-  }, []);
-
-  // --------------------------------------------------
-
-  function toggleOpen() {
+  async function toggleOpen() {
     setIsRevealed(!isRevealed);
     setEducationId(null);
     setErrorMessages([]);
+
+    if (!isRevealed && availableEducations === null)
+      setAvailableEducations(await ResumeManagerApi.getEducations());
   }
 
   function handleChange(evt) {
@@ -95,13 +88,14 @@ function AttachEducationCard() {
                 <option value="" disabled>
                   Choose an education
                 </option>
-                {availableEducations.map((education) => {
-                  return (
-                    <option key={education.id} value={education.id}>
-                      {`${education.school}, ${education.degree}`}
-                    </option>
-                  );
-                })}
+                {availableEducations &&
+                  availableEducations.map((education) => {
+                    return (
+                      <option key={education.id} value={education.id}>
+                        {`${education.school}, ${education.degree}`}
+                      </option>
+                    );
+                  })}
               </Input>
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">

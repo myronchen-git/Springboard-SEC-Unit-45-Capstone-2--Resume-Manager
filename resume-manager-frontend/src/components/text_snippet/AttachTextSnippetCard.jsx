@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Alert,
   Button,
@@ -31,20 +31,13 @@ function AttachTextSnippetCard() {
 
   // --------------------------------------------------
 
-  useEffect(() => {
-    async function runEffect() {
-      setAvailableTextSnippets(await getAvailableTextSnippets());
-    }
-
-    runEffect();
-  }, [getAvailableTextSnippets]);
-
-  // --------------------------------------------------
-
-  function toggleOpen() {
+  async function toggleOpen() {
     setIsRevealed(!isRevealed);
     setTextSnippetIdAndVersion([]);
     setErrorMessages([]);
+
+    if (!isRevealed && availableTextSnippets === null)
+      setAvailableTextSnippets(await getAvailableTextSnippets());
   }
 
   function handleChange(evt) {
@@ -95,16 +88,17 @@ function AttachTextSnippetCard() {
                 <option value="" disabled>
                   Choose a text
                 </option>
-                {availableTextSnippets.map((textSnippet) => {
-                  return (
-                    <option
-                      key={textSnippet.id}
-                      value={textSnippet.id + '|' + textSnippet.version}
-                    >
-                      {textSnippet.content}
-                    </option>
-                  );
-                })}
+                {availableTextSnippets &&
+                  availableTextSnippets.map((textSnippet) => {
+                    return (
+                      <option
+                        key={textSnippet.id}
+                        value={textSnippet.id + '|' + textSnippet.version}
+                      >
+                        {textSnippet.content}
+                      </option>
+                    );
+                  })}
               </Input>
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">
