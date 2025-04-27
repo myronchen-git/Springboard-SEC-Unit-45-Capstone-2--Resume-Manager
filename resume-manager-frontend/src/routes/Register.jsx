@@ -56,6 +56,10 @@ function Register() {
     navigate('/document');
   }
 
+  function handleCancel() {
+    navigate('/');
+  }
+
   // --------------------------------------------------
 
   return (
@@ -110,6 +114,9 @@ function Register() {
             ))}
             <Button color="light" type="submit">
               Submit
+            </Button>
+            <Button color="light" type="button" onClick={handleCancel}>
+              Cancel
             </Button>
           </Form>
         </CardBody>
