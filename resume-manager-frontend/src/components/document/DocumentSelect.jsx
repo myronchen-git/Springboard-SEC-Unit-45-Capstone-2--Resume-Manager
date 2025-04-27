@@ -32,23 +32,85 @@ import {
  *  used to cancel document selection.
  */
 function DocumentSelect({ documents, loadDocument, close }) {
-  const [documentId, setDocumentId] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [errorMessages, setErrorMessages] = useState([]);
 
   function handleChange(evt) {
     const { value } = evt.target;
-    setDocumentId(value);
+    setSelectedOption(value);
   }
 
   async function handleSubmit(evt) {
     evt.preventDefault();
 
     try {
-      await loadDocument(Number(documentId));
+      await loadDocument(Number(selectedOption));
     } catch (err) {
       setErrorMessages(err);
       return;
     }
+  }
+
+  // --------------------------------------------------
+
+  function DocumentOption({ document, selectedOption, handleChange }) {
+    return (
+      <FormGroup>
+        <Input
+          id={`DocumentSelect__input-doc-${document.id}`}
+          name="selected-document"
+          type="radio"
+          value={document.id}
+          checked={selectedOption == document.id}
+          required
+          onChange={handleChange}
+        />
+        <Label htmlFor={`DocumentSelect__input-doc-${document.id}`}>
+          <Card>
+            <CardBody>
+              <CardTitle>{document.documentName}</CardTitle>
+              <CardText>
+                Created on: {new Date(document.createdOn).toString()}
+                <br />
+                Last updated: {new Date(document.lastUpdated).toString()}
+                <br />
+                Master: {document.isMaster.toString()}
+                <br />
+                Template: {document.isTemplate.toString()}
+                <br />
+                Locked: {document.isLocked.toString()}
+                <br />
+              </CardText>
+            </CardBody>
+          </Card>
+        </Label>
+      </FormGroup>
+    );
+  }
+
+  function AddNewResumeOption({ selectedOption, handleChange }) {
+    // Ensure that there is no document with ID = 0.
+    return (
+      <FormGroup>
+        <Input
+          id={`DocumentSelect__input-doc-0`}
+          name="selected-document"
+          type="radio"
+          value="0"
+          checked={selectedOption == 0}
+          required
+          onChange={handleChange}
+        />
+        <Label htmlFor={`DocumentSelect__input-doc-0`}>
+          <Card>
+            <CardBody>
+              <CardTitle>New Resume</CardTitle>
+              <CardText>+</CardText>
+            </CardBody>
+          </Card>
+        </Label>
+      </FormGroup>
+    );
   }
 
   return (
@@ -61,55 +123,17 @@ function DocumentSelect({ documents, loadDocument, close }) {
       <Form className="DocumentSelect__form" onSubmit={handleSubmit}>
         <ModalBody>
           {documents.map((doc) => (
-            <FormGroup key={doc.id}>
-              <Input
-                id={`DocumentSelect__input-doc-${doc.id}`}
-                name="selected-document"
-                type="radio"
-                value={doc.id}
-                required
-                onChange={handleChange}
-              />
-              <Label htmlFor={`DocumentSelect__input-doc-${doc.id}`}>
-                <Card>
-                  <CardBody>
-                    <CardTitle>{doc.documentName}</CardTitle>
-                    <CardText>
-                      Created on: {new Date(doc.createdOn).toString()}
-                      <br />
-                      Last updated: {new Date(doc.lastUpdated).toString()}
-                      <br />
-                      Master: {doc.isMaster.toString()}
-                      <br />
-                      Template: {doc.isTemplate.toString()}
-                      <br />
-                      Locked: {doc.isLocked.toString()}
-                      <br />
-                    </CardText>
-                  </CardBody>
-                </Card>
-              </Label>
-            </FormGroup>
-          ))}
-          {/* Ensure that there is no document with ID = 0. */}
-          <FormGroup key="0">
-            <Input
-              id={`DocumentSelect__input-doc-0`}
-              name="selected-document"
-              type="radio"
-              value="0"
-              required
-              onChange={handleChange}
+            <DocumentOption
+              key={doc.id}
+              document={doc}
+              selectedOption={selectedOption}
+              handleChange={handleChange}
             />
-            <Label htmlFor={`DocumentSelect__input-doc-0`}>
-              <Card>
-                <CardBody>
-                  <CardTitle>New Resume</CardTitle>
-                  <CardText>+</CardText>
-                </CardBody>
-              </Card>
-            </Label>
-          </FormGroup>
+          ))}
+          <AddNewResumeOption
+            selectedOption={selectedOption}
+            handleChange={handleChange}
+          />
           {errorMessages.map((msg) => (
             <Alert key={msg} color="danger">
               {msg}
