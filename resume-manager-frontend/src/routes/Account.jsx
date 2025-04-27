@@ -23,6 +23,7 @@ function Account() {
   const initialFormData = {
     oldPassword: '',
     newPassword: '',
+    repeatedNewPassword: '',
   };
   const [formData, setFormData] = useState(initialFormData);
   const [errorMessages, setErrorMessages] = useState([]);
@@ -39,11 +40,19 @@ function Account() {
   async function handleSubmit(evt) {
     evt.preventDefault();
 
+    if (formData.newPassword !== formData.repeatedNewPassword) {
+      return setErrorMessages([
+        'New password and repeated new password do not match.',
+      ]);
+    }
+
+    const formDataCopy = { ...formData };
+    delete formDataCopy.repeatedNewPassword;
+
     try {
-      await updateAccount(formData);
+      await updateAccount(formDataCopy);
     } catch (err) {
-      setErrorMessages(err);
-      return;
+      return setErrorMessages(err);
     }
 
     navigate('/document');
@@ -65,7 +74,7 @@ function Account() {
                 id="Account__input-password"
                 type="password"
                 name="oldPassword"
-                value={formData.password}
+                value={formData.oldPassword}
                 required
                 onChange={handleChange}
               />
@@ -78,7 +87,20 @@ function Account() {
                 id="Account__input-password"
                 type="password"
                 name="newPassword"
-                value={formData.password}
+                value={formData.newPassword}
+                required
+                onChange={handleChange}
+              />
+            </FormGroup>
+            <FormGroup className="text-start">
+              <Label htmlFor="Account__input-repeated-new-password">
+                <b>Repeat New Password</b>
+              </Label>
+              <Input
+                id="Account__input-repeated-new-password"
+                type="password"
+                name="repeatedNewPassword"
+                value={formData.repeatedNewPassword}
                 required
                 onChange={handleChange}
               />

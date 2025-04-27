@@ -23,6 +23,7 @@ function Register() {
   const initialFormData = {
     username: '',
     password: '',
+    repeatedPassword: '',
   };
   const [formData, setFormData] = useState(initialFormData);
   const [errorMessages, setErrorMessages] = useState([]);
@@ -39,11 +40,17 @@ function Register() {
   async function handleSubmit(evt) {
     evt.preventDefault();
 
+    if (formData.password !== formData.repeatedPassword) {
+      return setErrorMessages(['Password and repeated password do not match.']);
+    }
+
+    const formDataCopy = { ...formData };
+    delete formDataCopy.repeatedPassword;
+
     try {
-      await registerUser(formData);
+      await registerUser(formDataCopy);
     } catch (err) {
-      setErrorMessages(err);
-      return;
+      return setErrorMessages(err);
     }
 
     navigate('/document');
@@ -79,6 +86,19 @@ function Register() {
                 type="password"
                 name="password"
                 value={formData.password}
+                required
+                onChange={handleChange}
+              />
+            </FormGroup>
+            <FormGroup className="text-start">
+              <Label htmlFor="Register__input-repeated-password">
+                <b>Repeat Password</b>
+              </Label>
+              <Input
+                id="Register__input-repeated-password"
+                type="password"
+                name="repeatedPassword"
+                value={formData.repeatedPassword}
                 required
                 onChange={handleChange}
               />
