@@ -25,7 +25,7 @@ import trashIcon from '../../assets/trash.svg';
  */
 function EducationCard({ item: education, idx }) {
   const [document, setDocument] = useContext(DocumentContext);
-  const [isEducationFormOpen, setIsEducationFormOpen] = useState(false);
+  const [isEditEducationFormOpen, setIsEditEducationFormOpen] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
@@ -59,7 +59,7 @@ function EducationCard({ item: education, idx }) {
     // Update document to re-render.
     setDocument(documentClone);
 
-    setIsEducationFormOpen(false);
+    setIsEditEducationFormOpen(false);
   }
 
   /**
@@ -125,7 +125,9 @@ function EducationCard({ item: education, idx }) {
                   src={pencilIcon}
                   alt="edit icon"
                   onClick={() =>
-                    setIsEducationFormOpen((previousState) => !previousState)
+                    setIsEditEducationFormOpen(
+                      (previousState) => !previousState
+                    )
                   }
                 />
               )}
@@ -137,7 +139,7 @@ function EducationCard({ item: education, idx }) {
               />
             </CardHeader>
             <CardBody>
-              {isEducationFormOpen ? (
+              {isEditEducationFormOpen ? (
                 <EducationForm
                   initialFormData={initialFormData}
                   processSubmission={editEducation}

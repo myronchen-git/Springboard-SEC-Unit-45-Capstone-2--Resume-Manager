@@ -16,7 +16,7 @@ import trashIcon from '../../assets/trash.svg';
  */
 function AddEducationCard() {
   const [document, setDocument] = useContext(DocumentContext);
-  const [isEducationFormOpen, setIsEducationFormOpen] = useState(false);
+  const [isAddEducationFormOpen, setIsAddEducationFormOpen] = useState(false);
 
   // --------------------------------------------------
 
@@ -39,7 +39,7 @@ function AddEducationCard() {
 
     setDocument(updatedDocument);
 
-    setIsEducationFormOpen(false);
+    setIsAddEducationFormOpen(false);
   }
 
   // --------------------------------------------------
@@ -51,13 +51,13 @@ function AddEducationCard() {
 
   return (
     <Card className="AddEducationCard">
-      {isEducationFormOpen ? (
+      {isAddEducationFormOpen ? (
         <>
           <CardHeader className="text-end">
             <img
               src={trashIcon}
               alt="trash icon"
-              onClick={() => setIsEducationFormOpen(false)}
+              onClick={() => setIsAddEducationFormOpen(false)}
             />
           </CardHeader>
           <CardBody>
@@ -68,7 +68,7 @@ function AddEducationCard() {
           </CardBody>
         </>
       ) : (
-        <CardBody onClick={() => setIsEducationFormOpen(true)}>
+        <CardBody onClick={() => setIsAddEducationFormOpen(true)}>
           Add Education
           <br />+
         </CardBody>
