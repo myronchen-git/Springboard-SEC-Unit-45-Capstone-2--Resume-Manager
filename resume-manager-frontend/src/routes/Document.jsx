@@ -205,7 +205,8 @@ function Document() {
         )}
         {isNewDocumentFormOpen && (
           <DocumentForm
-            initialFormData={{ documentName: '', isTemplate: false }}
+            // initialFormData={{ documentName: '', isTemplate: false }}
+            initialFormData={{ documentName: '' }}
             submitFunction={createDocument}
             submitText="Create"
             close={() => setIsNewDocumentFormOpen(false)}
@@ -213,15 +214,16 @@ function Document() {
         )}
         {isEditDocumentFormOpen && (
           <DocumentForm
-            initialFormData={
-              document.isMaster
-                ? { documentName: document.documentName }
-                : {
-                    documentName: document.documentName,
-                    isTemplate: document.isTemplate,
-                    isLocked: document.isLocked,
-                  }
-            }
+            // initialFormData={
+            //   document.isMaster
+            //     ? { documentName: document.documentName }
+            //     : {
+            //         documentName: document.documentName,
+            //         isTemplate: document.isTemplate,
+            //         isLocked: document.isLocked,
+            //       }
+            // }
+            initialFormData={{ documentName: document.documentName }}
             submitFunction={editDocument}
             submitText="Edit"
             close={() => setIsEditDocumentFormOpen(false)}
