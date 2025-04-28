@@ -111,6 +111,42 @@ function ExperienceCard({ item: experience, idx }) {
   }
 
   /**
+   * Adds a text snippet to the end of the bullets Array of this experience in
+   * the document state.
+   *
+   * @param {Object} textSnippet - The text snippet to add to this experience's
+   *  bullets.
+   */
+  const addTextSnippetToDocumentState = useCallback(
+    (textSnippet) => {
+      // A shallow copy is done as a quicker way of updating the document,
+      // instead of deep copying
+      const documentClone = { ...document };
+
+      // Create new bullets Array, with existing text snippets if they exist.
+      // Note that a new Array is used to indicate to other React components
+      // that there has been a change.
+      const bullets = experience.bullets
+        ? [...experience.bullets, textSnippet]
+        : [textSnippet];
+
+      // Create clone of experience and set or override bullets.  Cloning
+      // experience is necessary, because it's a prop to ExperienceCard.
+      const experienceClone = { ...experience };
+      experienceClone.bullets = bullets;
+
+      // Replace old experience in list with clone.
+      const experienceIdx = documentClone.experiences.findIndex(
+        (exp) => exp.id == experience.id
+      );
+      documentClone.experiences[experienceIdx] = experienceClone;
+
+      setDocument(documentClone);
+    },
+    [document, setDocument, experience]
+  );
+
+  /**
    * Sends a request to the back-end to create a new text snippet for this
    * specific experience and document, and updates the document Object / state.
    *
@@ -126,20 +162,9 @@ function ExperienceCard({ item: experience, idx }) {
         formData
       );
 
-      // Add text snippet to local version of experience. This mutates the
-      // experience Object to save from having to find the experience again.
-      // This is possible, because a shallow copy of the document will be
-      // performed.  Note that a new Array is set for bullets to indicate to
-      // other React components that there has been a change.
-      experience.bullets
-        ? (experience.bullets = [...experience.bullets, textSnippet])
-        : (experience.bullets = [textSnippet]);
-
-      // Update document with a clone to re-render. A shallow copy is done as a
-      // quicker way of updating the document, instead of deep copying.
-      setDocument({ ...document });
+      addTextSnippetToDocumentState(textSnippet);
     },
-    [document, setDocument, experience]
+    [document, experience, addTextSnippetToDocumentState]
   );
 
   /**
@@ -164,20 +189,9 @@ function ExperienceCard({ item: experience, idx }) {
         version
       );
 
-      // Add text snippet to local version of experience. This mutates the
-      // experience Object to save from having to find the experience again.
-      // This is possible, because a shallow copy of the document will be
-      // performed.  Note that a new Array is set for bullets to indicate to
-      // other React components that there has been a change.
-      experience.bullets
-        ? (experience.bullets = [...experience.bullets, textSnippetToAttach])
-        : (experience.bullets = [textSnippetToAttach]);
-
-      // Update document with a clone to re-render. A shallow copy is done as a
-      // quicker way of updating the document, instead of deep copying.
-      setDocument({ ...document });
+      addTextSnippetToDocumentState(textSnippetToAttach);
     },
-    [document, experience, setDocument]
+    [document, experience, addTextSnippetToDocumentState]
   );
 
   /**
