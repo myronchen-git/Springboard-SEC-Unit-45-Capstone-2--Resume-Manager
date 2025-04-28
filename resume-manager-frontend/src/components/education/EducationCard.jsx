@@ -4,9 +4,12 @@ import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
-import EducationForm from './EducationForm.jsx';
+import GenericForm from '../GenericForm.jsx';
 
-import { EDUCATION_FIELDS } from '../../commonData.js';
+import {
+  EDUCATION_FIELDS,
+  EDUCATION_OPTIONAL_FIELDS_START_INDEX,
+} from '../../commonData.js';
 
 import pencilIcon from '../../assets/pencil.svg';
 import dotsIcon from '../../assets/three-dots-vertical.svg';
@@ -140,7 +143,11 @@ function EducationCard({ item: education, idx }) {
             </CardHeader>
             <CardBody>
               {isEditEducationFormOpen ? (
-                <EducationForm
+                <GenericForm
+                  fields={EDUCATION_FIELDS}
+                  optionalFieldsStartIndex={
+                    EDUCATION_OPTIONAL_FIELDS_START_INDEX
+                  }
                   initialFormData={initialFormData}
                   processSubmission={editEducation}
                 />

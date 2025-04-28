@@ -3,9 +3,12 @@ import { Card, CardBody, CardHeader } from 'reactstrap';
 
 import { DocumentContext } from '../../contexts.jsx';
 import { addNewSectionItem } from '../../util/specificSectionsFuncs.js';
-import EducationForm from './EducationForm.jsx';
+import GenericForm from '../GenericForm.jsx';
 
-import { EDUCATION_FIELDS } from '../../commonData.js';
+import {
+  EDUCATION_FIELDS,
+  EDUCATION_OPTIONAL_FIELDS_START_INDEX,
+} from '../../commonData.js';
 
 import trashIcon from '../../assets/trash.svg';
 
@@ -61,7 +64,9 @@ function AddEducationCard() {
             />
           </CardHeader>
           <CardBody>
-            <EducationForm
+            <GenericForm
+              fields={EDUCATION_FIELDS}
+              optionalFieldsStartIndex={EDUCATION_OPTIONAL_FIELDS_START_INDEX}
               initialFormData={initialFormData}
               processSubmission={addEducation}
             />
