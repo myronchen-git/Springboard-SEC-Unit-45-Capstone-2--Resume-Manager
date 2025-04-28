@@ -3,9 +3,8 @@ import { Alert, Button } from 'reactstrap';
 
 import ResumeManagerApi from '../api';
 import ContactInfoCard from '../components/contact_info/ContactInfoCard.jsx';
+import DocumentForm from '../components/document/DocumentForm.jsx';
 import DocumentSelect from '../components/document/DocumentSelect';
-import EditDocumentForm from '../components/document/EditDocumentForm.jsx';
-import NewDocumentForm from '../components/document/NewDocumentForm';
 import SectionsList from '../components/general_section/SectionsList.jsx';
 import { DocumentContext, UserContext } from '../contexts.jsx';
 
@@ -205,14 +204,26 @@ function Document() {
           />
         )}
         {isNewDocumentFormOpen && (
-          <NewDocumentForm
-            createDocument={createDocument}
+          <DocumentForm
+            initialFormData={{ documentName: '', isTemplate: false }}
+            submitFunction={createDocument}
+            submitText="Create"
             close={() => setIsNewDocumentFormOpen(false)}
           />
         )}
         {isEditDocumentFormOpen && (
-          <EditDocumentForm
-            editDocument={editDocument}
+          <DocumentForm
+            initialFormData={
+              document.isMaster
+                ? { documentName: document.documentName }
+                : {
+                    documentName: document.documentName,
+                    isTemplate: document.isTemplate,
+                    isLocked: document.isLocked,
+                  }
+            }
+            submitFunction={editDocument}
+            submitText="Edit"
             close={() => setIsEditDocumentFormOpen(false)}
           />
         )}
