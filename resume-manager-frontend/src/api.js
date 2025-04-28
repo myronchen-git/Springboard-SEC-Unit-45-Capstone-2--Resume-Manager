@@ -277,7 +277,7 @@ class ResumeManagerApi {
    * @returns {Object} The document_x_section Object, which contains document
    *  ID, section ID, and position of section within document.
    */
-  static async addSection(documentId, sectionId) {
+  static async attachSectionToDocument(documentId, sectionId) {
     const res = await this.request(
       `users/${this.#username}/documents/${documentId}/sections/${sectionId}`,
       {},

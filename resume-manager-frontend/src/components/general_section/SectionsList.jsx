@@ -1,9 +1,9 @@
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useRef } from 'react';
 
 import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
-import AddSectionCard from './AddSectionCard.jsx';
+import AttachSectionCard from './AttachSectionCard.jsx';
 import SectionCard from './SectionCard.jsx';
 
 import { SECTION_ID_TO_DATABASE_NAME } from '../../commonData.js';
@@ -16,7 +16,6 @@ import { SECTION_ID_TO_DATABASE_NAME } from '../../commonData.js';
 function SectionsList() {
   const [document, setDocument] = useContext(DocumentContext);
 
-  const [availableSections, setAvailableSections] = useState([]);
   // Holds the timeout IDs of [sections, educations, experiences].
   const repositionTimeoutIdsRef = useRef(new Array(3).fill(null));
   // Holds old lists of [sections, educations, experiences].
@@ -28,42 +27,26 @@ function SectionsList() {
 
   // --------------------------------------------------
 
-  useEffect(() => {
-    async function runEffect() {
-      setAvailableSections(await ResumeManagerApi.getSections());
-    }
-
-    runEffect();
-  }, []);
-
-  // --------------------------------------------------
-
   /**
-   * Adds a new section to the document, both in the database and in the
-   * front-end.  The section is created locally in the front-end to avoid making
-   * a network call, though this could cause desync issues.
+   * Attaches a new section to the document, both in the database and in the
+   * front-end.
    *
-   * @param {Number} sectionId - ID of the section to add.
+   * @param {Number} sectionId - ID of the section to attach.
+   * @param {Object} sectionToAttach - The section Object to attach to the
+   *  document state.
    */
-  async function addSection(sectionId) {
-    await ResumeManagerApi.addSection(document.id, sectionId);
+  async function attachSection(sectionId, sectionToAttach) {
+    await ResumeManagerApi.attachSectionToDocument(document.id, sectionId);
 
     // Clone document so that React sees the document state has been modified.
-    const documentClone = structuredClone(document);
-
-    // Create an Object for the new section, so that it can be inserted into the
-    // document Object/state.
-    const sectionName = availableSections.find(
-      (section) => section.id === sectionId
-    ).sectionName;
-    const newSection = { id: sectionId, sectionName };
+    const documentClone = { ...document };
 
     // Add the new section Object to document.sections if it exists, otherwise
     // create a new sections property.
     if (documentClone.sections) {
-      documentClone.sections.push(newSection);
+      documentClone.sections = [...documentClone.sections, sectionToAttach];
     } else {
-      documentClone.sections = [newSection];
+      documentClone.sections = [sectionToAttach];
     }
 
     setDocument(documentClone);
@@ -258,10 +241,7 @@ function SectionsList() {
           )}
         </Droppable>
       </DragDropContext>
-      <AddSectionCard
-        availableSections={availableSections}
-        addSection={addSection}
-      />
+      <AttachSectionCard attachSection={attachSection} />
     </article>
   );
 }

@@ -9,34 +9,35 @@ import {
   Input,
 } from 'reactstrap';
 
+import ResumeManagerApi from '../../api.js';
+
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
 
 /**
- * Renders a card, that will be listed after all other sections, to allow adding
- * a predefined section to a document.
+ * Renders a card, that will be listed after all other sections, to allow
+ * attaching a predefined section to a document.
  *
  * @param {Object} props - React component properties.
- * @param {Object[]} props.availableSections - A list of section Objects,
- *  representing the available sections that can be added to a document.
- * @param {Number} props.availableSections[].id - ID of the section.
- * @param {String} props.availableSections[].sectionName - Name of the section,
- *  which can be used to display to users.
- * @param {Function} props.addSection - Accepts a section ID and adds the
- *  affiliated section to the document.
+ * @param {Function} props.attachSection - Accepts a section ID and a section
+ *  Object and attaches the affiliated section to the document.
  */
-function AddSectionCard({ availableSections, addSection }) {
+function AttachSectionCard({ attachSection }) {
   const [isRevealed, setIsRevealed] = useState(false);
   const [sectionId, setSectionId] = useState(null);
+  const [availableSections, setAvailableSections] = useState(null);
   const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
-  function toggleOpen() {
+  async function toggleOpen() {
     setIsRevealed(!isRevealed);
     setSectionId(null);
     setErrorMessages([]);
+
+    if (!isRevealed && availableSections === null)
+      setAvailableSections(await ResumeManagerApi.getSections());
   }
 
   function handleChange(evt) {
@@ -48,8 +49,14 @@ function AddSectionCard({ availableSections, addSection }) {
     evt.preventDefault();
 
     if (sectionId) {
+      const convertedSectionId = Number(sectionId);
+
       try {
-        await addSection(Number(sectionId));
+        const sectionToAttach = availableSections.find(
+          (section) => section.id === convertedSectionId
+        );
+
+        await attachSection(convertedSectionId, sectionToAttach);
       } catch (err) {
         setErrorMessages(err);
         return;
@@ -79,13 +86,14 @@ function AddSectionCard({ availableSections, addSection }) {
                 <option value="" disabled>
                   Choose a section
                 </option>
-                {availableSections.map((section) => {
-                  return (
-                    <option key={section.id} value={section.id}>
-                      {section.sectionName}
-                    </option>
-                  );
-                })}
+                {availableSections &&
+                  availableSections.map((section) => {
+                    return (
+                      <option key={section.id} value={section.id}>
+                        {section.sectionName}
+                      </option>
+                    );
+                  })}
               </Input>
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">
@@ -100,7 +108,7 @@ function AddSectionCard({ availableSections, addSection }) {
         </>
       ) : (
         <CardBody onClick={toggleOpen}>
-          Add Section
+          Attach Section
           <br />+
         </CardBody>
       )}
@@ -110,4 +118,4 @@ function AddSectionCard({ availableSections, addSection }) {
 
 // ==================================================
 
-export default AddSectionCard;
+export default AttachSectionCard;
