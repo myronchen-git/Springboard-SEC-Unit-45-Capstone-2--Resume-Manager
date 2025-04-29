@@ -12,6 +12,8 @@ import {
 
 import pencilIcon from '../../assets/pencil.svg';
 
+import './ContactInfoCard.css';
+
 // ==================================================
 
 /**
@@ -56,7 +58,7 @@ function ContactInfoCard() {
 
   return (
     <Card className="ContactInfoCard" tag="article">
-      <CardHeader className="text-end">
+      <CardHeader className="text-end" tag="header">
         <img
           src={pencilIcon}
           alt="edit icon"
@@ -64,7 +66,7 @@ function ContactInfoCard() {
         />
       </CardHeader>
       {isEditing ? (
-        <CardBody>
+        <CardBody tag="section">
           <GenericForm
             fields={CONTACT_INFO_FIELDS}
             optionalFieldsStartIndex={CONTACT_INFO_FIELDS_START_INDEX}
@@ -73,7 +75,7 @@ function ContactInfoCard() {
           />
         </CardBody>
       ) : (
-        <CardBody>
+        <CardBody tag="section">
           <h2 className="ContactInfoCard__name">
             {document?.contactInfo?.fullName || 'Input Contact Info'}
           </h2>
@@ -83,12 +85,12 @@ function ContactInfoCard() {
                 ([infoName, infoValue]) => {
                   if (infoName !== 'fullName') {
                     return (
-                      <div
+                      <span
                         key={infoName}
                         className="ContactInfoCard__contact-info-piece"
                       >
                         {infoValue}
-                      </div>
+                      </span>
                     );
                   }
                 }

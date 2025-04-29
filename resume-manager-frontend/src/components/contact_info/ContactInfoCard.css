@@ -1,0 +1,4 @@
+.ContactInfoCard__contact-info
+  .ContactInfoCard__contact-info-piece:not(:last-child)::after {
+  content: " • ";
+}
