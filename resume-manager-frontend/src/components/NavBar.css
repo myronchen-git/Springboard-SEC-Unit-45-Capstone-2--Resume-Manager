@@ -1,0 +1,10 @@
+.NavBar__menu__item {
+  margin: 0.25em 0;
+}
+
+.NavBar__menu a.active {
+  pointer-events: none;
+  color: gray;
+  cursor: default;
+  text-decoration: none;
+}
