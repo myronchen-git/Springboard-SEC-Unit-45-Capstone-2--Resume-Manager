@@ -10,8 +10,8 @@ import {
 import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 
+import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
-import dotsIcon from '../../assets/three-dots-vertical.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -115,36 +115,40 @@ function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
     >
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps}>
-          <Card className="TextSnippetCard">
-            <CardHeader className="text-end">
+          <Card className="TextSnippetCard" tag="article">
+            <CardHeader tag="header">
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">
                   {msg}
                 </Alert>
               ))}
-              {document.isMaster && (
+              <span></span>
+              <span>
                 <img
-                  src={pencilIcon}
-                  alt="edit icon"
-                  onClick={() =>
-                    setIsEditTextSnippetFormOpen(
-                      (previousState) => !previousState
-                    )
-                  }
+                  src={dotsIcon}
+                  alt="reposition icon"
+                  {...provided.dragHandleProps}
                 />
-              )}
-              <img
-                src={trashIcon}
-                alt="trash icon"
-                onClick={deleteTextSnippet}
-              />
-              <img
-                src={dotsIcon}
-                alt="reposition icon"
-                {...provided.dragHandleProps}
-              />
+              </span>
+              <span>
+                {document.isMaster && (
+                  <div
+                    className="clickable-icon"
+                    onClick={() =>
+                      setIsEditTextSnippetFormOpen(
+                        (previousState) => !previousState
+                      )
+                    }
+                  >
+                    <img src={pencilIcon} alt="edit icon" />
+                  </div>
+                )}
+                <div className="clickable-icon" onClick={deleteTextSnippet}>
+                  <img src={trashIcon} alt="trash icon" />
+                </div>
+              </span>
             </CardHeader>
-            <CardBody className="text-start">
+            <CardBody className="text-start" tag="section">
               {isEditTextSnippetFormOpen ? (
                 <GenericForm
                   fields={TEXT_SNIPPET_FIELDS}

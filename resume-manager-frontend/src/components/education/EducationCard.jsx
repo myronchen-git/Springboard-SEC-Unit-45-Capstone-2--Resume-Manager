@@ -11,8 +11,8 @@ import {
   EDUCATION_OPTIONAL_FIELDS_START_INDEX,
 } from '../../commonData.js';
 
+import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
-import dotsIcon from '../../assets/three-dots-vertical.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -116,32 +116,40 @@ function EducationCard({ item: education, idx }) {
     <Draggable draggableId={'education-' + education.id} index={idx}>
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps}>
-          <Card className="EducationCard">
-            <CardHeader className="text-end">
+          <Card className="EducationCard" tag="article">
+            <CardHeader tag="header">
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">
                   {msg}
                 </Alert>
               ))}
-              {document.isMaster && (
+              <span></span>
+              <span>
                 <img
-                  src={pencilIcon}
-                  alt="edit icon"
-                  onClick={() =>
-                    setIsEditEducationFormOpen(
-                      (previousState) => !previousState
-                    )
-                  }
+                  src={dotsIcon}
+                  alt="reposition icon"
+                  {...provided.dragHandleProps}
                 />
-              )}
-              <img src={trashIcon} alt="trash icon" onClick={deleteEducation} />
-              <img
-                src={dotsIcon}
-                alt="reposition icon"
-                {...provided.dragHandleProps}
-              />
+              </span>
+              <span>
+                {document.isMaster && (
+                  <div
+                    className="clickable-icon"
+                    onClick={() =>
+                      setIsEditEducationFormOpen(
+                        (previousState) => !previousState
+                      )
+                    }
+                  >
+                    <img src={pencilIcon} alt="edit icon" />
+                  </div>
+                )}
+                <div className="clickable-icon" onClick={deleteEducation}>
+                  <img src={trashIcon} alt="trash icon" />
+                </div>
+              </span>
             </CardHeader>
-            <CardBody>
+            <CardBody tag="section">
               {isEditEducationFormOpen ? (
                 <GenericForm
                   fields={EDUCATION_FIELDS}

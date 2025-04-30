@@ -11,6 +11,8 @@ import { DocumentContext, UserContext } from '../contexts.jsx';
 import pencilIcon from '../assets/pencil.svg';
 import trashIcon from '../assets/trash.svg';
 
+import './Document.css';
+
 // ==================================================
 
 /**

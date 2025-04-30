@@ -58,12 +58,17 @@ function ContactInfoCard() {
 
   return (
     <Card className="ContactInfoCard" tag="article">
-      <CardHeader className="text-end" tag="header">
-        <img
-          src={pencilIcon}
-          alt="edit icon"
-          onClick={() => setIsEditing((previousState) => !previousState)}
-        />
+      <CardHeader tag="header">
+        <span></span>
+        <span></span>
+        <span>
+          <div
+            className="clickable-icon"
+            onClick={() => setIsEditing((previousState) => !previousState)}
+          >
+            <img src={pencilIcon} alt="edit icon" />
+          </div>
+        </span>
       </CardHeader>
       {isEditing ? (
         <CardBody tag="section">

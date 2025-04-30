@@ -6,7 +6,7 @@ import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
 import SectionItemsList from './SectionItemsList.jsx';
 
-import dotsIcon from '../../assets/three-dots-vertical.svg';
+import dotsIcon from '../../assets/grip-horizontal.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -60,21 +60,30 @@ function SectionCard({ section, idx }) {
     <Draggable draggableId={'section-' + section.id} index={idx}>
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps}>
-          <Card className="SectionCard text-center">
-            <CardHeader className="text-end">
+          <Card className="SectionCard text-center" tag="article">
+            <CardHeader tag="header">
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">
                   {msg}
                 </Alert>
               ))}
-              <img src={trashIcon} alt="trash icon" onClick={deleteSection} />
-              <img
-                src={dotsIcon}
-                alt="reposition icon"
-                {...provided.dragHandleProps}
-              />
+              <span></span>
+              <span>
+                <img
+                  src={dotsIcon}
+                  alt="reposition icon"
+                  viewBox="0 0 50 100"
+                  preserveAspectRatio="none"
+                  {...provided.dragHandleProps}
+                />
+              </span>
+              <span>
+                <div className="clickable-icon" onClick={deleteSection}>
+                  <img src={trashIcon} alt="trash icon" />
+                </div>
+              </span>
             </CardHeader>
-            <CardBody>
+            <CardBody tag="section">
               <CardTitle>{section.sectionName}</CardTitle>
               <SectionItemsList sectionId={section.id} />
             </CardBody>

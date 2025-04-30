@@ -4,3 +4,16 @@
   padding: 2rem;
   text-align: center;
 }
+
+.clickable-icon {
+  display: flex;
+  height: 2em;
+  width: 2em;
+  padding: 0.5em;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.clickable-icon:hover {
+  background-color: Gainsboro;
+}

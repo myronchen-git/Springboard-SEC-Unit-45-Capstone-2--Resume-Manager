@@ -52,17 +52,22 @@ function AddExperienceCard() {
   }, {});
 
   return (
-    <Card className="AddExperienceCard">
+    <Card className="AddExperienceCard" tag="article">
       {isAddExperienceFormOpen ? (
         <>
-          <CardHeader className="text-end">
-            <img
-              src={trashIcon}
-              alt="trash icon"
-              onClick={() => setIsAddExperienceFormOpen(false)}
-            />
+          <CardHeader tag="header">
+            <span></span>
+            <span></span>
+            <span>
+              <div
+                className="clickable-icon"
+                onClick={() => setIsAddExperienceFormOpen(false)}
+              >
+                <img src={trashIcon} alt="trash icon" />
+              </div>
+            </span>
           </CardHeader>
-          <CardBody>
+          <CardBody tag="section">
             <GenericForm
               fields={EXPERIENCE_FIELDS}
               optionalFieldsStartIndex={EXPERIENCE_OPTIONAL_FIELDS_START_INDEX}
@@ -72,7 +77,10 @@ function AddExperienceCard() {
           </CardBody>
         </>
       ) : (
-        <CardBody onClick={() => setIsAddExperienceFormOpen(true)}>
+        <CardBody
+          tag="section"
+          onClick={() => setIsAddExperienceFormOpen(true)}
+        >
           Add Experience
           <br />+
         </CardBody>

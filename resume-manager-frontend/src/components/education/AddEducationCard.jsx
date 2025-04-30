@@ -53,17 +53,22 @@ function AddEducationCard() {
   }, {});
 
   return (
-    <Card className="AddEducationCard">
+    <Card className="AddEducationCard" tag="article">
       {isAddEducationFormOpen ? (
         <>
-          <CardHeader className="text-end">
-            <img
-              src={trashIcon}
-              alt="trash icon"
-              onClick={() => setIsAddEducationFormOpen(false)}
-            />
+          <CardHeader tag="header">
+            <span></span>
+            <span></span>
+            <span>
+              <div
+                className="clickable-icon"
+                onClick={() => setIsAddEducationFormOpen(false)}
+              >
+                <img src={trashIcon} alt="trash icon" />
+              </div>
+            </span>
           </CardHeader>
-          <CardBody>
+          <CardBody tag="section">
             <GenericForm
               fields={EDUCATION_FIELDS}
               optionalFieldsStartIndex={EDUCATION_OPTIONAL_FIELDS_START_INDEX}
@@ -73,7 +78,7 @@ function AddEducationCard() {
           </CardBody>
         </>
       ) : (
-        <CardBody onClick={() => setIsAddEducationFormOpen(true)}>
+        <CardBody tag="section" onClick={() => setIsAddEducationFormOpen(true)}>
           Add Education
           <br />+
         </CardBody>

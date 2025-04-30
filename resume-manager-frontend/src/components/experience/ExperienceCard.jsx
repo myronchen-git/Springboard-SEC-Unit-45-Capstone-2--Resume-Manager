@@ -11,8 +11,8 @@ import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 import TextSnippetsList from '../text_snippet/TextSnippetsList.jsx';
 
+import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
-import dotsIcon from '../../assets/three-dots-vertical.svg';
 import trashIcon from '../../assets/trash.svg';
 
 // ==================================================
@@ -320,36 +320,40 @@ function ExperienceCard({ item: experience, idx }) {
     <Draggable draggableId={'experience-' + experience.id} index={idx}>
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps}>
-          <Card className="ExperienceCard">
-            <CardHeader className="text-end">
+          <Card className="ExperienceCard" tag="article">
+            <CardHeader tag="header">
               {errorMessages.map((msg) => (
                 <Alert key={msg} color="danger">
                   {msg}
                 </Alert>
               ))}
-              {document.isMaster && (
+              <span></span>
+              <span>
                 <img
-                  src={pencilIcon}
-                  alt="edit icon"
-                  onClick={() =>
-                    setIsEditExperienceFormOpen(
-                      (previousState) => !previousState
-                    )
-                  }
+                  src={dotsIcon}
+                  alt="reposition icon"
+                  {...provided.dragHandleProps}
                 />
-              )}
-              <img
-                src={trashIcon}
-                alt="trash icon"
-                onClick={deleteExperience}
-              />
-              <img
-                src={dotsIcon}
-                alt="reposition icon"
-                {...provided.dragHandleProps}
-              />
+              </span>
+              <span>
+                {document.isMaster && (
+                  <div
+                    className="clickable-icon"
+                    onClick={() =>
+                      setIsEditExperienceFormOpen(
+                        (previousState) => !previousState
+                      )
+                    }
+                  >
+                    <img src={pencilIcon} alt="edit icon" />
+                  </div>
+                )}
+                <div className="clickable-icon" onClick={deleteExperience}>
+                  <img src={trashIcon} alt="trash icon" />
+                </div>
+              </span>
             </CardHeader>
-            <CardBody>
+            <CardBody tag="section">
               {isEditExperienceFormOpen ? (
                 <GenericForm
                   fields={EXPERIENCE_FIELDS}

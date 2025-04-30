@@ -71,13 +71,19 @@ function AttachEducationCard() {
   // --------------------------------------------------
 
   return (
-    <Card>
+    <Card tag="article">
       {isRevealed ? (
         <>
-          <CardHeader className="text-end">
-            <img src={trashIcon} alt="trash icon" onClick={toggleOpen} />
+          <CardHeader tag="header">
+            <span></span>
+            <span></span>
+            <span>
+              <div className="clickable-icon" onClick={toggleOpen}>
+                <img src={trashIcon} alt="trash icon" />
+              </div>
+            </span>
           </CardHeader>
-          <CardBody>
+          <CardBody tag="section">
             <Form onSubmit={handleSubmit}>
               <Input
                 type="select"
@@ -109,7 +115,7 @@ function AttachEducationCard() {
           </CardBody>
         </>
       ) : (
-        <CardBody onClick={toggleOpen}>
+        <CardBody tag="section" onClick={toggleOpen}>
           Attach Education
           <br />+
         </CardBody>

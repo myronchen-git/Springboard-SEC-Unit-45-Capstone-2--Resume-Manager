@@ -48,17 +48,22 @@ function AddTextSnippetCard() {
   initialFormData.type = 'plain';
 
   return (
-    <Card className="AddTextSnippetCard">
+    <Card className="AddTextSnippetCard" tag="article">
       {isAddTextSnippetFormOpen ? (
         <>
-          <CardHeader className="text-end">
-            <img
-              src={trashIcon}
-              alt="trash icon"
-              onClick={() => setIsAddTextSnippetFormOpen(false)}
-            />
+          <CardHeader tag="header">
+            <span></span>
+            <span></span>
+            <span>
+              <div
+                className="clickable-icon"
+                onClick={() => setIsAddTextSnippetFormOpen(false)}
+              >
+                <img src={trashIcon} alt="trash icon" />
+              </div>
+            </span>
           </CardHeader>
-          <CardBody>
+          <CardBody tag="section">
             <GenericForm
               fields={TEXT_SNIPPET_FIELDS}
               optionalFieldsStartIndex={
@@ -70,7 +75,10 @@ function AddTextSnippetCard() {
           </CardBody>
         </>
       ) : (
-        <CardBody onClick={() => setIsAddTextSnippetFormOpen(true)}>
+        <CardBody
+          tag="section"
+          onClick={() => setIsAddTextSnippetFormOpen(true)}
+        >
           Add Text
           <br />+
         </CardBody>
