@@ -80,9 +80,7 @@ function App() {
 
   return (
     <UserContext.Provider value={userContextValues}>
-      <div className="App">
-        <RoutesList />
-      </div>
+      <RoutesList />
     </UserContext.Provider>
   );
 }

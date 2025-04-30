@@ -1,0 +1,17 @@
+#root .btn-primary {
+  background-color: lightblue;
+  border-color: lightblue;
+  color: black;
+}
+
+#root .btn-primary:hover {
+  background-color: skyblue;
+  border-color: #76c7e8;
+  color: black;
+}
+
+#root .btn-primary:active {
+  background-color: #76c7e8;
+  border-color: #65c0e5;
+  color: black;
+}

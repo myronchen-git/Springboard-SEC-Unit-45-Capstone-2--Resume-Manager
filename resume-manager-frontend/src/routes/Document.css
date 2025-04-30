@@ -1,3 +1,15 @@
+.Document__page {
+  width: 50em;
+  margin: 1em;
+  padding: 1.5em;
+
+  background-color: white;
+}
+
+.Document__toolbar > button:not(:last-child) {
+  margin-right: 1em;
+}
+
 #Document {
   display: flex;
   flex-direction: column;

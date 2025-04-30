@@ -180,19 +180,24 @@ function Document() {
   return (
     <DocumentContext.Provider value={[document, setDocument]}>
       <main id="Document">
-        <Button onClick={() => setIsDocumentSelectOpen(true)}>
-          Select Document
-        </Button>
-        {document && (
-          <Button onClick={() => setIsEditDocumentFormOpen(true)}>
-            <img src={pencilIcon} alt="edit icon" />
+        <header className="Document__toolbar">
+          <Button color="primary" onClick={() => setIsDocumentSelectOpen(true)}>
+            Select Document
           </Button>
-        )}
-        {document && !document.isMaster && (
-          <Button onClick={deleteDocument}>
-            <img src={trashIcon} alt="trash icon" />
-          </Button>
-        )}
+          {document && (
+            <Button
+              color="primary"
+              onClick={() => setIsEditDocumentFormOpen(true)}
+            >
+              <img src={pencilIcon} alt="edit icon" />
+            </Button>
+          )}
+          {document && !document.isMaster && (
+            <Button onClick={deleteDocument}>
+              <img src={trashIcon} alt="trash icon" />
+            </Button>
+          )}
+        </header>
         {errorMessages.map((msg) => (
           <Alert key={msg} color="danger">
             {msg}
@@ -232,7 +237,7 @@ function Document() {
           />
         )}
         {document && (
-          <article>
+          <article className="Document__page shadow">
             <ContactInfoCard />
             <SectionsList />
           </article>

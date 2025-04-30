@@ -1,17 +1,19 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%;
   padding: 2rem;
+
   text-align: center;
 }
 
 .clickable-icon {
-  display: flex;
   height: 2em;
   width: 2em;
   padding: 0.5em;
-  cursor: pointer;
   border-radius: 50%;
+
+  display: flex;
+
+  cursor: pointer;
 }
 
 .clickable-icon:hover {
