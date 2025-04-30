@@ -3,7 +3,6 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
   Button,
   Nav,
-  Navbar,
   NavItem,
   Offcanvas,
   OffcanvasBody,
@@ -28,18 +27,15 @@ function NavBar() {
 
   return (
     <>
-      <Navbar className="NavBar" fixed="top" light>
-        {!isOpen && (
-          <Button
-            className="NavBar__menu-button shadow-sm"
-            color="light"
-            onClick={toggleNavbar}
-            style={{ backgroundColor: 'lightblue' }}
-          >
-            ☰ Menu
-          </Button>
-        )}
-      </Navbar>
+      {!isOpen && (
+        <Button
+          className="NavBar__menu-button btn-primary shadow-sm"
+          color="light"
+          onClick={toggleNavbar}
+        >
+          ☰ Menu
+        </Button>
+      )}
 
       <Offcanvas
         className="NavBar__menu shadow"
