@@ -1,0 +1,24 @@
+.Document__page .section-item-text {
+  display: grid;
+  grid-template-rows: 50% 50%;
+  grid-template-columns: 50% 50%;
+  justify-items: start;
+}
+
+.Document__page .section-item-text__p1 {
+  text-align: start;
+}
+
+.Document__page .section-item-text__p2 {
+  justify-self: end;
+  text-align: end;
+}
+
+.Document__page .section-item-text__p3 {
+  grid-row: 2 / 3;
+  grid-column: 1 / 3;
+
+  width: 100%;
+
+  text-align: start;
+}

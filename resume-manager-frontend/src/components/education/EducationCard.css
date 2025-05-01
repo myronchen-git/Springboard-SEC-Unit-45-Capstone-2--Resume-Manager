@@ -1,6 +1,0 @@
-.EducationCard .show-education-text {
-  display: grid;
-  grid-template-rows: 50% 50%;
-  grid-template-columns: 50% 50%;
-  justify-items: start;
-}

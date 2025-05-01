@@ -1,6 +1,5 @@
 import { Fragment, useMemo } from 'react';
 
-import './EducationText.css';
 
 // ==================================================
 
@@ -43,7 +42,7 @@ function EducationText({ education }) {
         text.push('Activities: ' + education.activities);
 
       return (
-        <p className="EducationText-p3">
+        <p className="section-item-text__p3">
           {text.map((t, idx) => (
             <Fragment key={t}>
               {t}
@@ -57,7 +56,7 @@ function EducationText({ education }) {
 
   return (
     <>
-      <p className="EducationText-p1">
+      <p className="section-item-text__p1">
         <b>{education.school}</b>
         <br />
         {education.degree}
@@ -68,7 +67,7 @@ function EducationText({ education }) {
           </>
         )}
       </p>
-      <p className="EducationText-p2">
+      <p className="section-item-text__p2">
         {education.location}
         <br />
         {startDateString} - {endDateString}

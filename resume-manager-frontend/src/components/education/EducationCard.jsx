@@ -16,8 +16,6 @@ import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
 import trashIcon from '../../assets/trash.svg';
 
-import './EducationCard.css';
-
 // ==================================================
 
 /**
@@ -155,8 +153,8 @@ function EducationCard({ item: education, idx }) {
             <CardBody
               className={
                 isEditEducationFormOpen
-                  ? 'show-edit-form'
-                  : 'show-education-text'
+                  ? 'section-item-edit-form'
+                  : 'section-item-text'
               }
               tag="section"
             >

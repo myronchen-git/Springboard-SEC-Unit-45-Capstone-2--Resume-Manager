@@ -11,6 +11,8 @@ import ExperienceCard from '../experience/ExperienceCard.jsx';
 
 import { SECTION_ID_TO_DATABASE_NAME } from '../../commonData.js';
 
+import './SectionItemsList.css';
+
 // ==================================================
 
 function SectionItemsList({ sectionId }) {
