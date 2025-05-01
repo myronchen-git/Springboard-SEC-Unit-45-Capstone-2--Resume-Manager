@@ -69,7 +69,7 @@ function AttachSectionCard({ attachSection }) {
   // --------------------------------------------------
 
   return (
-    <Card tag="article">
+    <Card className="AttachSectionCard" tag="article">
       {isRevealed ? (
         <>
           <CardHeader tag="header">

@@ -16,13 +16,17 @@
   align-items: center;
 }
 
+#Document .Document__page > *:first-child,
+#Document div[data-rfd-draggable-id] {
+  margin-bottom: 1.5em;
+}
+
 #Document .card {
   text-align: center;
 }
 
-#Document .Document__page > *:first-child,
-#Document div[data-rfd-draggable-id] {
-  margin-bottom: 1.5em;
+#Document .card form select {
+  margin-bottom: 1rem;
 }
 
 #Document .card img[alt="reposition icon"] {

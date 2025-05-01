@@ -3,6 +3,8 @@ import { Alert, Button, Form, FormGroup, Input, Label } from 'reactstrap';
 
 import { getFormInputPattern, getFormInputPlaceholder } from '../commonData.js';
 
+import './GenericForm.css';
+
 // ==================================================
 
 /**
