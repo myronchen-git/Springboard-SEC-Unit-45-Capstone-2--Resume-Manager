@@ -10,6 +10,7 @@ import {
 import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 import TextSnippetsList from '../text_snippet/TextSnippetsList.jsx';
+import ExperienceText from './ExperienceText.jsx';
 
 import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
@@ -353,7 +354,14 @@ function ExperienceCard({ item: experience, idx }) {
                 </div>
               </span>
             </CardHeader>
-            <CardBody tag="section">
+            <CardBody
+              className={
+                isEditExperienceFormOpen
+                  ? 'section-item-edit-form'
+                  : 'section-item-text'
+              }
+              tag="section"
+            >
               {isEditExperienceFormOpen ? (
                 <GenericForm
                   fields={EXPERIENCE_FIELDS}
@@ -365,25 +373,19 @@ function ExperienceCard({ item: experience, idx }) {
                 />
               ) : (
                 <>
-                  {experience.title}
-                  <br />
-                  {experience.organization}
-                  <br />
-                  {experience.location}
-                  <br />
-                  {experience.startDate}
-                  <br />
-                  {experience.endDate}
-                  <br />
-                  <TextSnippetContext.Provider value={textSnippetContextValues}>
-                    <TextSnippetsList
-                      textSnippets={experience.bullets}
-                      droppableProps={{
-                        droppableId: droppableIdName + '-list',
-                        type: droppableIdName,
-                      }}
-                    />
-                  </TextSnippetContext.Provider>
+                  <ExperienceText experience={experience}>
+                    <TextSnippetContext.Provider
+                      value={textSnippetContextValues}
+                    >
+                      <TextSnippetsList
+                        textSnippets={experience.bullets}
+                        droppableProps={{
+                          droppableId: droppableIdName + '-list',
+                          type: droppableIdName,
+                        }}
+                      />
+                    </TextSnippetContext.Provider>
+                  </ExperienceText>
                 </>
               )}
             </CardBody>

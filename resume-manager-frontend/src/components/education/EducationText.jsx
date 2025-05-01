@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react';
 
+import { generateDateString } from '../../util/conversions.js';
 
 // ==================================================
 
@@ -10,19 +11,6 @@ import { Fragment, useMemo } from 'react';
  * @param {Object} props.education - Contains the education info to display.
  */
 function EducationText({ education }) {
-  /**
-   * Helps to convert a date from ISO format to abbreviated month and year.
-   *
-   * @param {String} dateString - Date in "YYYY-MM-DD".
-   * @returns {String} Date in "(abbrev.)month year".
-   */
-  function generateDateString(dateString) {
-    return new Date(dateString).toLocaleDateString('UTC', {
-      year: 'numeric',
-      month: 'short',
-    });
-  }
-
   const startDateString = useMemo(
     () => generateDateString(education.startDate),
     [education]

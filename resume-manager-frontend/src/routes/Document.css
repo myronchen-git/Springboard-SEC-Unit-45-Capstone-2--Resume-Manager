@@ -16,6 +16,10 @@
   align-items: center;
 }
 
+#Document .card {
+  text-align: center;
+}
+
 #Document .Document__page > *:first-child,
 #Document div[data-rfd-draggable-id] {
   margin-bottom: 1.5em;

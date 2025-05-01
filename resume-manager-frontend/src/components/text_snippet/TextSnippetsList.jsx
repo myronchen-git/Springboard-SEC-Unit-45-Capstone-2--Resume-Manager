@@ -28,7 +28,7 @@ function TextSnippetsList({
   // --------------------------------------------------
 
   return (
-    <div className="SectionItemsList">
+    <div className="TextSnippetsList section-item-text__p3">
       <Droppable droppableId={droppableId} type={droppableType}>
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
