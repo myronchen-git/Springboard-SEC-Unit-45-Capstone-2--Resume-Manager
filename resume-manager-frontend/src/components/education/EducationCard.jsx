@@ -5,6 +5,7 @@ import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
 import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
+import EducationText from './EducationText.jsx';
 
 import {
   EDUCATION_FIELDS,
@@ -14,6 +15,8 @@ import {
 import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
 import trashIcon from '../../assets/trash.svg';
+
+import './EducationCard.css';
 
 // ==================================================
 
@@ -149,7 +152,14 @@ function EducationCard({ item: education, idx }) {
                 </div>
               </span>
             </CardHeader>
-            <CardBody tag="section">
+            <CardBody
+              className={
+                isEditEducationFormOpen
+                  ? 'show-edit-form'
+                  : 'show-education-text'
+              }
+              tag="section"
+            >
               {isEditEducationFormOpen ? (
                 <GenericForm
                   fields={EDUCATION_FIELDS}
@@ -160,24 +170,7 @@ function EducationCard({ item: education, idx }) {
                   processSubmission={editEducation}
                 />
               ) : (
-                <>
-                  {education.school}
-                  <br />
-                  {education.location}
-                  <br />
-                  {education.startDate}
-                  <br />
-                  {education.endDate}
-                  <br />
-                  {education.degree}
-                  <br />
-                  {education.gpa}
-                  <br />
-                  {education.awardsAndHonors}
-                  <br />
-                  {education.activities}
-                  <br />
-                </>
+                <EducationText education={education} />
               )}
             </CardBody>
           </Card>
