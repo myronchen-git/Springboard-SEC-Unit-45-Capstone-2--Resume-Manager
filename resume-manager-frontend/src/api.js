@@ -683,12 +683,14 @@ class ResumeManagerApi {
   }
 
   /**
-   * Updates a text snippet in the database.  Note that the version will be
-   * changed.
+   * Updates an experience's text snippet in the database.  Note that the
+   * version will be changed.
    *
    * The text snippet version is placed in the request body, because it is
    * complex and contains - (dashes), : (colons), and . (periods).
    *
+   * @param {Number} experienceId - ID of the experience that the text snippet
+   *  belongs to.
    * @param {Number} textSnippetId - ID part of the text snippet to update.
    * @param {String} textSnippetVersion - Version part of the text snippet to
    *  update.
@@ -698,9 +700,16 @@ class ResumeManagerApi {
    * @returns {Object} All the info of the updated text snippet, such as ID,
    *  version, parent text snippet, and content.
    */
-  static async updateTextSnippet(textSnippetId, textSnippetVersion, data) {
+  static async updateExperienceTextSnippet(
+    experienceId,
+    textSnippetId,
+    textSnippetVersion,
+    data
+  ) {
     const res = await this.request(
-      `users/${this.#username}/text-snippets/${textSnippetId}`,
+      `users/${
+        this.#username
+      }/experiences/${experienceId}/text-snippets/${textSnippetId}`,
       { textSnippetVersion, ...data },
       'patch'
     );

@@ -238,6 +238,34 @@ function ExperienceCard({ item: experience, idx }) {
   );
 
   /**
+   * Updates one of this experience's text snippet.  Sends a request to the
+   * back-end and make changes to the document state with the returned updated
+   * info.
+   *
+   * @param {Object} textSnippet - The text snippet Object, with ID and version,
+   *  to update.
+   * @param {Object} formData - Contains the updated text snippet properties or
+   *  content.
+   */
+  const updateTextSnippet = useCallback(
+    async (textSnippet, formData) => {
+      const updatedTextSnippet =
+        await ResumeManagerApi.updateExperienceTextSnippet(
+          experience.id,
+          textSnippet.id,
+          textSnippet.version,
+          formData
+        );
+
+      // Removing owner property because it is not needed.
+      delete updatedTextSnippet.owner;
+
+      replaceTextSnippetInDocumentState(updatedTextSnippet);
+    },
+    [experience, replaceTextSnippetInDocumentState]
+  );
+
+  /**
    * Removes a text snippet from this experience, but does not delete the
    * snippet itself.
    *
@@ -292,7 +320,7 @@ function ExperienceCard({ item: experience, idx }) {
       addTextSnippet,
       attachTextSnippet,
       getAvailableTextSnippets,
-      replaceTextSnippetInDocumentState,
+      updateTextSnippet,
       detachTextSnippet,
       removeTextSnippetFromDocumentState,
     }),
@@ -300,7 +328,7 @@ function ExperienceCard({ item: experience, idx }) {
       addTextSnippet,
       attachTextSnippet,
       getAvailableTextSnippets,
-      replaceTextSnippetInDocumentState,
+      updateTextSnippet,
       detachTextSnippet,
       removeTextSnippetFromDocumentState,
     ]

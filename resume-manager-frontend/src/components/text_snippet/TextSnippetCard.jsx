@@ -30,7 +30,7 @@ import trashIcon from '../../assets/trash.svg';
 function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
   const [document] = useContext(DocumentContext);
   const {
-    replaceTextSnippetInDocumentState,
+    updateTextSnippet,
     detachTextSnippet,
     removeTextSnippetFromDocumentState,
   } = useContext(TextSnippetContext);
@@ -43,30 +43,19 @@ function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
   // --------------------------------------------------
 
   /**
-   * Sends an API request to update a text snippet.  Then calls a passed-down
-   * function to update the relevant section in the document state.
+   * Edits a text snippet by calling a passed-down function.
    *
    * @param {Object} formData - Contains the updated text snippet properties or
    *  content.
    */
   async function editTextSnippet(formData) {
-    let updatedTextSnippet;
     try {
-      updatedTextSnippet = await ResumeManagerApi.updateTextSnippet(
-        textSnippet.id,
-        textSnippet.version,
-        formData
-      );
-
-      // Removing owner property because it is not needed.
-      delete updatedTextSnippet.owner;
+      await updateTextSnippet(textSnippet, formData);
     } catch (err) {
       setErrorMessages(err);
       setTimeout(() => setErrorMessages([]), 5000);
       return;
     }
-
-    replaceTextSnippetInDocumentState(updatedTextSnippet);
 
     setIsEditTextSnippetFormOpen(false);
   }
