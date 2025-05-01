@@ -16,13 +16,21 @@
   align-items: center;
 }
 
+#Document .Document__page > *:first-child,
+#Document div[data-rfd-draggable-id] {
+  margin-bottom: 1.5em;
+}
+
 #Document .card img[alt="reposition icon"] {
   width: 2em;
 }
 
 #Document .card-header {
+  padding: 0.25em 1em;
+
   display: flex;
   justify-content: space-between;
+
   background-color: lightblue;
 }
 

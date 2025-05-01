@@ -84,7 +84,7 @@ function SectionCard({ section, idx }) {
               </span>
             </CardHeader>
             <CardBody tag="section">
-              <CardTitle>{section.sectionName}</CardTitle>
+              <CardTitle tag="h4">{section.sectionName}</CardTitle>
               <SectionItemsList sectionId={section.id} />
             </CardBody>
           </Card>

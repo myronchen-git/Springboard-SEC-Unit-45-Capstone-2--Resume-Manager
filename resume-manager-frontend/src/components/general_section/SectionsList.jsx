@@ -230,7 +230,7 @@ function SectionsList() {
     : [];
 
   return (
-    <article>
+    <>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="sections-list" type="sections">
           {(provided) => (
@@ -242,7 +242,7 @@ function SectionsList() {
         </Droppable>
       </DragDropContext>
       <AttachSectionCard attachSection={attachSection} />
-    </article>
+    </>
   );
 }
 
