@@ -75,7 +75,7 @@ function GenericForm({
           {msg}
         </Alert>
       ))}
-      <Button color="light" type="submit">
+      <Button color="primary" type="submit">
         Submit
       </Button>
     </Form>

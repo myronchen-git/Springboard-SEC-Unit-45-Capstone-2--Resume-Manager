@@ -105,8 +105,12 @@ function DocumentForm({ initialFormData, submitFunction, submitText, close }) {
           ))}
         </ModalBody>
         <ModalFooter>
-          <Button type="submit">{submitText}</Button>
-          <Button onClick={close}>Cancel</Button>
+          <Button type="submit" color="primary">
+            {submitText}
+          </Button>
+          <Button color="primary" onClick={close}>
+            Cancel
+          </Button>
         </ModalFooter>
       </Form>
     </Modal>

@@ -29,8 +29,8 @@ function NavBar() {
     <>
       {!isOpen && (
         <Button
-          className="NavBar__menu-button btn-primary shadow-sm"
-          color="light"
+          className="NavBar__menu-button"
+          color="primary"
           onClick={toggleNavbar}
         >
           ☰ Menu

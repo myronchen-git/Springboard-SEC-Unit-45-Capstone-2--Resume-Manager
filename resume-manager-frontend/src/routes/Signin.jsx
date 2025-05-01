@@ -92,10 +92,10 @@ function Signin() {
                 {msg}
               </Alert>
             ))}
-            <Button color="light" type="submit">
+            <Button color="primary" type="submit">
               Submit
             </Button>
-            <Button color="light" type="button" onClick={handleCancel}>
+            <Button color="primary" type="button" onClick={handleCancel}>
               Cancel
             </Button>
           </Form>

@@ -141,8 +141,12 @@ function DocumentSelect({ documents, loadDocument, close }) {
           ))}
         </ModalBody>
         <ModalFooter>
-          <Button type="submit">Open</Button>
-          <Button onClick={close}>Cancel</Button>
+          <Button type="submit" color="primary">
+            Open
+          </Button>
+          <Button color="primary" onClick={close}>
+            Cancel
+          </Button>
         </ModalFooter>
       </Form>
     </Modal>

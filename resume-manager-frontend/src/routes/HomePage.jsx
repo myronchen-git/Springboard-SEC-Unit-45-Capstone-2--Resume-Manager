@@ -16,10 +16,10 @@ function HomePage() {
       </p>
       <div>
         <Link to="/register">
-          <Button>Register</Button>
+          <Button color="primary">Register</Button>
         </Link>
         <Link to="/signin">
-          <Button>Sign In</Button>
+          <Button color="primary">Sign In</Button>
         </Link>
       </div>
     </main>

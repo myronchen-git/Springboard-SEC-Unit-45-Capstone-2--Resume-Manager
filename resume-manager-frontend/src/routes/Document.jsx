@@ -193,7 +193,7 @@ function Document() {
             </Button>
           )}
           {document && !document.isMaster && (
-            <Button onClick={deleteDocument}>
+            <Button color="primary" onClick={deleteDocument}>
               <img src={trashIcon} alt="trash icon" />
             </Button>
           )}

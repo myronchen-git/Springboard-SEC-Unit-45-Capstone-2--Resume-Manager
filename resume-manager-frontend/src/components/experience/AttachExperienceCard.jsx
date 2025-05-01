@@ -110,7 +110,7 @@ function AttachExperienceCard() {
                   {msg}
                 </Alert>
               ))}
-              <Button color="light" type="submit">
+              <Button color="primary" type="submit">
                 Add
               </Button>
             </Form>

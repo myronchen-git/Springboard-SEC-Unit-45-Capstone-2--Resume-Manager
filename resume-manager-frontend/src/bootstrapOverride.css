@@ -1,16 +1,20 @@
-#root .btn-primary {
+body .btn {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+body .btn-primary {
   background-color: lightblue;
   border-color: lightblue;
   color: black;
 }
 
-#root .btn-primary:hover {
+body .btn-primary:hover {
   background-color: skyblue;
   border-color: #76c7e8;
   color: black;
 }
 
-#root .btn-primary:active {
+body .btn-primary:active {
   background-color: #76c7e8;
   border-color: #65c0e5;
   color: black;
