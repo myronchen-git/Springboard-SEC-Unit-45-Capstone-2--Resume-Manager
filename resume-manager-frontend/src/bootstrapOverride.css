@@ -3,19 +3,19 @@ body .btn {
 }
 
 body .btn-primary {
-  background-color: lightblue;
-  border-color: lightblue;
-  color: black;
+  background-color: lightblue !important;
+  border-color: lightblue !important;
+  color: black !important;
 }
 
 body .btn-primary:hover {
-  background-color: skyblue;
-  border-color: #76c7e8;
-  color: black;
+  background-color: skyblue !important;
+  border-color: #76c7e8 !important;
+  color: black !important;
 }
 
 body .btn-primary:active {
-  background-color: #76c7e8;
-  border-color: #65c0e5;
-  color: black;
+  background-color: #76c7e8 !important;
+  border-color: #65c0e5 !important;
+  color: black !important;
 }
