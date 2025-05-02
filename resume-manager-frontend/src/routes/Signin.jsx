@@ -1,17 +1,7 @@
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardTitle,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-} from 'reactstrap';
 
+import RegisterOrSigninView from '../components/RegisterOrSigninView.jsx';
 import { UserContext } from '../contexts.jsx';
 
 // ==================================================
@@ -56,52 +46,14 @@ function Signin() {
   // --------------------------------------------------
 
   return (
-    <main className="Signin">
-      <Card>
-        <CardBody>
-          <CardTitle tag={'h2'}>Signin</CardTitle>
-          <Form className="Signin__form" onSubmit={handleSubmit}>
-            <FormGroup className="text-start">
-              <Label htmlFor="Signin__input-username">
-                <b>Username</b>
-              </Label>
-              <Input
-                id="Signin__input-username"
-                type="text"
-                name="username"
-                value={formData.username}
-                required
-                onChange={handleChange}
-              />
-            </FormGroup>
-            <FormGroup className="text-start">
-              <Label htmlFor="Signin__input-password">
-                <b>Password</b>
-              </Label>
-              <Input
-                id="Signin__input-password"
-                type="password"
-                name="password"
-                value={formData.password}
-                required
-                onChange={handleChange}
-              />
-            </FormGroup>
-            {errorMessages.map((msg) => (
-              <Alert key={msg} color="danger">
-                {msg}
-              </Alert>
-            ))}
-            <Button color="primary" type="submit">
-              Submit
-            </Button>
-            <Button color="primary" type="button" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </Form>
-        </CardBody>
-      </Card>
-    </main>
+    <RegisterOrSigninView
+      name="Signin"
+      formData={formData}
+      handleChange={handleChange}
+      handleSubmit={handleSubmit}
+      handleCancel={handleCancel}
+      errorMessages={errorMessages}
+    />
   );
 }
 
