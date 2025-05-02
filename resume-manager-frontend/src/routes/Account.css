@@ -1,0 +1,13 @@
+.Account {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Account .card {
+  width: 20em;
+
+  background-color: #fffffff2;
+}
