@@ -50,6 +50,8 @@ function Document() {
    * @param {Number} documentId - ID of the document to retrieve and display.
    */
   async function loadDocument(documentId) {
+    setDocument(null);
+
     if (documentId === 0) {
       setIsNewDocumentFormOpen(true);
     } else {
