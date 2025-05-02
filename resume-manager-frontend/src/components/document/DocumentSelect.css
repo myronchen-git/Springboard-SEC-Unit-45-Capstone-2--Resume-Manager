@@ -1,0 +1,27 @@
+.DocumentSelect__form ul {
+  padding: 0;
+  margin: 0;
+
+  list-style: none;
+}
+
+.DocumentSelect__form input[type="radio"] {
+  position: fixed;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+.DocumentSelect__form label {
+  width: 100%;
+}
+
+.AddNewResumeOption .card .card-body {
+  text-align: center;
+}
+
+.DocumentSelect__form input[type="radio"]:checked ~ label > .card {
+  border-width: 0.25em;
+  border-color: var(--color-1);
+}

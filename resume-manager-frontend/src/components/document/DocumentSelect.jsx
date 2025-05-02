@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Alert,
   Button,
@@ -14,6 +14,10 @@ import {
   ModalBody,
   ModalFooter,
 } from 'reactstrap';
+
+import { generateDateTimeString } from '../../util/conversions';
+
+import './DocumentSelect.css';
 
 // ==================================================
 
@@ -54,8 +58,19 @@ function DocumentSelect({ documents, loadDocument, close }) {
   // --------------------------------------------------
 
   function DocumentOption({ document, selectedOption, handleChange }) {
+    const createdDateTime = useMemo(
+      () => generateDateTimeString(document.createdOn),
+      [document]
+    );
+
+    const updatedDateTime = useMemo(
+      () =>
+        document.lastUpdated && generateDateTimeString(document.lastUpdated),
+      [document]
+    );
+
     return (
-      <FormGroup>
+      <FormGroup tag="li">
         <Input
           id={`DocumentSelect__input-doc-${document.id}`}
           name="selected-document"
@@ -66,20 +81,20 @@ function DocumentSelect({ documents, loadDocument, close }) {
           onChange={handleChange}
         />
         <Label htmlFor={`DocumentSelect__input-doc-${document.id}`}>
-          <Card>
-            <CardBody>
-              <CardTitle>{document.documentName}</CardTitle>
-              <CardText>
-                Created on: {new Date(document.createdOn).toString()}
-                <br />
-                Last updated: {new Date(document.lastUpdated).toString()}
-                <br />
-                Master: {document.isMaster.toString()}
-                <br />
-                Template: {document.isTemplate.toString()}
-                <br />
-                Locked: {document.isLocked.toString()}
-                <br />
+          <Card tag="article">
+            <CardBody tag="section">
+              <CardTitle tag="h4">{document.documentName}</CardTitle>
+              <CardText tag="section">
+                <p>
+                  Created on:
+                  <br />
+                  {createdDateTime}
+                </p>
+                <p>
+                  Last updated:
+                  <br />
+                  {updatedDateTime}
+                </p>
               </CardText>
             </CardBody>
           </Card>
@@ -91,7 +106,7 @@ function DocumentSelect({ documents, loadDocument, close }) {
   function AddNewResumeOption({ selectedOption, handleChange }) {
     // Ensure that there is no document with ID = 0.
     return (
-      <FormGroup>
+      <FormGroup className="AddNewResumeOption" tag="li">
         <Input
           id={`DocumentSelect__input-doc-0`}
           name="selected-document"
@@ -102,10 +117,10 @@ function DocumentSelect({ documents, loadDocument, close }) {
           onChange={handleChange}
         />
         <Label htmlFor={`DocumentSelect__input-doc-0`}>
-          <Card>
-            <CardBody>
-              <CardTitle>New Resume</CardTitle>
-              <CardText>+</CardText>
+          <Card tag="article">
+            <CardBody tag="section">
+              <CardTitle tag="h6">New Resume</CardTitle>
+              <CardText tag="section">+</CardText>
             </CardBody>
           </Card>
         </Label>
@@ -121,26 +136,28 @@ function DocumentSelect({ documents, loadDocument, close }) {
       fade={false}
     >
       <Form className="DocumentSelect__form" onSubmit={handleSubmit}>
-        <ModalBody>
-          {documents.map((doc) => (
-            <DocumentOption
-              key={doc.id}
-              document={doc}
+        <ModalBody tag="main">
+          <ul>
+            {documents.map((doc) => (
+              <DocumentOption
+                key={doc.id}
+                document={doc}
+                selectedOption={selectedOption}
+                handleChange={handleChange}
+              />
+            ))}
+            <AddNewResumeOption
               selectedOption={selectedOption}
               handleChange={handleChange}
             />
-          ))}
-          <AddNewResumeOption
-            selectedOption={selectedOption}
-            handleChange={handleChange}
-          />
+          </ul>
           {errorMessages.map((msg) => (
             <Alert key={msg} color="danger">
               {msg}
             </Alert>
           ))}
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter tag="footer">
           <Button type="submit" color="primary">
             Open
           </Button>
