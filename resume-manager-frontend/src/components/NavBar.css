@@ -1,4 +1,4 @@
-#root .NavBar__menu-button {
+#NavBar__menu-button {
   position: fixed;
   top: 2em;
   left: 2em;
@@ -6,11 +6,19 @@
   z-index: 10;
 }
 
-.NavBar__menu__item {
+#NavBar__menu {
+  width: 15em;
+
+  background-color: #add8e6cc;
+
+  border: none;
+}
+
+#NavBar__menu .NavBar__menu__item {
   margin: 0.25em 0;
 }
 
-.NavBar__menu a.active {
+#NavBar__menu a.active {
   pointer-events: none;
   color: gray;
   cursor: default;

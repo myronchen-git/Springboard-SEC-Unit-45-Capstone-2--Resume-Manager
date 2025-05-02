@@ -28,23 +28,19 @@ function NavBar() {
   return (
     <>
       {!isOpen && (
-        <Button
-          className="NavBar__menu-button"
-          color="primary"
-          onClick={toggleNavbar}
-        >
+        <Button id="NavBar__menu-button" color="primary" onClick={toggleNavbar}>
           ☰ Menu
         </Button>
       )}
 
       <Offcanvas
-        className="NavBar__menu shadow"
+        id="NavBar__menu"
+        className="shadow"
         isOpen={isOpen}
         toggle={toggleNavbar}
         direction="start"
         backdrop={false}
         tag="aside"
-        style={{ width: '15em', backgroundColor: '#add8e680', border: 'none' }}
       >
         <OffcanvasHeader toggle={toggleNavbar} wrapTag="header">
           Resume Manager
