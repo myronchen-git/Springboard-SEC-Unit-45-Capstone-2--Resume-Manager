@@ -6,11 +6,17 @@
   background-color: white;
 }
 
-.Document__toolbar > button:not(:last-child) {
+.Document__header-toolbar__buttons {
+  padding: 0 1em 1em;
+}
+
+.Document__header-toolbar__buttons > button:not(:last-child) {
   margin-right: 1em;
 }
 
 #Document {
+  padding: 2em;
+
   display: flex;
   flex-direction: column;
   align-items: center;

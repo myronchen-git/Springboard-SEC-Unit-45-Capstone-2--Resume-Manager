@@ -182,23 +182,29 @@ function Document() {
   return (
     <DocumentContext.Provider value={[document, setDocument]}>
       <main id="Document">
-        <header className="Document__toolbar">
-          <Button color="primary" onClick={() => setIsDocumentSelectOpen(true)}>
-            Select Document
-          </Button>
-          {document && (
+        <header className="Document__header-toolbar">
+          <div className="Document__header-toolbar__buttons">
             <Button
               color="primary"
-              onClick={() => setIsEditDocumentFormOpen(true)}
+              onClick={() => setIsDocumentSelectOpen(true)}
             >
-              <img src={pencilIcon} alt="edit icon" />
+              Select Document
             </Button>
-          )}
-          {document && !document.isMaster && (
-            <Button color="primary" onClick={deleteDocument}>
-              <img src={trashIcon} alt="trash icon" />
-            </Button>
-          )}
+            {document && (
+              <Button
+                color="primary"
+                onClick={() => setIsEditDocumentFormOpen(true)}
+              >
+                <img src={pencilIcon} alt="edit icon" />
+              </Button>
+            )}
+            {document && !document.isMaster && (
+              <Button color="primary" onClick={deleteDocument}>
+                <img src={trashIcon} alt="trash icon" />
+              </Button>
+            )}
+          </div>
+          {document && <h4>{document.documentName}</h4>}
         </header>
         {errorMessages.map((msg) => (
           <Alert key={msg} color="danger">

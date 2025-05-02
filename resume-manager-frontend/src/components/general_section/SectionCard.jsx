@@ -9,6 +9,8 @@ import SectionItemsList from './SectionItemsList.jsx';
 import dotsIcon from '../../assets/grip-horizontal.svg';
 import trashIcon from '../../assets/trash.svg';
 
+import './SectionCard.css';
+
 // ==================================================
 
 /**
