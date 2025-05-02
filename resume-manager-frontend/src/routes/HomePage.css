@@ -1,0 +1,26 @@
+.HomePage {
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: border-box url("../assets/resume-6627200.jpg") center no-repeat;
+  background-size: cover;
+}
+
+.HomePage-backdrop {
+  padding: 3em;
+
+  border-radius: 2em;
+
+  background-color: #ffffffe6;
+}
+
+.HomePage-title {
+  font-family: "Libre Baskerville", serif;
+}
+
+.HomePage button {
+  margin: 1em;
+}
