@@ -10,6 +10,8 @@ import {
   Label,
 } from 'reactstrap';
 
+import './RegisterOrSigninView.css';
+
 // ==================================================
 
 /**
@@ -36,7 +38,7 @@ function RegisterOrSigninView({
 }) {
   return (
     <main className={name}>
-      <Card>
+      <Card className={`${name}__card`}>
         <CardBody>
           <CardTitle tag={'h2'}>{name}</CardTitle>
           <Form className={`${name}__form`} onSubmit={handleSubmit}>

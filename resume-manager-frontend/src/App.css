@@ -19,3 +19,22 @@
 .clickable-icon:hover {
   background-color: Gainsboro;
 }
+
+.HomePage,
+.Register,
+.Signin {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: border-box url("./assets/resume-6627200.jpg") center no-repeat;
+  background-size: cover;
+}
+
+.HomePage .HomePage-backdrop,
+.Register .Register__card,
+.Signin .Signin__card {
+  background-color: #fffffff2;
+}

@@ -1,0 +1,9 @@
+.Register__card,
+.Signin__card {
+  width: 20em;
+}
+
+.Register button,
+.Signin button {
+  margin: 1em;
+}
