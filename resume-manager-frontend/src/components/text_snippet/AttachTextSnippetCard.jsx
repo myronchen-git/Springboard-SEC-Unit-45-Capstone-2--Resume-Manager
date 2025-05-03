@@ -11,7 +11,7 @@ import {
 
 import { TextSnippetContext } from '../../contexts.jsx';
 
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 // ==================================================
 
@@ -78,9 +78,7 @@ function AttachTextSnippetCard() {
             <span></span>
             <span></span>
             <span>
-              <div className="clickable-icon" onClick={toggleOpen}>
-                <img src={trashIcon} alt="trash icon" />
-              </div>
+              <TrashIcon clickFunc={toggleOpen} />
             </span>
           </CardHeader>
           <CardBody tag="section">

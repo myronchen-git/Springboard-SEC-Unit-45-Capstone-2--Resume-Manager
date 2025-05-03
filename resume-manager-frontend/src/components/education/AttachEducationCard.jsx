@@ -13,7 +13,7 @@ import ResumeManagerApi from '../../api.js';
 import { DocumentContext } from '../../contexts.jsx';
 import { attachSectionItem } from '../../util/specificSectionsFuncs.js';
 
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 // ==================================================
 
@@ -78,9 +78,7 @@ function AttachEducationCard() {
             <span></span>
             <span></span>
             <span>
-              <div className="clickable-icon" onClick={toggleOpen}>
-                <img src={trashIcon} alt="trash icon" />
-              </div>
+              <TrashIcon clickFunc={toggleOpen} />
             </span>
           </CardHeader>
           <CardBody tag="section">

@@ -9,7 +9,7 @@ import SectionsList from '../components/general_section/SectionsList.jsx';
 import { DocumentContext, UserContext } from '../contexts.jsx';
 
 import pencilIcon from '../assets/pencil.svg';
-import trashIcon from '../assets/trash.svg';
+import TrashButton from '../components/TrashButton.jsx';
 
 import './Document.css';
 
@@ -199,9 +199,7 @@ function Document() {
               </Button>
             )}
             {document && !document.isMaster && (
-              <Button color="primary" onClick={deleteDocument}>
-                <img src={trashIcon} alt="trash icon" />
-              </Button>
+              <TrashButton clickFunc={deleteDocument} />
             )}
           </div>
           {document && <h4>{document.documentName}</h4>}

@@ -9,7 +9,7 @@ import { DocumentContext } from '../../contexts.jsx';
 import { addNewSectionItem } from '../../util/specificSectionsFuncs.js';
 import GenericForm from '../GenericForm.jsx';
 
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 // ==================================================
 
@@ -59,12 +59,7 @@ function AddExperienceCard() {
             <span></span>
             <span></span>
             <span>
-              <div
-                className="clickable-icon"
-                onClick={() => setIsAddExperienceFormOpen(false)}
-              >
-                <img src={trashIcon} alt="trash icon" />
-              </div>
+              <TrashIcon clickFunc={() => setIsAddExperienceFormOpen(false)} />
             </span>
           </CardHeader>
           <CardBody tag="section">

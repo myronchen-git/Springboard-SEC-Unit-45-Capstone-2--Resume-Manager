@@ -10,7 +10,7 @@ import {
   EDUCATION_OPTIONAL_FIELDS_START_INDEX,
 } from '../../commonData.js';
 
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 // ==================================================
 
@@ -60,12 +60,7 @@ function AddEducationCard() {
             <span></span>
             <span></span>
             <span>
-              <div
-                className="clickable-icon"
-                onClick={() => setIsAddEducationFormOpen(false)}
-              >
-                <img src={trashIcon} alt="trash icon" />
-              </div>
+              <TrashIcon clickFunc={() => setIsAddEducationFormOpen(false)} />
             </span>
           </CardHeader>
           <CardBody tag="section">

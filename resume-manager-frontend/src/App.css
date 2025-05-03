@@ -12,8 +12,17 @@
   border-radius: 50%;
 
   display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 
   cursor: pointer;
+}
+
+.clickable-icon--warn {
+  padding: 0.5em 0;
+
+  color: red;
 }
 
 .clickable-icon:hover {

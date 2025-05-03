@@ -14,7 +14,7 @@ import {
 
 import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 // ==================================================
 
@@ -145,9 +145,7 @@ function EducationCard({ item: education, idx }) {
                     <img src={pencilIcon} alt="edit icon" />
                   </div>
                 )}
-                <div className="clickable-icon" onClick={deleteEducation}>
-                  <img src={trashIcon} alt="trash icon" />
-                </div>
+                <TrashIcon clickFunc={deleteEducation} />
               </span>
             </CardHeader>
             <CardBody

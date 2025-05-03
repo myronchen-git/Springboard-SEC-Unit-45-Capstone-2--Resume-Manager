@@ -9,7 +9,7 @@ import {
   TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX,
 } from '../../commonData.js';
 
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 // ==================================================
 
@@ -55,12 +55,7 @@ function AddTextSnippetCard() {
             <span></span>
             <span></span>
             <span>
-              <div
-                className="clickable-icon"
-                onClick={() => setIsAddTextSnippetFormOpen(false)}
-              >
-                <img src={trashIcon} alt="trash icon" />
-              </div>
+              <TrashIcon clickFunc={() => setIsAddTextSnippetFormOpen(false)} />
             </span>
           </CardHeader>
           <CardBody tag="section">

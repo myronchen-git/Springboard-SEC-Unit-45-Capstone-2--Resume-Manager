@@ -7,7 +7,7 @@ import { DocumentContext } from '../../contexts.jsx';
 import SectionItemsList from './SectionItemsList.jsx';
 
 import dotsIcon from '../../assets/grip-horizontal.svg';
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 import './SectionCard.css';
 
@@ -80,9 +80,7 @@ function SectionCard({ section, idx }) {
                 />
               </span>
               <span>
-                <div className="clickable-icon" onClick={deleteSection}>
-                  <img src={trashIcon} alt="trash icon" />
-                </div>
+                <TrashIcon clickFunc={deleteSection} />
               </span>
             </CardHeader>
             <CardBody tag="section">

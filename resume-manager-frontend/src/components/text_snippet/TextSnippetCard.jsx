@@ -12,7 +12,7 @@ import GenericForm from '../GenericForm.jsx';
 
 import dotsIcon from '../../assets/grip-horizontal.svg';
 import pencilIcon from '../../assets/pencil.svg';
-import trashIcon from '../../assets/trash.svg';
+import TrashIcon from '../TrashIcon.jsx';
 
 // ==================================================
 
@@ -132,9 +132,7 @@ function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
                     <img src={pencilIcon} alt="edit icon" />
                   </div>
                 )}
-                <div className="clickable-icon" onClick={deleteTextSnippet}>
-                  <img src={trashIcon} alt="trash icon" />
-                </div>
+                <TrashIcon clickFunc={deleteTextSnippet} />
               </span>
             </CardHeader>
             <CardBody className="text-start" tag="section">
