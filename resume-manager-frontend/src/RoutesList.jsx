@@ -6,7 +6,7 @@ import Document from './routes/Document.jsx';
 import HomePage from './routes/HomePage.jsx';
 import Register from './routes/Register.jsx';
 import Signin from './routes/Signin.jsx';
-import RouteProtector from './routes/middleware/routeProtector.jsx';
+import RouteProtector from './routes/middleware/RouteProtector.jsx';
 
 // ==================================================
 
