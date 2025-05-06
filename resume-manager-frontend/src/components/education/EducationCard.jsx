@@ -43,7 +43,6 @@ function EducationCard({ item: education, idx }) {
    */
   async function editEducation(formData) {
     const updatedEducation = await ResumeManagerApi.updateEducation(
-      document.id,
       education.id,
       formData
     );

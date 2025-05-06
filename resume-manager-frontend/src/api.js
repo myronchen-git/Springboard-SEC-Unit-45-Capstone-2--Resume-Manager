@@ -386,9 +386,8 @@ class ResumeManagerApi {
   }
 
   /**
-   * Updates an education, only if the document is the master resume.
+   * Updates an education.
    *
-   * @param {Number} documentId - ID of the document that the education is in.
    * @param {Number} educationId - ID of the education being updated.
    * @param {Object} data - Contains info for updating education info.
    * @param {String} [data.school] - School or education center name.
@@ -405,11 +404,9 @@ class ResumeManagerApi {
    *  school.
    * @returns {Object} All of the education's current info from the database.
    */
-  static async updateEducation(documentId, educationId, data) {
+  static async updateEducation(educationId, data) {
     const res = await this.request(
-      `users/${
-        this.#username
-      }/documents/${documentId}/educations/${educationId}`,
+      `users/${this.#username}/educations/${educationId}`,
       data,
       'patch'
     );
