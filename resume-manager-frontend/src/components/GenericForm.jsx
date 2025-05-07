@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Alert, Button, Form, FormGroup, Input, Label } from 'reactstrap';
+import { useContext, useState } from 'react';
+import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 
 import { getFormInputPattern, getFormInputPlaceholder } from '../commonData.js';
+import { AppContext } from '../contexts.jsx';
 
 import './GenericForm.css';
 
@@ -27,8 +28,9 @@ function GenericForm({
   initialFormData,
   processSubmission,
 }) {
+  const { addAlert } = useContext(AppContext);
+
   const [formData, setFormData] = useState(initialFormData);
-  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -43,8 +45,7 @@ function GenericForm({
     try {
       await processSubmission(formData);
     } catch (err) {
-      setErrorMessages(err);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
   }
 
@@ -71,11 +72,6 @@ function GenericForm({
             onChange={handleChange}
           />
         </FormGroup>
-      ))}
-      {errorMessages.map((msg) => (
-        <Alert key={msg} color="danger">
-          {msg}
-        </Alert>
       ))}
       <Button color="primary" type="submit">
         Submit

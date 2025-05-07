@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import RegisterOrSigninView from '../components/RegisterOrSigninView.jsx';
-import { UserContext } from '../contexts.jsx';
+import { AppContext, UserContext } from '../contexts.jsx';
 
 // ==================================================
 
@@ -10,14 +10,16 @@ import { UserContext } from '../contexts.jsx';
  * Displays and handles the user registration form.
  */
 function Register() {
+  const { addAlert, clearAlerts } = useContext(AppContext);
+  const { registerUser } = useContext(UserContext);
+
   const initialFormData = {
     username: '',
     password: '',
     repeatedPassword: '',
   };
   const [formData, setFormData] = useState(initialFormData);
-  const [errorMessages, setErrorMessages] = useState([]);
-  const { registerUser } = useContext(UserContext);
+
   const navigate = useNavigate();
 
   // --------------------------------------------------
@@ -31,7 +33,7 @@ function Register() {
     evt.preventDefault();
 
     if (formData.password !== formData.repeatedPassword) {
-      return setErrorMessages(['Password and repeated password do not match.']);
+      return addAlert('Password and repeated password do not match.', 'danger');
     }
 
     const formDataCopy = { ...formData };
@@ -40,13 +42,15 @@ function Register() {
     try {
       await registerUser(formDataCopy);
     } catch (err) {
-      return setErrorMessages(err);
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
+    clearAlerts();
     navigate('/document');
   }
 
   function handleCancel() {
+    clearAlerts();
     navigate('/');
   }
 
@@ -59,7 +63,6 @@ function Register() {
       handleChange={handleChange}
       handleSubmit={handleSubmit}
       handleCancel={handleCancel}
-      errorMessages={errorMessages}
     />
   );
 }

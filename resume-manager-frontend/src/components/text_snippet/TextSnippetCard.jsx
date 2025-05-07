@@ -1,13 +1,17 @@
 import { Draggable } from '@hello-pangea/dnd';
 import { useContext, useState } from 'react';
-import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
+import { Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
 import {
   TEXT_SNIPPET_FIELDS,
   TEXT_SNIPPET_OPTIONAL_FIELDS_START_INDEX,
 } from '../../commonData.js';
-import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
+import {
+  AppContext,
+  DocumentContext,
+  TextSnippetContext,
+} from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 
 import dotsIcon from '../../assets/grip-horizontal.svg';
@@ -28,6 +32,8 @@ import TrashIcon from '../TrashIcon.jsx';
  *  beginning of the text content.
  */
 function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
+  const { addAlert } = useContext(AppContext);
+
   const [document] = useContext(DocumentContext);
   const {
     updateTextSnippet,
@@ -37,8 +43,6 @@ function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
 
   const [isEditTextSnippetFormOpen, setIsEditTextSnippetFormOpen] =
     useState(false);
-
-  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -52,9 +56,7 @@ function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
     try {
       await updateTextSnippet(textSnippet, formData);
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
     setIsEditTextSnippetFormOpen(false);
@@ -80,9 +82,7 @@ function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
         await detachTextSnippet(textSnippet.id);
       }
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
     removeTextSnippetFromDocumentState(textSnippet.id);
@@ -106,11 +106,6 @@ function TextSnippetCard({ textSnippet, idx, addBullet = true }) {
         <div ref={provided.innerRef} {...provided.draggableProps}>
           <Card className="TextSnippetCard" tag="article">
             <CardHeader tag="header">
-              {errorMessages.map((msg) => (
-                <Alert key={msg} color="danger">
-                  {msg}
-                </Alert>
-              ))}
               <span></span>
               <span>
                 <img

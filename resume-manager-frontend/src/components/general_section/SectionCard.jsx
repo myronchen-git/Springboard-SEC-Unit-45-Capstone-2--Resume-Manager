@@ -1,9 +1,9 @@
 import { Draggable } from '@hello-pangea/dnd';
-import { useContext, useState } from 'react';
-import { Alert, Card, CardBody, CardHeader, CardTitle } from 'reactstrap';
+import { useContext } from 'react';
+import { Card, CardBody, CardHeader, CardTitle } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
-import { DocumentContext } from '../../contexts.jsx';
+import { AppContext, DocumentContext } from '../../contexts.jsx';
 import SectionItemsList from './SectionItemsList.jsx';
 
 import dotsIcon from '../../assets/grip-horizontal.svg';
@@ -25,8 +25,8 @@ import './SectionCard.css';
  *  is used for @hello-pangea/dnd.
  */
 function SectionCard({ section, idx }) {
+  const { addAlert } = useContext(AppContext);
   const [document, setDocument] = useContext(DocumentContext);
-  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -38,9 +38,7 @@ function SectionCard({ section, idx }) {
     try {
       await ResumeManagerApi.deleteSection(document.id, section.id);
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
     // Clone Array to indicate to other components that it has been changed.
@@ -64,11 +62,6 @@ function SectionCard({ section, idx }) {
         <div ref={provided.innerRef} {...provided.draggableProps}>
           <Card className="SectionCard text-center" tag="article">
             <CardHeader tag="header">
-              {errorMessages.map((msg) => (
-                <Alert key={msg} color="danger">
-                  {msg}
-                </Alert>
-              ))}
               <span></span>
               <span>
                 <img

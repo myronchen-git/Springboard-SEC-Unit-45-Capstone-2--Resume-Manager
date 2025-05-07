@@ -1,16 +1,8 @@
 import { useContext, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Form,
-  Input,
-} from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Form, Input } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
-import { DocumentContext } from '../../contexts.jsx';
+import { AppContext, DocumentContext } from '../../contexts.jsx';
 import { attachSectionItem } from '../../util/specificSectionsFuncs.js';
 
 import TrashIcon from '../TrashIcon.jsx';
@@ -18,18 +10,18 @@ import TrashIcon from '../TrashIcon.jsx';
 // ==================================================
 
 function AttachExperienceCard() {
+  const { addAlert } = useContext(AppContext);
+  const [document, setDocument] = useContext(DocumentContext);
+
   const [isRevealed, setIsRevealed] = useState(false);
   const [experienceId, setExperienceId] = useState(null);
-  const [errorMessages, setErrorMessages] = useState([]);
   const [availableExperiences, setAvailableExperiences] = useState(null);
-  const [document, setDocument] = useContext(DocumentContext);
 
   // --------------------------------------------------
 
   async function toggleOpen() {
     setIsRevealed(!isRevealed);
     setExperienceId(null);
-    setErrorMessages([]);
 
     if (!isRevealed && availableExperiences === null)
       setAvailableExperiences(await ResumeManagerApi.getExperiences());
@@ -60,8 +52,7 @@ function AttachExperienceCard() {
 
         setDocument(updatedDocument);
       } catch (err) {
-        setErrorMessages(err);
-        return;
+        return err.forEach((message) => addAlert(message, 'danger'));
       }
 
       toggleOpen();
@@ -103,11 +94,6 @@ function AttachExperienceCard() {
                     );
                   })}
               </Input>
-              {errorMessages.map((msg) => (
-                <Alert key={msg} color="danger">
-                  {msg}
-                </Alert>
-              ))}
               <Button color="primary" type="submit">
                 Add
               </Button>

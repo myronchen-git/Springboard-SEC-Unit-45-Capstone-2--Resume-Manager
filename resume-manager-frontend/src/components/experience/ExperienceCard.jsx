@@ -1,13 +1,17 @@
 import { Draggable } from '@hello-pangea/dnd';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
+import { Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
 import {
   EXPERIENCE_FIELDS,
   EXPERIENCE_OPTIONAL_FIELDS_START_INDEX,
 } from '../../commonData.js';
-import { DocumentContext, TextSnippetContext } from '../../contexts.jsx';
+import {
+  AppContext,
+  DocumentContext,
+  TextSnippetContext,
+} from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 import TextSnippetsList from '../text_snippet/TextSnippetsList.jsx';
 import ExperienceText from './ExperienceText.jsx';
@@ -28,10 +32,11 @@ import TrashIcon from '../TrashIcon.jsx';
  *  This is used for @hello-pangea/dnd.
  */
 function ExperienceCard({ item: experience, idx }) {
+  const { addAlert } = useContext(AppContext);
   const [document, setDocument] = useContext(DocumentContext);
+
   const [isEditExperienceFormOpen, setIsEditExperienceFormOpen] =
     useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -43,10 +48,15 @@ function ExperienceCard({ item: experience, idx }) {
    * @see ResumeManagerApi.updateExperience for formData properties.
    */
   async function editExperience(formData) {
-    let updatedExperience = await ResumeManagerApi.updateExperience(
-      experience.id,
-      formData
-    );
+    let updatedExperience;
+    try {
+      updatedExperience = await ResumeManagerApi.updateExperience(
+        experience.id,
+        formData
+      );
+    } catch (err) {
+      return err.forEach((message) => addAlert(message, 'danger'));
+    }
 
     // Removing owner property because it is not necessary.
     delete updatedExperience.owner;
@@ -93,9 +103,7 @@ function ExperienceCard({ item: experience, idx }) {
         );
       }
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
     // Clone Array to indicate to other components that it has been changed.
@@ -351,11 +359,6 @@ function ExperienceCard({ item: experience, idx }) {
         <div ref={provided.innerRef} {...provided.draggableProps}>
           <Card className="ExperienceCard" tag="article">
             <CardHeader tag="header">
-              {errorMessages.map((msg) => (
-                <Alert key={msg} color="danger">
-                  {msg}
-                </Alert>
-              ))}
               <span></span>
               <span>
                 <img

@@ -2,7 +2,8 @@ import { jwtDecode } from 'jwt-decode';
 import { useCallback, useMemo, useState } from 'react';
 
 import ResumeManagerApi from './api.js';
-import { UserContext } from './contexts.jsx';
+import Notifications from './components/Notifications.jsx';
+import { AppContext, UserContext } from './contexts.jsx';
 import RoutesList from './RoutesList.jsx';
 
 import './App.css';
@@ -16,8 +17,34 @@ function App() {
   const [user, setUser] = useState(
     ResumeManagerApi.authToken ? jwtDecode(ResumeManagerApi.authToken) : {}
   );
+  const [alerts, setAlerts] = useState([]);
 
   // --------------------------------------------------
+
+  /**
+   * Adds a notification, alert, or error message to the list of notifications.
+   *
+   * @param {String} message - The text to display.
+   * @param {String} color - Bootstrap color type (primary, danger).
+   */
+  const addAlert = useCallback((message, color) => {
+    setAlerts((alerts) => [...alerts, { id: Date.now(), message, color }]);
+  }, []);
+
+  /**
+   * Removes a notification, alert, or error message from the list of
+   * notifications.
+   *
+   * @param {Number} id - The ID of an alert to remove.
+   */
+  const removeAlert = useCallback((id) => {
+    setAlerts((alerts) => alerts.filter((alert) => alert.id !== id));
+  }, []);
+
+  /**
+   * Clears all notifications, alerts, or error messages.
+   */
+  const clearAlerts = useCallback(() => setAlerts([]), []);
 
   /**
    * Registers a new user.
@@ -65,6 +92,11 @@ function App() {
 
   // --------------------------------------------------
 
+  const appContextValues = useMemo(
+    () => ({ addAlert, clearAlerts }),
+    [addAlert, clearAlerts]
+  );
+
   const userContextValues = useMemo(
     () => ({
       user,
@@ -79,9 +111,12 @@ function App() {
   // --------------------------------------------------
 
   return (
-    <UserContext.Provider value={userContextValues}>
-      <RoutesList />
-    </UserContext.Provider>
+    <AppContext.Provider value={appContextValues}>
+      <UserContext.Provider value={userContextValues}>
+        <Notifications alerts={alerts} removeAlert={removeAlert} />
+        <RoutesList />
+      </UserContext.Provider>
+    </AppContext.Provider>
   );
 }
 

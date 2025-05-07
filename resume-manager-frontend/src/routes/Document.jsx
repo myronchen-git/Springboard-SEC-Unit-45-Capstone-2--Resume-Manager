@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
-import { Alert, Button } from 'reactstrap';
+import { Button } from 'reactstrap';
 
 import ResumeManagerApi from '../api';
 import ContactInfoCard from '../components/contact_info/ContactInfoCard.jsx';
 import DocumentForm from '../components/document/DocumentForm.jsx';
 import DocumentSelect from '../components/document/DocumentSelect';
 import SectionsList from '../components/general_section/SectionsList.jsx';
-import { DocumentContext, UserContext } from '../contexts.jsx';
+import { AppContext, DocumentContext, UserContext } from '../contexts.jsx';
 
 import pencilIcon from '../assets/pencil.svg';
 import TrashButton from '../components/TrashButton.jsx';
@@ -20,13 +20,14 @@ import './Document.css';
  * allows interacting with it, as well as gives document selection.
  */
 function Document() {
+  const { addAlert } = useContext(AppContext);
+  const { user } = useContext(UserContext);
+
   const [document, setDocument] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [isDocumentSelectOpen, setIsDocumentSelectOpen] = useState(true);
   const [isNewDocumentFormOpen, setIsNewDocumentFormOpen] = useState(false);
   const [isEditDocumentFormOpen, setIsEditDocumentFormOpen] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
-  const { user } = useContext(UserContext);
 
   // --------------------------------------------------
 
@@ -58,8 +59,7 @@ function Document() {
       try {
         setDocument(await ResumeManagerApi.getDocument(documentId));
       } catch (err) {
-        setErrorMessages(err);
-        setTimeout(() => setErrorMessages([]), 5000);
+        err.forEach((message) => addAlert(message, 'danger'));
       }
     }
 
@@ -84,9 +84,7 @@ function Document() {
       // might be large.
       setDocuments([...documents, { ...newDocument }]);
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     } finally {
       setIsNewDocumentFormOpen(false);
     }
@@ -122,9 +120,7 @@ function Document() {
     try {
       await ResumeManagerApi.deleteDocument(document.id);
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
     // Clear out currently-viewing document.
@@ -155,9 +151,7 @@ function Document() {
         formData
       );
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     } finally {
       setIsEditDocumentFormOpen(false);
     }
@@ -204,11 +198,6 @@ function Document() {
           </div>
           {document && <h4>{document.documentName}</h4>}
         </header>
-        {errorMessages.map((msg) => (
-          <Alert key={msg} color="danger">
-            {msg}
-          </Alert>
-        ))}
         {isDocumentSelectOpen && (
           <DocumentSelect
             documents={documents}

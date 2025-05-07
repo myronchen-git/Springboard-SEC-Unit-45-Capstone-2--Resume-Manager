@@ -2,7 +2,7 @@ import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { useCallback, useContext, useRef } from 'react';
 
 import ResumeManagerApi from '../../api.js';
-import { DocumentContext } from '../../contexts.jsx';
+import { AppContext, DocumentContext } from '../../contexts.jsx';
 import AttachSectionCard from './AttachSectionCard.jsx';
 import SectionCard from './SectionCard.jsx';
 
@@ -14,6 +14,7 @@ import { SECTION_ID_TO_DATABASE_NAME } from '../../commonData.js';
  * Renders a list of sections for a resume.
  */
 function SectionsList() {
+  const { addAlert } = useContext(AppContext);
   const [document, setDocument] = useContext(DocumentContext);
 
   // Holds the timeout IDs of [sections, educations, experiences].
@@ -97,8 +98,7 @@ function SectionsList() {
         try {
           await repositionFunc(document.id, newListIds);
         } catch (err) {
-          // TODO: display error message
-          console.error(err);
+          err.forEach((message) => addAlert(message, 'danger'));
 
           // Put list back to its original order.
           setDocument({ ...document, [sectionName]: oldLists[idIdx] });
@@ -108,7 +108,7 @@ function SectionsList() {
         }
       }, repositionTimeDelay);
     },
-    [document, setDocument]
+    [document, setDocument, addAlert]
   );
 
   /**
@@ -166,8 +166,7 @@ function SectionsList() {
             newBulletsIds
           );
         } catch (err) {
-          // TODO: display error message
-          console.error(err);
+          err.forEach((message) => addAlert(message, 'danger'));
 
           // Put list back to its original order.
           const originalDocument = { ...document };
@@ -181,7 +180,7 @@ function SectionsList() {
       }, repositionTimeDelay);
       timeoutIds.set(experienceId, timeoutId);
     },
-    [document, setDocument]
+    [document, setDocument, addAlert]
   );
 
   async function onDragEnd(result) {

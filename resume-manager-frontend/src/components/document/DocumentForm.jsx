@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
-  Alert,
   Button,
   Form,
   FormGroup,
@@ -10,6 +9,8 @@ import {
   ModalBody,
   ModalFooter,
 } from 'reactstrap';
+
+import { AppContext } from '../../contexts.jsx';
 
 // ==================================================
 
@@ -27,8 +28,9 @@ import {
  *  modal React component.  This helps to cancel creating or editing a document.
  */
 function DocumentForm({ initialFormData, submitFunction, submitText, close }) {
+  const { addAlert } = useContext(AppContext);
+
   const [formData, setFormData] = useState(initialFormData);
-  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -46,8 +48,7 @@ function DocumentForm({ initialFormData, submitFunction, submitText, close }) {
     try {
       await submitFunction(formData);
     } catch (err) {
-      setErrorMessages(err);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
   }
 
@@ -98,11 +99,6 @@ function DocumentForm({ initialFormData, submitFunction, submitText, close }) {
               <Label htmlFor="DocumentForm__input-lock">Lock?</Label>
             </FormGroup>
           )}
-          {errorMessages.map((msg) => (
-            <Alert key={msg} color="danger">
-              {msg}
-            </Alert>
-          ))}
         </ModalBody>
         <ModalFooter>
           <Button type="submit" color="primary">

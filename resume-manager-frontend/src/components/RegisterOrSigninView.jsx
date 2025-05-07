@@ -1,5 +1,4 @@
 import {
-  Alert,
   Button,
   Card,
   CardBody,
@@ -25,8 +24,6 @@ import './RegisterOrSigninView.css';
  *  component.
  * @param {Function} props.handleCancel - Handles cancelling the registration or
  *  signing in.
- * @param {String[]} props.errorMessages - Error messages to display to the
- *  user.
  */
 function RegisterOrSigninView({
   name,
@@ -34,7 +31,6 @@ function RegisterOrSigninView({
   handleChange,
   handleSubmit,
   handleCancel,
-  errorMessages,
 }) {
   return (
     <main className={name}>
@@ -83,11 +79,6 @@ function RegisterOrSigninView({
                 />
               </FormGroup>
             )}
-            {errorMessages.map((msg) => (
-              <Alert key={msg} color="danger">
-                {msg}
-              </Alert>
-            ))}
             <Button color="primary" type="submit">
               Submit
             </Button>

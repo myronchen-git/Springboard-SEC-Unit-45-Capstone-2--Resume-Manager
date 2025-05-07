@@ -1,15 +1,8 @@
-import { useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Form,
-  Input,
-} from 'reactstrap';
+import { useContext, useState } from 'react';
+import { Button, Card, CardBody, CardHeader, Form, Input } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
+import { AppContext } from '../../contexts.jsx';
 
 import TrashIcon from '../TrashIcon.jsx';
 
@@ -24,17 +17,17 @@ import TrashIcon from '../TrashIcon.jsx';
  *  Object and attaches the affiliated section to the document.
  */
 function AttachSectionCard({ attachSection }) {
+  const { addAlert } = useContext(AppContext);
+
   const [isRevealed, setIsRevealed] = useState(false);
   const [sectionId, setSectionId] = useState(null);
   const [availableSections, setAvailableSections] = useState(null);
-  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
   async function toggleOpen() {
     setIsRevealed(!isRevealed);
     setSectionId(null);
-    setErrorMessages([]);
 
     if (!isRevealed && availableSections === null)
       setAvailableSections(await ResumeManagerApi.getSections());
@@ -58,8 +51,7 @@ function AttachSectionCard({ attachSection }) {
 
         await attachSection(convertedSectionId, sectionToAttach);
       } catch (err) {
-        setErrorMessages(err);
-        return;
+        return err.forEach((message) => addAlert(message, 'danger'));
       }
 
       toggleOpen();
@@ -99,11 +91,6 @@ function AttachSectionCard({ attachSection }) {
                     );
                   })}
               </Input>
-              {errorMessages.map((msg) => (
-                <Alert key={msg} color="danger">
-                  {msg}
-                </Alert>
-              ))}
               <Button color="primary" type="submit">
                 Add
               </Button>

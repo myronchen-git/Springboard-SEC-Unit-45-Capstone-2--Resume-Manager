@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Alert,
   Button,
   Card,
   CardBody,
@@ -12,7 +11,7 @@ import {
   Label,
 } from 'reactstrap';
 
-import { UserContext } from '../contexts.jsx';
+import { AppContext, UserContext } from '../contexts.jsx';
 
 import './Account.css';
 
@@ -22,14 +21,16 @@ import './Account.css';
  * Displays and handles the form to update account info.
  */
 function Account() {
+  const { addAlert, clearAlerts } = useContext(AppContext);
+  const { updateAccount } = useContext(UserContext);
+
   const initialFormData = {
     oldPassword: '',
     newPassword: '',
     repeatedNewPassword: '',
   };
   const [formData, setFormData] = useState(initialFormData);
-  const [errorMessages, setErrorMessages] = useState([]);
-  const { updateAccount } = useContext(UserContext);
+
   const navigate = useNavigate();
 
   // --------------------------------------------------
@@ -43,9 +44,10 @@ function Account() {
     evt.preventDefault();
 
     if (formData.newPassword !== formData.repeatedNewPassword) {
-      return setErrorMessages([
+      return addAlert(
         'New password and repeated new password do not match.',
-      ]);
+        'danger'
+      );
     }
 
     const formDataCopy = { ...formData };
@@ -54,9 +56,10 @@ function Account() {
     try {
       await updateAccount(formDataCopy);
     } catch (err) {
-      return setErrorMessages(err);
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
+    clearAlerts();
     navigate('/document');
   }
 
@@ -107,11 +110,6 @@ function Account() {
                 onChange={handleChange}
               />
             </FormGroup>
-            {errorMessages.map((msg) => (
-              <Alert key={msg} color="danger">
-                {msg}
-              </Alert>
-            ))}
             <Button color="primary" type="submit">
               Submit
             </Button>

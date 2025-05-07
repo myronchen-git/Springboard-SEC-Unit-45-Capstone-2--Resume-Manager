@@ -1,9 +1,9 @@
 import { Draggable } from '@hello-pangea/dnd';
 import { useContext, useState } from 'react';
-import { Alert, Card, CardBody, CardHeader } from 'reactstrap';
+import { Card, CardBody, CardHeader } from 'reactstrap';
 
 import ResumeManagerApi from '../../api.js';
-import { DocumentContext } from '../../contexts.jsx';
+import { AppContext, DocumentContext } from '../../contexts.jsx';
 import GenericForm from '../GenericForm.jsx';
 import EducationText from './EducationText.jsx';
 
@@ -28,9 +28,10 @@ import TrashIcon from '../TrashIcon.jsx';
  *  This is used for @hello-pangea/dnd.
  */
 function EducationCard({ item: education, idx }) {
+  const { addAlert } = useContext(AppContext);
   const [document, setDocument] = useContext(DocumentContext);
+
   const [isEditEducationFormOpen, setIsEditEducationFormOpen] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
 
   // --------------------------------------------------
 
@@ -42,10 +43,15 @@ function EducationCard({ item: education, idx }) {
    * @see ResumeManagerApi.updateEducation for formData properties.
    */
   async function editEducation(formData) {
-    const updatedEducation = await ResumeManagerApi.updateEducation(
-      education.id,
-      formData
-    );
+    let updatedEducation;
+    try {
+      updatedEducation = await ResumeManagerApi.updateEducation(
+        education.id,
+        formData
+      );
+    } catch (err) {
+      return err.forEach((message) => addAlert(message, 'danger'));
+    }
 
     // Removing owner property because it is not necessary.
     delete updatedEducation.owner;
@@ -85,9 +91,7 @@ function EducationCard({ item: education, idx }) {
         );
       }
     } catch (err) {
-      setErrorMessages(err);
-      setTimeout(() => setErrorMessages([]), 5000);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
 
     // Clone Array to indicate to other components that it has been changed.
@@ -118,11 +122,6 @@ function EducationCard({ item: education, idx }) {
         <div ref={provided.innerRef} {...provided.draggableProps}>
           <Card className="EducationCard" tag="article">
             <CardHeader tag="header">
-              {errorMessages.map((msg) => (
-                <Alert key={msg} color="danger">
-                  {msg}
-                </Alert>
-              ))}
               <span></span>
               <span>
                 <img

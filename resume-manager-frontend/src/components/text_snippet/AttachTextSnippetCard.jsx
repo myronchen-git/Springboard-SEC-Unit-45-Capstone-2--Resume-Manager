@@ -1,15 +1,7 @@
 import { useContext, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Form,
-  Input,
-} from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Form, Input } from 'reactstrap';
 
-import { TextSnippetContext } from '../../contexts.jsx';
+import { AppContext, TextSnippetContext } from '../../contexts.jsx';
 
 import TrashIcon from '../TrashIcon.jsx';
 
@@ -20,6 +12,7 @@ import TrashIcon from '../TrashIcon.jsx';
  * section item.
  */
 function AttachTextSnippetCard() {
+  const { addAlert } = useContext(AppContext);
   const { attachTextSnippet, getAvailableTextSnippets } =
     useContext(TextSnippetContext);
 
@@ -27,14 +20,11 @@ function AttachTextSnippetCard() {
   const [textSnippetIdAndVersion, setTextSnippetIdAndVersion] = useState([]);
   const [availableTextSnippets, setAvailableTextSnippets] = useState(null);
 
-  const [errorMessages, setErrorMessages] = useState([]);
-
   // --------------------------------------------------
 
   async function toggleOpen() {
     setIsRevealed(!isRevealed);
     setTextSnippetIdAndVersion([]);
-    setErrorMessages([]);
 
     if (!isRevealed && availableTextSnippets === null)
       setAvailableTextSnippets(await getAvailableTextSnippets());
@@ -60,8 +50,7 @@ function AttachTextSnippetCard() {
 
         await attachTextSnippet(id, version, textSnippetToAttach);
       } catch (err) {
-        setErrorMessages(err);
-        return;
+        return err.forEach((message) => addAlert(message, 'danger'));
       }
 
       toggleOpen();
@@ -104,11 +93,6 @@ function AttachTextSnippetCard() {
                     );
                   })}
               </Input>
-              {errorMessages.map((msg) => (
-                <Alert key={msg} color="danger">
-                  {msg}
-                </Alert>
-              ))}
               <Button color="primary" type="submit">
                 Add
               </Button>

@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import {
-  Alert,
   Button,
   Card,
   CardBody,
@@ -14,6 +13,8 @@ import {
   ModalBody,
   ModalFooter,
 } from 'reactstrap';
+
+import { AppContext } from '../../contexts.jsx';
 
 import { generateDateTimeString } from '../../util/conversions';
 
@@ -36,8 +37,11 @@ import './DocumentSelect.css';
  *  used to cancel document selection.
  */
 function DocumentSelect({ documents, loadDocument, close }) {
+  const { addAlert } = useContext(AppContext);
+
   const [selectedOption, setSelectedOption] = useState(null);
-  const [errorMessages, setErrorMessages] = useState([]);
+
+  // --------------------------------------------------
 
   function handleChange(evt) {
     const { value } = evt.target;
@@ -50,8 +54,7 @@ function DocumentSelect({ documents, loadDocument, close }) {
     try {
       await loadDocument(Number(selectedOption));
     } catch (err) {
-      setErrorMessages(err);
-      return;
+      return err.forEach((message) => addAlert(message, 'danger'));
     }
   }
 
@@ -151,11 +154,6 @@ function DocumentSelect({ documents, loadDocument, close }) {
               handleChange={handleChange}
             />
           </ul>
-          {errorMessages.map((msg) => (
-            <Alert key={msg} color="danger">
-              {msg}
-            </Alert>
-          ))}
         </ModalBody>
         <ModalFooter tag="footer">
           <Button type="submit" color="primary">
