@@ -1,6 +1,6 @@
 import { Button } from 'reactstrap';
 
-import useConfirmClick from '../util/useConfirmClick.jsx';
+import useConfirmClick from '../hooks/useConfirmClick.jsx';
 
 import TrashSvg from '../assets/trashSvg.jsx';
 

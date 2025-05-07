@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import ResumeManagerApi from './api.js';
 import Notifications from './components/Notifications.jsx';
 import { AppContext, UserContext } from './contexts.jsx';
+import useNotifications from './hooks/useNotifications.jsx';
 import RoutesList from './RoutesList.jsx';
 
 import './App.css';
@@ -17,34 +18,9 @@ function App() {
   const [user, setUser] = useState(
     ResumeManagerApi.authToken ? jwtDecode(ResumeManagerApi.authToken) : {}
   );
-  const [alerts, setAlerts] = useState([]);
+  const { alerts, addAlert, removeAlert, clearAlerts } = useNotifications();
 
   // --------------------------------------------------
-
-  /**
-   * Adds a notification, alert, or error message to the list of notifications.
-   *
-   * @param {String} message - The text to display.
-   * @param {String} color - Bootstrap color type (primary, danger).
-   */
-  const addAlert = useCallback((message, color) => {
-    setAlerts((alerts) => [...alerts, { id: Date.now(), message, color }]);
-  }, []);
-
-  /**
-   * Removes a notification, alert, or error message from the list of
-   * notifications.
-   *
-   * @param {Number} id - The ID of an alert to remove.
-   */
-  const removeAlert = useCallback((id) => {
-    setAlerts((alerts) => alerts.filter((alert) => alert.id !== id));
-  }, []);
-
-  /**
-   * Clears all notifications, alerts, or error messages.
-   */
-  const clearAlerts = useCallback(() => setAlerts([]), []);
 
   /**
    * Registers a new user.
