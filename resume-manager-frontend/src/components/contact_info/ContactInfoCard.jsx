@@ -62,12 +62,14 @@ function ContactInfoCard() {
         <span></span>
         <span></span>
         <span>
-          <div
-            className="clickable-icon"
-            onClick={() => setIsEditing((previousState) => !previousState)}
-          >
-            <img src={pencilIcon} alt="edit icon" />
-          </div>
+          {document.isMaster && (
+            <div
+              className="clickable-icon"
+              onClick={() => setIsEditing((previousState) => !previousState)}
+            >
+              <img src={pencilIcon} alt="edit icon" />
+            </div>
+          )}
         </span>
       </CardHeader>
       {isEditing ? (

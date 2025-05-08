@@ -40,6 +40,8 @@
 }
 
 #Document .card-header {
+  box-sizing: content-box;
+  min-height: 2em;
   padding: 0.25em 1em;
 
   display: flex;
