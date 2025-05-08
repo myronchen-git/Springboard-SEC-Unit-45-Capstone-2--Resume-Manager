@@ -86,10 +86,10 @@ function ContactInfoCard() {
           </h2>
           {document?.contactInfo && (
             <div className="ContactInfoCard__contact-info">
-              {Object.entries(document.contactInfo).map(
-                ([infoName, infoValue]) => {
-                  if (infoName !== 'fullName') {
-                    return (
+              {Object.entries(document.contactInfo).reduce(
+                (infoList, [infoName, infoValue]) => {
+                  if (infoName !== 'fullName' && infoValue) {
+                    infoList.push(
                       <span
                         key={infoName}
                         className="ContactInfoCard__contact-info-piece"
@@ -98,7 +98,10 @@ function ContactInfoCard() {
                       </span>
                     );
                   }
-                }
+
+                  return infoList;
+                },
+                []
               )}
             </div>
           )}
