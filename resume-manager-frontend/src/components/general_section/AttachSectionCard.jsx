@@ -29,8 +29,13 @@ function AttachSectionCard({ attachSection }) {
     setIsRevealed(!isRevealed);
     setSectionId(null);
 
-    if (!isRevealed && availableSections === null)
-      setAvailableSections(await ResumeManagerApi.getSections());
+    if (!isRevealed && availableSections === null) {
+      // setAvailableSections(await ResumeManagerApi.getSections());
+
+      // Temporary exclusion of sections until they get implemented.
+      const retrievedSections = await ResumeManagerApi.getSections();
+      setAvailableSections(retrievedSections.slice(0, 2));
+    }
   }
 
   function handleChange(evt) {
