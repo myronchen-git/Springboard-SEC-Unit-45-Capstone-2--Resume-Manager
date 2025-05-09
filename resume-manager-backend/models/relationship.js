@@ -107,7 +107,9 @@ class Relationship {
   /**
    * Updates the positions of all relationships belonging to a particular
    * container.  In other words, updates all of the positions of a type of
-   * content in a document, experience, etc..
+   * content in a document, experience, etc..  Ensure that exactly all
+   * educations, experiences, etc. for a document or all text snippets for an
+   * experience are provided.
    *
    * @param {Object} attachTo - Holds the data related to the container of the
    *  content.
@@ -137,28 +139,6 @@ class Relationship {
     const dbClient = await db.getClient();
 
     try {
-      // Verify number of IDs.
-      const countResult = await db.query({
-        queryConfig: {
-          text: `
-  SELECT COUNT(*)
-  FROM ${this.tableName}
-  WHERE ${attachTo.sqlName} = $1;`,
-          values: [attachTo.id],
-        },
-        logPrefix,
-        dbClient,
-      });
-      if (countResult.rows[0].count != attachWiths.ids.length) {
-        logger.error(
-          `${logPrefix}: Number of content to reposition is not equal to ` +
-            `number in container.  Container has ${countResult.rows[0].count}.`
-        );
-        throw new AppServerError(
-          'Number of things to reposition must be total number in container.'
-        );
-      }
-
       // Start SQL transaction.
       await db.query({
         queryConfig: {
@@ -201,8 +181,11 @@ class Relationship {
       return results;
     } catch (err) {
       if (err instanceof AppError) {
+        // Currently, no AppError is being thrown, but in the future, if Error
+        // thrown is already an AppError, continue throwing.
         throw err;
       } else {
+        // Rethrow Error given by database.
         logger.error(`${logPrefix}: ${err.message}`);
         throw new AppServerError('Error when updating positions in database.');
       }

@@ -315,54 +315,6 @@ describe('Document_X_Section', () => {
         shuffledDocuments_x_sections
       );
     });
-
-    test.each([
-      [
-        documents_x_sections.length - 1,
-        (() => {
-          const clonedData = structuredClone(documents_x_sections);
-          clonedData.pop();
-          return clonedData;
-        })(),
-        ,
-      ],
-      [
-        documents_x_sections.length + 1,
-        (() => {
-          const clonedData = structuredClone(documents_x_sections);
-          clonedData.push({ ...clonedData.at(-1) });
-          clonedData.at(-1).sectionId = clonedData.at(-1).sectionId + 1;
-          clonedData.at(-1).position = clonedData.at(-1).position + 1;
-          return clonedData;
-        })(),
-        ,
-      ],
-    ])(
-      'Throws an Error if the number of section IDs is not the exact ' +
-        'amount in a document.  # of section IDs = %d.',
-      async (amount, documents_x_sections) => {
-        // Arrange
-        const shuffledDocuments_x_sections = shuffle(documents_x_sections);
-        shuffledDocuments_x_sections.forEach(
-          (_, idx) => (shuffledDocuments_x_sections[idx].position = idx)
-        );
-
-        const updatedPositionedSectionIds = shuffledDocuments_x_sections.map(
-          (dxs) => dxs.sectionId
-        );
-
-        // Act
-        async function runFunc() {
-          await Document_X_Section.updateAllPositions(
-            documentId,
-            updatedPositionedSectionIds
-          );
-        }
-
-        // Assert
-        await expect(runFunc).rejects.toThrow(AppServerError);
-      }
-    );
   });
 
   // -------------------------------------------------- update
