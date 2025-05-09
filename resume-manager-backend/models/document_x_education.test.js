@@ -369,6 +369,76 @@ describe('Document_X_Education', () => {
     });
   });
 
+  // -------------------------------------------------- updateAllPositions
+
+  describe('updateAllPositions', () => {
+    beforeEach(async () => {
+      for (const documentXEducation of documents_x_educations) {
+        await Document_X_Education.add(documentXEducation);
+      }
+    });
+
+    test('Updates all education positions in a document.', async () => {
+      // Arrange
+      const repositionedEducationIds = documents_x_educations
+        .map((documentXEducation) => documentXEducation.educationId)
+        .reverse();
+
+      // Act
+      const repositionedDocumentsXEducations =
+        await Document_X_Education.updateAllPositions(
+          documentId,
+          repositionedEducationIds
+        );
+
+      // Assert
+      const expectedDocumentsXEducations = documents_x_educations.map(
+        (_, idx) => ({
+          ...documents_x_educations.at(-1 * idx - 1),
+          position: idx,
+        })
+      );
+
+      expect(repositionedDocumentsXEducations).toEqual(
+        expectedDocumentsXEducations
+      );
+
+      const databaseEntries = (
+        await db.query({
+          queryConfig: {
+            text: sqlTextSelectAll + '\n  ORDER BY position;',
+          },
+        })
+      ).rows;
+
+      expect(databaseEntries).toEqual(expectedDocumentsXEducations);
+    });
+
+    test("Throws custom Error instead of node-postgres' error type", async () => {
+      // Arrange
+      const educationIds = documents_x_educations.map(
+        (documentXEducation) => documentXEducation.educationId
+      );
+      educationIds.push(99);
+
+      // Act/Assert
+      await expect(
+        Document_X_Education.updateAllPositions(documentId, educationIds)
+      ).rejects.toThrow(AppServerError);
+
+      // Assert
+      const databaseEntries = (
+        await db.query({
+          queryConfig: {
+            text: sqlTextSelectAll + '\n  ORDER BY position;',
+          },
+        })
+      ).rows;
+
+      expect(databaseEntries).toEqual(documents_x_educations);
+    });
+  });
+
   // -------------------------------------------------- delete
 
   describe('delete', () => {
