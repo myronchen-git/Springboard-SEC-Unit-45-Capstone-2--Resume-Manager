@@ -2,20 +2,18 @@
 
 const Document = require('../models/document');
 const { updateDocument, deleteDocument } = require('./documentService');
+const { deleteItem: mockDeleteItem } = require('./commonServices');
 const {
   validateOwnership: mockValidateOwnership,
 } = require('../util/serviceHelpers');
 
-const {
-  ForbiddenError,
-  NotFoundError,
-  ArgumentError,
-} = require('../errors/appErrors');
+const { ForbiddenError, ArgumentError } = require('../errors/appErrors');
 
 // ==================================================
 
-jest.mock('../util/serviceHelpers');
 jest.mock('../models/document');
+jest.mock('./commonServices');
+jest.mock('../util/serviceHelpers');
 
 // ==================================================
 
@@ -140,39 +138,39 @@ describe('deleteDocument', () => {
   const username = 'user1';
   const documentId = '1';
 
-  const mockDelete = jest.fn();
-
   beforeEach(() => {
-    mockValidateOwnership.mockReset();
-    mockDelete.mockReset();
+    mockDeleteItem.mockReset();
   });
 
-  test('Calls document.delete if document is found and belongs to user.', async () => {
+  test('Does not throw an Error if the document is not the master resume.', async () => {
     // Arrange
     const document = { owner: username, isMaster: false };
 
-    mockValidateOwnership.mockResolvedValue(document);
-    document.delete = mockDelete;
+    mockDeleteItem.mockImplementation(
+      (_classRef, _username, _id, runExtraFunction) =>
+        Promise.resolve(runExtraFunction(document))
+    );
 
     // Act
     await deleteDocument(username, documentId);
 
     // Assert
-    expect(mockValidateOwnership).toHaveBeenCalledWith(
+    expect(mockDeleteItem).toHaveBeenCalledWith(
       Document,
       username,
       { id: documentId },
-      expect.any(String)
+      expect.any(Function)
     );
-    expect(document.delete).toHaveBeenCalled();
   });
 
   test('Throws an Error if the document is the master resume.', async () => {
     // Arrange
     const document = { owner: username, isMaster: true };
 
-    mockValidateOwnership.mockResolvedValue(document);
-    document.delete = mockDelete;
+    mockDeleteItem.mockImplementation(
+      (_classRef, _username, _id, runExtraFunction) =>
+        Promise.resolve(runExtraFunction(document))
+    );
 
     // Act
     async function runFunc() {
@@ -181,55 +179,12 @@ describe('deleteDocument', () => {
 
     // Assert
     await expect(runFunc).rejects.toThrow(ForbiddenError);
-    expect(mockValidateOwnership).toHaveBeenCalledWith(
+
+    expect(mockDeleteItem).toHaveBeenCalledWith(
       Document,
       username,
       { id: documentId },
-      expect.any(String)
+      expect.any(Function)
     );
-    expect(document.delete).not.toHaveBeenCalled();
-  });
-
-  test('Does not throw an Error if document is not found.', async () => {
-    // Arrange
-    const document = { owner: username, isMaster: false };
-
-    mockValidateOwnership.mockRejectedValue(new NotFoundError());
-    document.delete = mockDelete;
-
-    // Act
-    await deleteDocument(username, documentId);
-
-    // Assert
-    expect(mockValidateOwnership).toHaveBeenCalledWith(
-      Document,
-      username,
-      { id: documentId },
-      expect.any(String)
-    );
-    expect(document.delete).not.toHaveBeenCalled();
-  });
-
-  test('Passes along other Errors from validateOwnership.', async () => {
-    // Arrange
-    const document = { owner: username, isMaster: false };
-
-    mockValidateOwnership.mockRejectedValue(new Error());
-    document.delete = mockDelete;
-
-    // Act
-    async function runFunc() {
-      await deleteDocument(username, documentId);
-    }
-
-    // Assert
-    await expect(runFunc).rejects.toThrow();
-    expect(mockValidateOwnership).toHaveBeenCalledWith(
-      Document,
-      username,
-      { id: documentId },
-      expect.any(String)
-    );
-    expect(document.delete).not.toHaveBeenCalled();
   });
 });

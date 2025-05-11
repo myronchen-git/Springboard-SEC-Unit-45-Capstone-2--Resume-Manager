@@ -4,13 +4,10 @@ const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
 const Document = require('../models/document');
+const { deleteItem } = require('./commonServices');
 const { validateOwnership } = require('../util/serviceHelpers');
 
-const {
-  ForbiddenError,
-  NotFoundError,
-  ArgumentError,
-} = require('../errors/appErrors');
+const { ForbiddenError, ArgumentError } = require('../errors/appErrors');
 
 const logger = require('../util/logger');
 
@@ -95,28 +92,12 @@ async function deleteDocument(username, documentId) {
     `documentId = ${documentId})`;
   logger.verbose(logPrefix);
 
-  let document;
-  try {
-    document = await validateOwnership(
-      Document,
-      username,
-      { id: documentId },
-      logPrefix
-    );
-  } catch (err) {
-    if (err instanceof NotFoundError) {
-      return;
-    } else {
-      throw err;
+  await deleteItem(Document, username, { id: documentId }, (document) => {
+    if (document.isMaster) {
+      logger.error(`${logPrefix}: User attempted to delete the master resume.`);
+      throw new ForbiddenError('Can not delete master resume.');
     }
-  }
-
-  if (document.isMaster) {
-    logger.error(`${logPrefix}: User attempted to delete the master resume.`);
-    throw new ForbiddenError('Can not delete master resume.');
-  }
-
-  await document.delete();
+  });
 }
 
 // ==================================================

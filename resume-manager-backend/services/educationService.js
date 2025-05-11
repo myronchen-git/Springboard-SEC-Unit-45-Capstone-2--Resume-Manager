@@ -11,6 +11,7 @@ const {
   createDocumentXSectionTypeRelationship,
   updateDocumentXSectionTypePositions,
 } = require('./commonSectionsService');
+const { deleteItem } = require('./commonServices');
 const {
   validateOwnership,
   transformObjectEmptyStringValuesIntoNulls,
@@ -181,14 +182,7 @@ async function deleteEducation(username, educationId) {
     `educationId = ${educationId})`;
   logger.verbose(logPrefix);
 
-  const education = await validateOwnership(
-    Education,
-    username,
-    { id: educationId },
-    logPrefix
-  );
-
-  await education.delete();
+  await deleteItem(Education, username, { id: educationId });
 }
 
 // ==================================================

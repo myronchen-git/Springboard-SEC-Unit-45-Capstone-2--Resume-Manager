@@ -4,7 +4,7 @@ const path = require('path');
 const fileName = path.basename(__filename, '.js');
 
 const TextSnippet = require('../models/textSnippet');
-const { validateOwnership } = require('../util/serviceHelpers');
+const { deleteItem } = require('./commonServices');
 
 const logger = require('../util/logger');
 
@@ -27,14 +27,10 @@ async function deleteTextSnippet(username, textSnippetId, textSnippetVersion) {
     `textSnippetVersion = "${textSnippetVersion}")`;
   logger.verbose(logPrefix);
 
-  const textSnippet = await validateOwnership(
-    TextSnippet,
-    username,
-    { id: textSnippetId, version: textSnippetVersion },
-    logPrefix
-  );
-
-  await textSnippet.delete();
+  await deleteItem(TextSnippet, username, {
+    id: textSnippetId,
+    version: textSnippetVersion,
+  });
 }
 
 // ==================================================
