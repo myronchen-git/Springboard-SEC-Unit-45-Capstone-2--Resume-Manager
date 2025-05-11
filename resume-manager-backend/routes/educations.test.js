@@ -629,3 +629,94 @@ describe('PATCH /users/:username/educations/:educationId', () => {
     expect(resp.body).not.toHaveProperty('education');
   });
 });
+
+// --------------------------------------------------
+// DELETE /users/:username/educations/:educationId
+
+describe('DELETE /users/:username/educations/:educationId', () => {
+  // Temporary URL generator until a better modular and more general URL
+  // generator is made.
+  const getEducationUrl = (username, educationId) =>
+    `/api/v1/users/${username}/educations/${educationId}`;
+
+  let authToken;
+  let documentId;
+  let educationId;
+
+  beforeAll(async () => {
+    authToken = authTokens[0];
+    documentId = masterDocumentIds[0];
+  });
+
+  beforeEach(async () => {
+    await clearTable(db, Education.tableName);
+
+    // Adding an education into database.
+    const resp = await request(app)
+      .post(getEducationsGeneralUrl(username, documentId))
+      .send(educationsForRawClientInputs[0])
+      .set('authorization', `Bearer ${authToken}`);
+
+    educationId = resp.body.education.id;
+  });
+
+  afterAll(() => clearTable(db, Education.tableName));
+
+  test('Deletes an education', async () => {
+    // Act
+    const resp = await request(app)
+      .delete(getEducationUrl(username, educationId))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+  });
+
+  test(
+    'Giving an invalid education ID in the URL ' + 'should return 400 status.',
+    async () => {
+      // Arrange
+      const invalidEducationId = 'abc';
+
+      // Act
+      const resp = await request(app)
+        .delete(getEducationUrl(username, invalidEducationId))
+        .set('authorization', `Bearer ${authToken}`);
+
+      // Assert
+      expect(resp.statusCode).toBe(400);
+    }
+  );
+
+  test('Deleting a nonexistent education should return 200 status.', async () => {
+    // Arrange
+    const nonexistentEducationId = 99;
+
+    // Act
+    const resp = await request(app)
+      .delete(getEducationUrl(username, nonexistentEducationId))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(200);
+  });
+
+  test("Deleting another user's education should return 403 status.", async () => {
+    // Arrange
+    // Adding another user's education into database.
+    let resp = await request(app)
+      .post(getEducationsGeneralUrl(users[1].username, masterDocumentIds[1]))
+      .send(educationsForRawClientInputs[0])
+      .set('authorization', `Bearer ${authTokens[1]}`);
+
+    const otherEducationId = resp.body.education.id;
+
+    // Act
+    resp = await request(app)
+      .delete(getEducationUrl(username, otherEducationId))
+      .set('authorization', `Bearer ${authToken}`);
+
+    // Assert
+    expect(resp.statusCode).toBe(403);
+  });
+});
