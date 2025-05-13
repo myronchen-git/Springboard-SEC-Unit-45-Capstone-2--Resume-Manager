@@ -49,7 +49,7 @@ class ResumeManagerApi {
    * @param {Object} data - If the method is GET, this will be used for the
    *  query parameters.  Else, this will be in the request body.
    * @param {String} method - The HTTP method.
-   * @returns {Object} The response data.
+   * @returns {Promise<Object>} The response data.
    */
   static async request(endpoint, data = {}, method = 'get') {
     console.debug('API Call: ', endpoint, data, method);
@@ -111,7 +111,8 @@ class ResumeManagerApi {
    * Registers a new user.
    *
    * @param {Object} user - { username, password }
-   * @returns {Object} Decoded authentication token, which should be user data.
+   * @returns {Promise<Object>} Decoded authentication token, which should be
+   *  user data.
    */
   static async registerUser(user) {
     const res = await this.request('auth/register', user, 'post');
@@ -123,7 +124,8 @@ class ResumeManagerApi {
    * Signs in a user.
    *
    * @param {Object} user - { username, password }
-   * @returns {Object} Decoded authentication token, which should be user data.
+   * @returns {Promise<Object>} Decoded authentication token, which should be
+   *  user data.
    */
   static async signinUser(user) {
     const res = await this.request('auth/signin', user, 'post');
@@ -137,7 +139,7 @@ class ResumeManagerApi {
    * @param {Object} user - Contains the data for updating account.
    * @param {String} user.oldPassword - Old password of the user.
    * @param {String} user.newPassword - New password of the user.
-   * @returns {Object} Account info of the user, such as username.
+   * @returns {Promise<Object>} Account info of the user, such as username.
    */
   static async updateAccount(user) {
     const res = await this.request(`users/${this.#username}`, user, 'patch');
@@ -147,7 +149,7 @@ class ResumeManagerApi {
   /**
    * Gets a user's contact information, such as full name, location, and email.
    *
-   * @returns {Object} Contact information data.
+   * @returns {Promise<Object>} Contact information data.
    */
   static async getContactInfo() {
     const res = await this.request(`users/${this.#username}/contact-info`);
@@ -168,7 +170,7 @@ class ResumeManagerApi {
    *  the user.
    * @param {String} [data.github] - GitHub URL address for the user's GitHub
    *  profile.
-   * @returns {Object} Updated contact information data.
+   * @returns {Promise<Object>} Updated contact information data.
    */
   static async updateContactInfo(data) {
     const res = await this.request(
@@ -186,7 +188,7 @@ class ResumeManagerApi {
    * @param {String} data.documentName - Name of the new document.
    * @param {Boolean} data.isTemplate - Whether this new document should be a
    *  template.
-   * @returns {Object} Returns the properties of the document.
+   * @returns {Promise<Object>} Returns the properties of the document.
    */
   static async createDocument(data) {
     const res = await this.request(
@@ -214,8 +216,8 @@ class ResumeManagerApi {
    * Gets all documents and their properties.  This does not get the contents,
    * such as education and experience.
    *
-   * @returns {Object} Returns a list of documents containing all info of each
-   *  document.
+   * @returns {Promise<Object>} Returns a list of documents containing all info
+   *  of each document.
    */
   static async getDocuments() {
     const res = await this.request(`users/${this.#username}/documents`);
@@ -226,8 +228,8 @@ class ResumeManagerApi {
    * Gets a document with all its contents.
    *
    * @param {Number} documentId - ID of the document to retrieve.
-   * @returns {Object} Document properties, contact info, education, experience,
-   *  etc.
+   * @returns {Promise<Object>} Document properties, contact info, education,
+   *  experience, etc.
    */
   static async getDocument(documentId) {
     const res = await this.request(
@@ -246,7 +248,8 @@ class ResumeManagerApi {
    * @param {Boolean} [data.isTemplate] - Whether this document should be a
    *  template.
    * @param {Boolean} [data.isLocked] - Whether this document should be locked.
-   * @returns {Object} document - Returns all info of the updated document.
+   * @returns {Promise<Object>} document - Returns all info of the updated
+   *  document.
    */
   static async updateDocument(documentId, data) {
     const res = await this.request(
@@ -260,7 +263,7 @@ class ResumeManagerApi {
   /**
    * Gets all allowed sections that a resume can contain.
    *
-   * @returns {Object[]} A list of section Objects that can be used in
+   * @returns {Promise<Object[]>} A list of section Objects that can be used in
    *  documents.
    */
   static async getSections() {
@@ -274,8 +277,8 @@ class ResumeManagerApi {
    *
    * @param {Number} documentId - ID of the document to add a section to.
    * @param {Number} sectionId - ID of the section to add.
-   * @returns {Object} The document_x_section Object, which contains document
-   *  ID, section ID, and position of section within document.
+   * @returns {Promise<Object>} The document_x_section Object, which contains
+   *  document ID, section ID, and position of section within document.
    */
   static async attachSectionToDocument(documentId, sectionId) {
     const res = await this.request(
@@ -292,8 +295,8 @@ class ResumeManagerApi {
    * @param {Number} documentId - ID of the document that is having its sections
    *  repositioned.
    * @param {Number[]} sectionIds - A list of section IDs in the desired order.
-   * @returns {Array} A list of Section Objects in order of position in the
-   *  document, each containing general section info.
+   * @returns {Promise<Object[]>} A list of Section Objects in order of position
+   *  in the document, each containing general section info.
    */
   static async repositionSections(documentId, sectionIds) {
     const res = await this.request(
@@ -322,8 +325,8 @@ class ResumeManagerApi {
   /**
    * Gets all educations from a user.
    *
-   * @returns {Object[]} A list of education Objects, each containing info like
-   *  school name and location.
+   * @returns {Promise<Object[]>} A list of education Objects, each containing
+   *  info like school name and location.
    */
   static async getEducations() {
     const res = await this.request(`users/${this.#username}/educations`);
@@ -347,10 +350,10 @@ class ResumeManagerApi {
    *  school.
    * @param {String} [data.activities] - Any activities done in relation to the
    *  school.
-   * @returns {{
+   * @returns {Promise<{
    *    education: Object,
    *    document_x_education: Object
-   *  }}
+   *  }>}
    *  education - The education ID and all of the given info.
    *  document_x_education - The document ID that owns the education, the
    *  education ID, and the position of the education among other educations in
@@ -371,8 +374,8 @@ class ResumeManagerApi {
    *
    * @param {Number} documentId - ID of the document to attach an education to.
    * @param {Number} educationId - ID of the education to attach.
-   * @returns {Object} The document_x_education Object, which contains document
-   *  ID, education ID, and position of education within document.
+   * @returns {Promise<Object>} The document_x_education Object, which contains
+   *  document ID, education ID, and position of education within document.
    */
   static async attachEducationToDocument(documentId, educationId) {
     const res = await this.request(
@@ -402,7 +405,8 @@ class ResumeManagerApi {
    *  school.
    * @param {String} [data.activities] - Any activities done in relation to the
    *  school.
-   * @returns {Object} All of the education's current info from the database.
+   * @returns {Promise<Object>} All of the education's current info from the
+   *  database.
    */
   static async updateEducation(educationId, data) {
     const res = await this.request(
@@ -420,8 +424,8 @@ class ResumeManagerApi {
    *  educations repositioned.
    * @param {Number[]} educationIds - A list of education IDs in the desired
    *  order.
-   * @returns {Array} A list of Education Objects in order of position in the
-   *  document, each containing education info.
+   * @returns {Promise<Object[]>} A list of Education Objects in order of
+   *  position in the document, each containing education info.
    */
   static async repositionEducations(documentId, educationIds) {
     const res = await this.request(
@@ -466,8 +470,8 @@ class ResumeManagerApi {
   /**
    * Gets all experiences from a user.
    *
-   * @returns {Object[]} A list of experience Objects, each containing info like
-   *  job title and organization name.
+   * @returns {Promise<Object[]>} A list of experience Objects, each containing
+   *  info like job title and organization name.
    */
   static async getExperiences() {
     const res = await this.request(`users/${this.#username}/experiences`);
@@ -486,10 +490,10 @@ class ResumeManagerApi {
    * @param {String} data.startDate - The start date of joining the
    *  organization.
    * @param {String} [data.endDate] - The end date of leaving the organization.
-   * @returns {{
+   * @returns {Promise<{
    *    experience: Object,
    *    document_x_experience: Object
-   *  }}
+   *  }>}
    *  experience - The experience ID and all of the given info.
    *  document_x_experience - The ID of the document_x_experience, the document
    *  ID that owns the experience, the experience ID, and the position of the
@@ -510,9 +514,9 @@ class ResumeManagerApi {
    *
    * @param {Number} documentId - ID of the document to attach an experience to.
    * @param {Number} experienceId - ID of the experience to attach.
-   * @returns {Object} The document_x_experience Object, which contains the ID
-   *  of the document_x_experience, document ID, experience ID, and position of
-   *  experience within document.
+   * @returns {Promise<Object>} The document_x_experience Object, which contains
+   *  the ID of the document_x_experience, document ID, experience ID, and
+   *  position of experience within document.
    */
   static async attachExperienceToDocument(documentId, experienceId) {
     const res = await this.request(
@@ -537,8 +541,8 @@ class ResumeManagerApi {
    * @param {String} [data.location] - Location of the organization.
    * @param {String} [data.startDate] - Start date of joining the organization.
    * @param {String} [data.endDate] - End date of leaving the organization.
-   * @returns {Object} All of the experience's current info from the database,
-   *  but does not include text snippets.
+   * @returns {Promise<Object>} All of the experience's current info from the
+   *  database, but does not include text snippets.
    */
   static async updateExperience(experienceId, data) {
     const res = await this.request(
@@ -557,8 +561,8 @@ class ResumeManagerApi {
    *  experiences repositioned.
    * @param {Number[]} experienceIds - A list of experience IDs in the desired
    *  order.
-   * @returns {Array} A list of Experience Objects in order of position in the
-   *  document, each containing experience info.
+   * @returns {Promise<Object[]>} A list of Experience Objects in order of
+   *  position in the document, each containing experience info.
    */
   static async repositionExperiences(documentId, experienceIds) {
     const res = await this.request(
@@ -609,13 +613,13 @@ class ResumeManagerApi {
    * @param {Number} sectionId - ID of the section type.
    * @param {Number} sectionItemId - ID of the specific item in the section.
    * @param {Object} data - Holds the info for creating a new text snippet.
-   * @param {String} data.type - The type of content, such as bullet point
-   *  or description.
+   * @param {String} data.type - The type of content, such as bullet point or
+   *  description.
    * @param {String} data.content - Content of the text snippet.
-   * @returns {{
+   * @returns {Promise<{
    *    textSnippet: Object,
    *    sectionItemXTextSnippet: Object
-   *  }}
+   *  }>}
    *  textSnippet - Text snippet ID, version, owner, parent, type, and content.
    *  sectionItemXTextSnippet - Not actually called sectionItemXTextSnippet but
    *  can be experienceXTextSnippet or non-existent.  Includes the
@@ -638,8 +642,8 @@ class ResumeManagerApi {
    *
    * @param {Number} experienceId - ID of the experience to fetch text snippets
    *  for.
-   * @returns {Object[]} A list of text snippet Objects, each containing info
-   *  like content.
+   * @returns {Promise<Object[]>} A list of text snippet Objects, each
+   *  containing info like content.
    */
   static async getTextSnippetsForExperience(experienceId) {
     const res = await this.request(
@@ -658,9 +662,9 @@ class ResumeManagerApi {
    * @param {Number} textSnippetId - ID part of the text snippet to attach.
    * @param {String} textSnippetVersion - Version part of the text snippet to
    *  attach.
-   * @returns {Object} The experience_x_textSnippet Object, which contains the
-   *  ID of the document_x_experience, text snippet ID and version, and position
-   *  of the text snippet within the experience.
+   * @returns {Promise<Object>} The experience_x_textSnippet Object, which
+   *  contains the ID of the document_x_experience, text snippet ID and version,
+   *  and position of the text snippet within the experience.
    */
   static async attachTextSnippetToExperience(
     documentId,
@@ -694,8 +698,8 @@ class ResumeManagerApi {
    * @param {Object} data - Contains info for updating the text snippet.
    * @param {String} [data.type] - Type of content.
    * @param {String} [data.content] - Content of the text snippet.
-   * @returns {Object} All the info of the updated text snippet, such as ID,
-   *  version, parent text snippet, and content.
+   * @returns {Promise<Object>} All the info of the updated text snippet, such
+   *  as ID, version, parent text snippet, and content.
    */
   static async updateExperienceTextSnippet(
     experienceId,
@@ -722,8 +726,9 @@ class ResumeManagerApi {
    *  snippets repositioned.
    * @param {Number[]} textSnippetIds - A list of text snippet IDs in the
    *  desired order.
-   * @returns {Array} A list of TextSnippet Objects in order of position within
-   *  experience and document, each containing text snippet info.
+   * @returns {Promise<Object[]>} A list of TextSnippet Objects in order of
+   *  position within experience and document, each containing text snippet
+   *  info.
    */
   static async repositionExperienceTextSnippets(
     documentId,
