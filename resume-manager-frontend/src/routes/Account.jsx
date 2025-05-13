@@ -76,7 +76,7 @@ function Account() {
                 <b>Old Password</b>
               </Label>
               <Input
-                id="Account__input-password"
+                id="Account__input-old-password"
                 type="password"
                 name="oldPassword"
                 value={formData.oldPassword}
@@ -89,7 +89,7 @@ function Account() {
                 <b>New Password</b>
               </Label>
               <Input
-                id="Account__input-password"
+                id="Account__input-new-password"
                 type="password"
                 name="newPassword"
                 value={formData.newPassword}

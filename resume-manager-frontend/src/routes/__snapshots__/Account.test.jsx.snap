@@ -1,0 +1,93 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Account > matches snapshot. 1`] = `
+<DocumentFragment>
+  <main
+    class="Account"
+  >
+    <div
+      class="card"
+    >
+      <div
+        class="card-body"
+      >
+        <h2
+          class="card-title"
+        >
+          Account
+        </h2>
+        <form
+          class="Account__form"
+        >
+          <div
+            class="text-start mb-3"
+          >
+            <label
+              class="form-label"
+              for="Account__input-old-password"
+            >
+              <b>
+                Old Password
+              </b>
+            </label>
+            <input
+              class="form-control"
+              id="Account__input-old-password"
+              name="oldPassword"
+              required=""
+              type="password"
+              value=""
+            />
+          </div>
+          <div
+            class="text-start mb-3"
+          >
+            <label
+              class="form-label"
+              for="Account__input-new-password"
+            >
+              <b>
+                New Password
+              </b>
+            </label>
+            <input
+              class="form-control"
+              id="Account__input-new-password"
+              name="newPassword"
+              required=""
+              type="password"
+              value=""
+            />
+          </div>
+          <div
+            class="text-start mb-3"
+          >
+            <label
+              class="form-label"
+              for="Account__input-repeated-new-password"
+            >
+              <b>
+                Repeat New Password
+              </b>
+            </label>
+            <input
+              class="form-control"
+              id="Account__input-repeated-new-password"
+              name="repeatedNewPassword"
+              required=""
+              type="password"
+              value=""
+            />
+          </div>
+          <button
+            class="btn btn-primary"
+            type="submit"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+</DocumentFragment>
+`;
