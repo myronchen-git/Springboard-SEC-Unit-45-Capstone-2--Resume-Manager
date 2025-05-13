@@ -1,0 +1,79 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Signin > matches snapshot. 1`] = `
+<DocumentFragment>
+  <main
+    class="Signin"
+  >
+    <div
+      class="Signin__card card"
+    >
+      <div
+        class="card-body"
+      >
+        <h2
+          class="card-title"
+        >
+          Signin
+        </h2>
+        <form
+          class="Signin__form"
+        >
+          <div
+            class="text-start mb-3"
+          >
+            <label
+              class="form-label"
+              for="Signin__input-username"
+            >
+              <b>
+                Username
+              </b>
+            </label>
+            <input
+              class="form-control"
+              id="Signin__input-username"
+              name="username"
+              required=""
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="text-start mb-3"
+          >
+            <label
+              class="form-label"
+              for="Signin__input-password"
+            >
+              <b>
+                Password
+              </b>
+            </label>
+            <input
+              class="form-control"
+              id="Signin__input-password"
+              name="password"
+              required=""
+              type="password"
+              value=""
+            />
+          </div>
+          <button
+            class="btn btn-primary"
+            type="submit"
+          >
+            Submit
+          </button>
+          <button
+            class="btn btn-primary"
+            type="button"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+</DocumentFragment>
+`;
