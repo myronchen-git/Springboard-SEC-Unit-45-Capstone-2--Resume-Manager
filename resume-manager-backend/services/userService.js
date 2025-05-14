@@ -34,7 +34,7 @@ async function createUser(props) {
   // This does not need to be awaited, because the master resume does not need
   // to be used immediately.  The main concern is to create a user account.
   Document.add({
-    documentName: 'Master',
+    documentName: 'Primary',
     owner: props.username,
     isMaster: true,
     isTemplate: false,

@@ -10,7 +10,7 @@ INSERT INTO contact_info VALUES
 -- ==================================================
 
 INSERT INTO documents (document_name, owner, is_master, is_template) VALUES
-    ('Master', 'user1', TRUE, FALSE),
+    ('Primary', 'user1', TRUE, FALSE),
     ('Doc 1', 'user1', FALSE, FALSE),
     ('Doc 1', 'user2', FALSE, FALSE);
 

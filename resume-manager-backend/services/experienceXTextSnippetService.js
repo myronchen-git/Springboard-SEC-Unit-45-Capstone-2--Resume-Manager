@@ -71,7 +71,7 @@ async function createTextSnippet(username, documentId, experienceId, props) {
         'not to the master resume.'
     );
     throw new ForbiddenError(
-      'Text snippet can only be added to the master resume.'
+      'Text snippet can only be added to the primary resume template.'
     );
   }
 

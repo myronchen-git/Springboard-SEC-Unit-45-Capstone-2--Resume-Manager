@@ -67,7 +67,7 @@ async function updateDocument(username, documentId, props) {
           `with ID ${documentId} with properties other than documentName.`
       );
       throw new ArgumentError(
-        'Only document name can be updated for master resumes.'
+        'Only document name can be updated for primary resume templates.'
       );
     }
   }
@@ -95,7 +95,7 @@ async function deleteDocument(username, documentId) {
   await deleteItem(Document, username, { id: documentId }, (document) => {
     if (document.isMaster) {
       logger.error(`${logPrefix}: User attempted to delete the master resume.`);
-      throw new ForbiddenError('Can not delete master resume.');
+      throw new ForbiddenError('Can not delete primary resume template.');
     }
   });
 }

@@ -73,7 +73,7 @@ async function createSectionItem(
         'not to the master resume.'
     );
     throw new ForbiddenError(
-      `${className}s can only be added to the master resume.`
+      `${className}s can only be added to the primary resume template.`
     );
   }
 
