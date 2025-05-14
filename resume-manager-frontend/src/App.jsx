@@ -2,9 +2,9 @@ import { jwtDecode } from 'jwt-decode';
 import { useCallback, useMemo, useState } from 'react';
 
 import ResumeManagerApi from './api.js';
-import Notifications from './components/Notifications.jsx';
+import Notifications from './components/Notifications/Notifications.jsx';
 import { AppContext, UserContext } from './contexts.jsx';
-import useNotifications from './hooks/useNotifications.jsx';
+import useNotifications from './hooks/useNotifications/useNotifications.jsx';
 import RoutesList from './RoutesList.jsx';
 
 import './App.css';

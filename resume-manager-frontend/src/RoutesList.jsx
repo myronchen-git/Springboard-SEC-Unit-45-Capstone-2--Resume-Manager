@@ -1,11 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import NavBar from './components/NavBar.jsx';
-import Account from './routes/Account.jsx';
-import Document from './routes/Document.jsx';
-import HomePage from './routes/HomePage.jsx';
-import Register from './routes/Register.jsx';
-import Signin from './routes/Signin.jsx';
+import NavBar from './components/NavBar/NavBar.jsx';
+import Account from './routes/Account/Account.jsx';
+import Document from './routes/Document/Document.jsx';
+import HomePage from './routes/HomePage/HomePage.jsx';
+import Register from './routes/Register/Register.jsx';
+import Signin from './routes/Signin/Signin.jsx';
 import RouteProtector from './routes/middleware/RouteProtector.jsx';
 
 // ==================================================
