@@ -79,7 +79,7 @@ function AttachTextSnippetCard() {
                 onChange={handleChange}
               >
                 <option value="" disabled>
-                  Choose a text
+                  Choose an achievement
                 </option>
                 {availableTextSnippets &&
                   availableTextSnippets.map((textSnippet) => {
@@ -101,7 +101,7 @@ function AttachTextSnippetCard() {
         </>
       ) : (
         <CardBody tag="section" onClick={toggleOpen}>
-          Attach Text
+          Attach Achievement
           <br />+
         </CardBody>
       )}
