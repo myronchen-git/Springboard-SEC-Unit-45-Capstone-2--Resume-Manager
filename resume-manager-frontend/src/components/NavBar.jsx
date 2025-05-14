@@ -39,7 +39,6 @@ function NavBar() {
         isOpen={isOpen}
         toggle={toggleNavbar}
         direction="start"
-        backdrop={false}
         tag="aside"
       >
         <OffcanvasHeader toggle={toggleNavbar} wrapTag="header">
