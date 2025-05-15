@@ -1,9 +1,12 @@
 # Resume Manager
 
-https://myron-chen-resume-manager-frontend.onrender.com/  
+https://myron-chen-resume-manager-frontend.onrender.com  
 https://myron-chen-resume-manager-backend.onrender.com
 
 Create and manage multiple resumes from one template.
+
+<img src="readme_files/home_page.jpg" alt="Home page" width="600"/>
+<img src="readme_files/resume_page.png" alt="Resume page" width="600"/>
 
 ## Overview
 
