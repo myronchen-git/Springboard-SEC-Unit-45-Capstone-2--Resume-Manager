@@ -4,6 +4,8 @@ https://myron-chen-resume-manager-frontend.onrender.com
 
 https://myron-chen-resume-manager-backend.onrender.com
 
+https://github.com/myronchen-git/Springboard-SEC-Unit-45-Capstone-2--Resume-Manager
+
 Create and manage multiple resumes from one template.
 
 <img src="readme_files/home_page.jpg" alt="Home page" width="600"/>
