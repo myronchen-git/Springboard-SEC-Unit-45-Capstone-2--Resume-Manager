@@ -1,0 +1,7 @@
+{
+  "primary": { "src": "resume_page.png", "alt": "Resume page" },
+  "all": [
+    { "src": "home_page.jpg", "alt": "Home page" },
+    { "src": "resume_page.png", "alt": "Resume page" }
+  ]
+}
